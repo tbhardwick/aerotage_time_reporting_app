@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+  <title>Electron macOS Template</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Custom title bar for macOS -->
+    <div class="title-bar">
+      <div class="title-bar-content">
+        <h1 class="app-title">Electron macOS Template</h1>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <main class="main-content">
+      <div class="container">
+        <div class="welcome-section">
+          <div class="app-icon">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="64" height="64" rx="12" fill="url(#gradient)"/>
+              <path d="M32 16L48 32L32 48L16 32L32 16Z" fill="white" fill-opacity="0.9"/>
+              <defs>
+                <linearGradient id="gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#007AFF"/>
+                  <stop offset="1" stop-color="#5856D6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          
+          <h2>Welcome to Electron</h2>
+          <p class="subtitle">A modern macOS app template built with Electron</p>
+          
+          <div class="features">
+            <div class="feature">
+              <div class="feature-icon">🚀</div>
+              <h3>Modern Architecture</h3>
+              <p>Built with security best practices and modern Electron APIs</p>
+            </div>
+            
+            <div class="feature">
+              <div class="feature-icon">🎨</div>
+              <h3>macOS Native Feel</h3>
+              <p>Optimized for macOS with native styling and behaviors</p>
+            </div>
+            
+            <div class="feature">
+              <div class="feature-icon">⚡</div>
+              <h3>Developer Ready</h3>
+              <p>Hot reload, auto-updates, and comprehensive tooling included</p>
+            </div>
+          </div>
+          
+          <div class="actions">
+            <button id="openFile" class="btn btn-primary">Open File</button>
+            <button id="showPreferences" class="btn btn-secondary">Preferences</button>
+          </div>
+          
+          <div class="info">
+            <div class="info-item">
+              <span class="label">Platform:</span>
+              <span id="platform">Loading...</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Version:</span>
+              <span id="version">Loading...</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Theme:</span>
+              <span id="theme">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="scripts/renderer.js"></script>
+</body>
+</html> 
