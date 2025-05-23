@@ -12,6 +12,13 @@ export interface TimeEntry {
   isBillable: boolean;
   status: 'draft' | 'submitted' | 'approved' | 'rejected';
   createdAt: string;
+  // Approval workflow fields
+  submittedAt?: string;
+  submittedBy?: string;
+  approverId?: string;
+  approvedAt?: string;
+  rejectedAt?: string;
+  comment?: string; // Approval/rejection comment
 }
 
 export interface Client {
@@ -98,6 +105,12 @@ type AppAction =
   | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
   | { type: 'DELETE_TIME_ENTRY'; payload: string }
   
+  // Approval Workflow Actions
+  | { type: 'SUBMIT_TIME_ENTRIES'; payload: string[] } // Array of time entry IDs
+  | { type: 'APPROVE_TIME_ENTRIES'; payload: { ids: string[]; approverId: string; comment?: string } }
+  | { type: 'REJECT_TIME_ENTRIES'; payload: { ids: string[]; approverId: string; comment: string } }
+  | { type: 'BULK_UPDATE_TIME_ENTRY_STATUS'; payload: { ids: string[]; status: TimeEntry['status']; userId?: string; comment?: string } }
+  
   // Timer Actions
   | { type: 'START_TIMER'; payload: { projectId: string; description: string } }
   | { type: 'STOP_TIMER' }
@@ -144,6 +157,84 @@ const initialState: AppState = {
       isBillable: true,
       status: 'draft',
       createdAt: new Date().toISOString(),
+    },
+    // Submitted entries for approval workflow testing
+    {
+      id: '2',
+      projectId: '2',
+      date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
+      duration: 180,
+      description: 'Mobile app wireframes and user flow design',
+      isBillable: true,
+      status: 'submitted',
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      submittedAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+      submittedBy: '3', // Bob Johnson (employee)
+    },
+    {
+      id: '3',
+      projectId: '1',
+      date: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
+      duration: 240,
+      description: 'Client meeting and requirements gathering',
+      isBillable: true,
+      status: 'submitted',
+      createdAt: new Date(Date.now() - 172800000).toISOString(),
+      submittedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+      submittedBy: '3', // Bob Johnson (employee)
+    },
+    // Approved entry
+    {
+      id: '4',
+      projectId: '3',
+      date: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
+      duration: 300,
+      description: 'Logo concepts and brand color exploration',
+      isBillable: true,
+      status: 'approved',
+      createdAt: new Date(Date.now() - 259200000).toISOString(),
+      submittedAt: new Date(Date.now() - 86400000).toISOString(),
+      submittedBy: '3', // Bob Johnson (employee)
+      approverId: '2', // Jane Smith (manager)
+      approvedAt: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
+      comment: 'Great work on the logo concepts!',
+    },
+    // Rejected entry
+    {
+      id: '5',
+      projectId: '2',
+      date: new Date(Date.now() - 345600000).toISOString().split('T')[0], // 4 days ago
+      duration: 60,
+      description: 'Internal team meeting',
+      isBillable: false,
+      status: 'rejected',
+      createdAt: new Date(Date.now() - 345600000).toISOString(),
+      submittedAt: new Date(Date.now() - 259200000).toISOString(),
+      submittedBy: '3', // Bob Johnson (employee)
+      approverId: '2', // Jane Smith (manager)
+      rejectedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      comment: 'This should not be billable to the client. Please resubmit as non-billable time.',
+    },
+    // More draft entries for testing bulk submission
+    {
+      id: '6',
+      projectId: '1',
+      date: new Date().toISOString().split('T')[0],
+      duration: 90,
+      description: 'Code review and testing',
+      isBillable: true,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: '7',
+      projectId: '3',
+      date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
+      duration: 150,
+      description: 'Typography selection and layout design',
+      isBillable: true,
+      status: 'draft',
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
     },
   ],
   clients: [
@@ -334,6 +425,80 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         timeEntries: state.timeEntries.filter(entry => entry.id !== action.payload),
+      };
+
+    // Approval Workflow Actions
+    case 'SUBMIT_TIME_ENTRIES':
+      return {
+        ...state,
+        timeEntries: state.timeEntries.map(entry =>
+          action.payload.includes(entry.id)
+            ? { 
+                ...entry, 
+                status: 'submitted', 
+                submittedAt: new Date().toISOString(),
+                submittedBy: state.user?.id 
+              }
+            : entry
+        ),
+      };
+
+    case 'APPROVE_TIME_ENTRIES':
+      return {
+        ...state,
+        timeEntries: state.timeEntries.map(entry =>
+          action.payload.ids.includes(entry.id)
+            ? { 
+                ...entry, 
+                status: 'approved', 
+                approverId: action.payload.approverId, 
+                approvedAt: new Date().toISOString(),
+                comment: action.payload.comment 
+              }
+            : entry
+        ),
+      };
+
+    case 'REJECT_TIME_ENTRIES':
+      return {
+        ...state,
+        timeEntries: state.timeEntries.map(entry =>
+          action.payload.ids.includes(entry.id)
+            ? { 
+                ...entry, 
+                status: 'rejected', 
+                approverId: action.payload.approverId, 
+                rejectedAt: new Date().toISOString(),
+                comment: action.payload.comment 
+              }
+            : entry
+        ),
+      };
+
+    case 'BULK_UPDATE_TIME_ENTRY_STATUS':
+      return {
+        ...state,
+        timeEntries: state.timeEntries.map(entry =>
+          action.payload.ids.includes(entry.id)
+            ? { 
+                ...entry, 
+                status: action.payload.status,
+                comment: action.payload.comment,
+                ...(action.payload.status === 'submitted' && {
+                  submittedAt: new Date().toISOString(),
+                  submittedBy: action.payload.userId
+                }),
+                ...(action.payload.status === 'approved' && {
+                  approverId: action.payload.userId,
+                  approvedAt: new Date().toISOString()
+                }),
+                ...(action.payload.status === 'rejected' && {
+                  approverId: action.payload.userId,
+                  rejectedAt: new Date().toISOString()
+                })
+              }
+            : entry
+        ),
       };
 
     // Timer Actions
