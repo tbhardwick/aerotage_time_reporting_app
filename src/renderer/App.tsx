@@ -6,6 +6,7 @@ import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
 import Reports from './pages/Reports';
 import Invoices from './pages/Invoices';
+import Users from './pages/Users';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const Dashboard: React.FC = () => (
@@ -40,6 +41,14 @@ const Dashboard: React.FC = () => (
         <div className="text-2xl mb-2">📊</div>
         <h3 className="font-semibold mb-2">Reports</h3>
         <p className="text-sm text-purple-100">Generate insights and export data</p>
+      </Link>
+      <Link 
+        to="/users" 
+        className="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
+      >
+        <div className="text-2xl mb-2">👥</div>
+        <h3 className="font-semibold mb-2">User Management</h3>
+        <p className="text-sm text-indigo-100">Manage users, roles, and permissions</p>
       </Link>
     </div>
   </div>
@@ -80,6 +89,7 @@ const Navigation: React.FC = () => (
             <NavLink to="/approvals" icon="✅">Approvals</NavLink>
             <NavLink to="/reports" icon="📊">Reports</NavLink>
             <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+            <NavLink to="/users" icon="👥">Users</NavLink>
           </div>
         </div>
       </div>
@@ -102,6 +112,7 @@ const App: React.FC = () => {
                 <Route path="/approvals" element={<Approvals />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/invoices" element={<Invoices />} />
+                <Route path="/users" element={<Users />} />
               </Routes>
             </main>
           </div>

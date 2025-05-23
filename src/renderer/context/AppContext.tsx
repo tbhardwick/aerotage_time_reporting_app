@@ -60,18 +60,47 @@ export interface User {
   role: 'admin' | 'manager' | 'employee';
   hourlyRate?: number;
   teamId?: string;
+  department?: string;
   isActive: boolean;
+  contactInfo?: {
+    phone?: string;
+    address?: string;
+    emergencyContact?: string;
+  };
+  profilePicture?: string;
+  jobTitle?: string;
+  startDate: string;
+  lastLogin?: string;
+  permissions: {
+    features: string[]; // e.g., ['timeTracking', 'approvals', 'reporting', 'invoicing', 'userManagement']
+    projects: string[]; // Project IDs user has access to
+  };
+  preferences: {
+    theme: 'light' | 'dark';
+    notifications: boolean;
+    timezone: string;
+  };
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
 }
 
 export interface Team {
   id: string;
   name: string;
+  description?: string;
   managerId: string;
   memberIds: string[];
+  department?: string;
+  parentTeamId?: string; // For hierarchical team structure
+  permissions: {
+    defaultRole: 'manager' | 'employee';
+    projectAccess: string[]; // Project IDs this team has access to
+  };
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
 }
 
 export interface TimerState {
@@ -113,6 +142,10 @@ export interface AppState {
   users: User[];
   teams: Team[];
   invoices: Invoice[];
+  userSessions: UserSession[];
+  userInvitations: UserInvitation[];
+  userActivity: UserActivity[];
+  permissions: PermissionMatrix;
   timer: TimerState;
   user: User | null;
   loading: {
@@ -362,9 +395,29 @@ const initialState: AppState = {
       name: 'John Doe',
       role: 'admin',
       hourlyRate: 150,
+      department: 'Administration',
       isActive: true,
+      contactInfo: {
+        phone: '+1 (555) 123-4567',
+        address: '123 Admin St, Suite 100, New York, NY 10001',
+        emergencyContact: 'Jane Doe (Spouse) - +1 (555) 123-4568',
+      },
+      profilePicture: undefined,
+      jobTitle: 'System Administrator',
+      startDate: new Date(Date.now() - 31536000000).toISOString(), // 1 year ago
+      lastLogin: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+      permissions: {
+        features: ['timeTracking', 'approvals', 'reporting', 'invoicing', 'userManagement', 'projectManagement'],
+        projects: ['1', '2', '3'], // Access to all projects
+      },
+      preferences: {
+        theme: 'light',
+        notifications: true,
+        timezone: 'America/New_York',
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      createdBy: '1', // Self-created (admin)
     },
     {
       id: '2',
@@ -373,9 +426,29 @@ const initialState: AppState = {
       role: 'manager',
       hourlyRate: 125,
       teamId: '1',
+      department: 'Design',
       isActive: true,
+      contactInfo: {
+        phone: '+1 (555) 234-5678',
+        address: '456 Design Ave, Suite 200, San Francisco, CA 94105',
+        emergencyContact: 'Mike Smith (Husband) - +1 (555) 234-5679',
+      },
+      profilePicture: undefined,
+      jobTitle: 'Design Team Manager',
+      startDate: new Date(Date.now() - 15768000000).toISOString(), // 6 months ago
+      lastLogin: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
+      permissions: {
+        features: ['timeTracking', 'approvals', 'reporting', 'projectManagement'],
+        projects: ['1', '2', '3'], // Access to team projects
+      },
+      preferences: {
+        theme: 'dark',
+        notifications: true,
+        timezone: 'America/Los_Angeles',
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      createdBy: '1', // Created by admin
     },
     {
       id: '3',
@@ -384,19 +457,48 @@ const initialState: AppState = {
       role: 'employee',
       hourlyRate: 100,
       teamId: '1',
+      department: 'Design',
       isActive: true,
+      contactInfo: {
+        phone: '+1 (555) 345-6789',
+        address: '789 Creative Blvd, Austin, TX 73301',
+        emergencyContact: 'Alice Johnson (Sister) - +1 (555) 345-6790',
+      },
+      profilePicture: undefined,
+      jobTitle: 'UI/UX Designer',
+      startDate: new Date(Date.now() - 7884000000).toISOString(), // 3 months ago
+      lastLogin: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
+      permissions: {
+        features: ['timeTracking'],
+        projects: ['1', '2', '3'], // Access to assigned projects
+      },
+      preferences: {
+        theme: 'light',
+        notifications: false,
+        timezone: 'America/Chicago',
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      createdBy: '1', // Created by admin
     },
   ],
   teams: [
     {
       id: '1',
       name: 'Design Team',
+      description: 'Responsible for UI/UX design and visual elements',
       managerId: '2',
       memberIds: ['2', '3'],
+      department: 'Design',
+      parentTeamId: undefined,
+      permissions: {
+        defaultRole: 'employee',
+        projectAccess: ['1', '2', '3'],
+      },
+      isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      createdBy: '1', // Created by admin
     },
   ],
   invoices: [
@@ -432,7 +534,15 @@ const initialState: AppState = {
     name: 'John Doe',
     role: 'admin',
     hourlyRate: 150,
+    department: 'Administration',
     isActive: true,
+    contactInfo: {
+      phone: '+1 (555) 123-4567',
+      address: '123 Admin St, Suite 100, New York, NY 10001',
+      emergencyContact: 'Jane Doe (Spouse) - +1 (555) 123-4568',
+    },
+    profilePicture: undefined,
+    jobTitle: 'System Administrator',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -900,4 +1010,77 @@ export function useAppContext() {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
+}
+
+// ✅ NEW - Phase 8 User Management Interfaces
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  loginTime: string;
+  lastActivity: string;
+  ipAddress: string;
+  userAgent: string;
+  isActive: boolean;
+  logoutTime?: string;
+  securityFlags: {
+    mfaVerified: boolean;
+    passwordChangeRequired: boolean;
+  };
+}
+
+export interface UserInvitation {
+  id: string;
+  email: string;
+  invitedBy: string; // User ID of inviter
+  role: 'admin' | 'manager' | 'employee';
+  teamId?: string;
+  status: 'pending' | 'accepted' | 'expired' | 'cancelled';
+  invitationToken: string;
+  expiresAt: string;
+  acceptedAt?: string;
+  onboardingCompleted: boolean;
+  createdAt: string;
+}
+
+export interface UserActivity {
+  id: string;
+  userId: string;
+  action: string; // e.g., 'login', 'logout', 'create_project', 'approve_timesheet'
+  resource: string; // e.g., 'user', 'project', 'timesheet', 'invoice'
+  timestamp: string;
+  details: {
+    oldValue?: any;
+    newValue?: any;
+    metadata?: Record<string, any>;
+  };
+  ipAddress: string;
+  userAgent: string;
+  sessionId: string;
+}
+
+export interface PermissionMatrix {
+  roles: {
+    admin: {
+      features: string[];
+      permissions: Record<string, boolean>;
+    };
+    manager: {
+      features: string[];
+      permissions: Record<string, boolean>;
+    };
+    employee: {
+      features: string[];
+      permissions: Record<string, boolean>;
+    };
+  };
+  features: {
+    timeTracking: boolean;
+    approvals: boolean;
+    reporting: boolean;
+    invoicing: boolean;
+    userManagement: boolean;
+    projectManagement: boolean;
+    clientManagement: boolean;
+  };
 } 
