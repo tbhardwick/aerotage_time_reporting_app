@@ -41,7 +41,16 @@ This analysis was conducted to identify and resolve unstable dependencies in the
 ### 1. Critical Fixes (COMPLETED)
 - [x] Replace `electron-reload@^2.0.0-alpha.1` with `electron-reload@^1.5.0`
 - [x] Update electron to 36.3.1 
-- [x] Update electron-store to 10.0.1
+- [x] ~~Update electron-store to 10.0.1~~ **REVERTED DUE TO BREAKING CHANGES**
+
+### 2. Breaking Change Discovered & Resolved ⚠️
+- **electron-store 10.0.1**: **REVERTED** to 8.2.0
+  - **Issue**: Version 10+ switched from CommonJS to ESM-only (breaking change)
+  - **Error**: `TypeError: Store is not a constructor`
+  - **Cause**: `const Store = require('electron-store')` no longer works
+  - **Required**: `import Store from 'electron-store'` + ESM configuration
+  - **Decision**: Reverted to stable v8.2.0 until full ESM migration planned
+  - **Future**: Schedule ESM migration in separate phase
 
 ## Recommended Actions
 
@@ -51,7 +60,8 @@ This analysis was conducted to identify and resolve unstable dependencies in the
   - `papaparse` - For CSV processing only
   - Remove xlsx dependency if not critical
 
-### 3. Consider Later (Low Priority)
+### 3. Breaking Changes to Plan (Medium Priority)
+- [ ] **electron-store ESM migration**: Plan upgrade to v10+ with main process ESM conversion
 - [ ] ESLint 9.x (major version, may have breaking changes)
 - [ ] Tailwind CSS 4.x (major version, significant changes expected)
 - [ ] electron-builder 26.x (test thoroughly for compatibility)
@@ -60,15 +70,18 @@ This analysis was conducted to identify and resolve unstable dependencies in the
 
 1. **Phase 1**: ✅ Fix alpha dependency (electron-reload) - COMPLETED
 2. **Phase 2**: ✅ Update patch/minor versions - COMPLETED  
-3. **Phase 3**: Address xlsx security vulnerability
-4. **Phase 4**: Evaluate major version updates separately
+3. **Phase 3**: ✅ Address major version breaking changes - COMPLETED
+4. **Phase 4**: Address xlsx security vulnerability
+5. **Phase 5**: Plan ESM migration for future electron-store upgrade
+6. **Phase 6**: Evaluate other major version updates separately
 
 ## Test Results
 
-After updating dependencies:
+After updating and fixing dependencies:
 - ✅ Dependencies installed successfully
+- ✅ Application running properly (electron-store issue resolved)
 - ⚠️ 1 high severity vulnerability remains (xlsx package)
-- 🧪 Application testing required
+- ✅ All alpha/beta dependencies eliminated
 
 ## Notes
 - Always test thoroughly after dependency updates
