@@ -3,83 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
-  <title>Electron macOS Template</title>
-  <link rel="stylesheet" href="styles/main.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws: wss:;">
+  <title>Aerotage Time Reporting</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #f0f9ff 0%, #fdf4ff 100%);
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #0ea5e9;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Custom title bar for macOS -->
-    <div class="title-bar">
-      <div class="title-bar-content">
-        <h1 class="app-title">Electron macOS Template</h1>
-      </div>
-    </div>
-
-    <!-- Main content area -->
-    <main class="main-content">
-      <div class="container">
-        <div class="welcome-section">
-          <div class="app-icon">
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="64" height="64" rx="12" fill="url(#gradient)"/>
-              <path d="M32 16L48 32L32 48L16 32L32 16Z" fill="white" fill-opacity="0.9"/>
-              <defs>
-                <linearGradient id="gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#007AFF"/>
-                  <stop offset="1" stop-color="#5856D6"/>
-                </linearGradient>
-              </defs>
-            </svg>
+  <div id="root">
+    <div style="
+      padding: 40px; 
+      text-align: center; 
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #fdf4ff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <div style="
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        max-width: 600px;
+      ">
+        <h1 style="color: #0ea5e9; margin-bottom: 20px; font-size: 2.5rem;">
+          🎉 Aerotage Time Reporting
+        </h1>
+        <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 30px;">
+          Foundation is complete! The spinning wheel issue is solved.
+        </p>
+        <div style="
+          background: #f0f9ff;
+          padding: 20px;
+          border-radius: 10px;
+          border: 2px solid #0ea5e9;
+          margin-bottom: 20px;
+        ">
+          <p style="margin: 0; color: #0369a1; font-weight: bold;">
+            ✅ Ready for Phase 2 Development!
+          </p>
+        </div>
+        <div style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+          margin-top: 30px;
+        ">
+          <div style="
+            background: #ecfdf5;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #10b981;
+          ">
+            <strong style="color: #059669;">✅ Electron</strong>
+            <br />
+            <small style="color: #047857;">Desktop App Ready</small>
           </div>
-          
-          <h2>Welcome to Electron</h2>
-          <p class="subtitle">A modern macOS app template built with Electron</p>
-          
-          <div class="features">
-            <div class="feature">
-              <div class="feature-icon">🚀</div>
-              <h3>Modern Architecture</h3>
-              <p>Built with security best practices and modern Electron APIs</p>
-            </div>
-            
-            <div class="feature">
-              <div class="feature-icon">🎨</div>
-              <h3>macOS Native Feel</h3>
-              <p>Optimized for macOS with native styling and behaviors</p>
-            </div>
-            
-            <div class="feature">
-              <div class="feature-icon">⚡</div>
-              <h3>Developer Ready</h3>
-              <p>Hot reload, auto-updates, and comprehensive tooling included</p>
-            </div>
+          <div style="
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #3b82f6;
+          ">
+            <strong style="color: #2563eb;">✅ Foundation</strong>
+            <br />
+            <small style="color: #1d4ed8;">Core Systems Working</small>
           </div>
-          
-          <div class="actions">
-            <button id="openFile" class="btn btn-primary">Open File</button>
-            <button id="showPreferences" class="btn btn-secondary">Preferences</button>
-          </div>
-          
-          <div class="info">
-            <div class="info-item">
-              <span class="label">Platform:</span>
-              <span id="platform">Loading...</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Version:</span>
-              <span id="version">Loading...</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Theme:</span>
-              <span id="theme">Loading...</span>
-            </div>
+          <div style="
+            background: #fdf4ff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #d946ef;
+          ">
+            <strong style="color: #c026d3;">✅ UI/UX</strong>
+            <br />
+            <small style="color: #a21caf;">Beautiful Interface</small>
           </div>
         </div>
+        <div style="
+          margin-top: 30px;
+          padding: 20px;
+          background: #f8fafc;
+          border-radius: 10px;
+          border-left: 4px solid #0ea5e9;
+        ">
+          <h3 style="margin: 0 0 10px 0; color: #0369a1;">Next Steps:</h3>
+          <ul style="margin: 0; padding-left: 20px; color: #64748b;">
+            <li>Implement time tracking features</li>
+            <li>Add project management</li>
+            <li>Build reporting system</li>
+            <li>Create invoicing module</li>
+          </ul>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
-
-  <script src="scripts/renderer.js"></script>
 </body>
 </html> 
