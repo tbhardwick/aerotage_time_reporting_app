@@ -82,12 +82,37 @@ export interface TimerState {
   elapsedTime: number;
 }
 
+// Invoice Types
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  clientId: string;
+  projectIds: string[];
+  timeEntryIds: string[];
+  amount: number;
+  tax?: number;
+  totalAmount: number;
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  issueDate: string;
+  dueDate: string;
+  sentDate?: string;
+  paidDate?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Populated fields
+  client?: Client;
+  projects?: Project[];
+  timeEntries?: TimeEntry[];
+}
+
 export interface AppState {
   timeEntries: TimeEntry[];
   projects: Project[];
   clients: Client[];
   users: User[];
   teams: Team[];
+  invoices: Invoice[];
   timer: TimerState;
   user: User | null;
   loading: {
@@ -140,6 +165,13 @@ type AppAction =
   | { type: 'UPDATE_TEAM'; payload: { id: string; updates: Partial<Team> } }
   | { type: 'DELETE_TEAM'; payload: string }
   | { type: 'SET_TEAMS'; payload: Team[] }
+  
+  // Invoice Actions
+  | { type: 'ADD_INVOICE'; payload: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'UPDATE_INVOICE'; payload: { id: string; updates: Partial<Invoice> } }
+  | { type: 'DELETE_INVOICE'; payload: string }
+  | { type: 'SET_INVOICES'; payload: Invoice[] }
+  | { type: 'GENERATE_INVOICE'; payload: { clientId: string; timeEntryIds: string[]; projectIds: string[]; dueDate: string; notes?: string } }
   
   // UI State Actions
   | { type: 'SET_LOADING'; payload: { key: string; loading: boolean } }
@@ -365,6 +397,26 @@ const initialState: AppState = {
       memberIds: ['2', '3'],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+    },
+  ],
+  invoices: [
+    // Mock invoice data for development
+    {
+      id: '1',
+      invoiceNumber: 'INV-2024-001',
+      clientId: '1',
+      projectIds: ['1'],
+      timeEntryIds: ['4'], // Approved entry
+      amount: 750.00, // 5 hours at $150/hr
+      tax: 75.00, // 10% tax
+      totalAmount: 825.00,
+      status: 'sent',
+      issueDate: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
+      dueDate: new Date(Date.now() + 1296000000).toISOString().split('T')[0], // 15 days from now
+      sentDate: new Date(Date.now() - 172800000).toISOString(),
+      notes: 'Logo design and brand exploration work',
+      createdAt: new Date(Date.now() - 172800000).toISOString(),
+      updatedAt: new Date(Date.now() - 172800000).toISOString(),
     },
   ],
   timer: {
@@ -722,6 +774,82 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         teams: action.payload,
+      };
+
+    // Invoice Actions
+    case 'ADD_INVOICE':
+      return {
+        ...state,
+        invoices: [
+          ...state.invoices,
+          {
+            ...action.payload,
+            id: Date.now().toString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+      };
+
+    case 'UPDATE_INVOICE':
+      return {
+        ...state,
+        invoices: state.invoices.map(invoice =>
+          invoice.id === action.payload.id
+            ? { ...invoice, ...action.payload.updates, updatedAt: new Date().toISOString() }
+            : invoice
+        ),
+      };
+
+    case 'DELETE_INVOICE':
+      return {
+        ...state,
+        invoices: state.invoices.filter(invoice => invoice.id !== action.payload),
+      };
+
+    case 'SET_INVOICES':
+      return {
+        ...state,
+        invoices: action.payload,
+      };
+
+    case 'GENERATE_INVOICE':
+      // Calculate the total amount from time entries
+      const relatedTimeEntries = state.timeEntries.filter(entry => 
+        action.payload.timeEntryIds.includes(entry.id)
+      );
+      const totalHours = relatedTimeEntries.reduce((sum, entry) => sum + entry.duration, 0) / 60; // Convert minutes to hours
+      const project = state.projects.find(p => action.payload.projectIds.includes(p.id));
+      const hourlyRate = project?.hourlyRate || 100;
+      const baseAmount = totalHours * hourlyRate;
+      const tax = baseAmount * 0.1; // 10% tax
+      const totalAmount = baseAmount + tax;
+      
+      // Generate invoice number
+      const invoiceCount = state.invoices.length + 1;
+      const year = new Date().getFullYear();
+      const invoiceNumber = `INV-${year}-${String(invoiceCount).padStart(3, '0')}`;
+      
+      const newInvoice: Invoice = {
+        id: Date.now().toString(),
+        invoiceNumber,
+        clientId: action.payload.clientId,
+        projectIds: action.payload.projectIds,
+        timeEntryIds: action.payload.timeEntryIds,
+        amount: baseAmount,
+        tax,
+        totalAmount,
+        status: 'draft',
+        issueDate: new Date().toISOString().split('T')[0],
+        dueDate: action.payload.dueDate,
+        notes: action.payload.notes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      return {
+        ...state,
+        invoices: [...state.invoices, newInvoice],
       };
 
     // UI State Actions
