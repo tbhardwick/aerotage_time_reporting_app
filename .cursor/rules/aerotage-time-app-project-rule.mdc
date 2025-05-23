@@ -19,6 +19,73 @@ You are developing the Aerotage Time Reporting Application, a professional deskt
 - **Charts**: Chart.js with react-chartjs-2
 - **Backend**: AWS Serverless (Cognito, API Gateway, Lambda, DynamoDB)
 
+### Dependency Management Rules ⚠️ CRITICAL
+**STABILITY FIRST**: Only stable, production-ready dependencies are allowed in this project.
+
+#### Forbidden Dependency Versions
+- **Alpha releases** (e.g., `2.0.0-alpha.1`) ❌
+- **Beta releases** (e.g., `3.0.0-beta.2`) ❌  
+- **Release candidates** (e.g., `1.5.0-rc.1`) ❌
+- **Pre-release versions** (e.g., `4.0.0-pre.3`) ❌
+- **Canary builds** (e.g., `1.2.0-canary.45`) ❌
+- **Next tags** (e.g., `@next`) ❌
+- **Dev builds** (e.g., `2.1.0-dev.1`) ❌
+- **Snapshot versions** (e.g., `1.0.0-SNAPSHOT`) ❌
+
+#### Required Dependency Practices
+1. **Stability Check**: Run `npm run check-deps` before any dependency changes
+2. **Documentation**: Reference `DEPENDENCY_ANALYSIS.md` for guidelines
+3. **Version Pinning**: Use caret ranges (`^1.2.3`) for stable dependencies only
+4. **Security Audits**: Run `npm audit` and address vulnerabilities immediately
+5. **Update Strategy**: Only update to latest stable versions after testing
+6. **Branch Testing**: Test dependency updates in feature branches first
+
+#### Dependency Installation Process
+```bash
+# 1. Check current dependencies are stable
+npm run check-deps
+
+# 2. Install new dependency (stable version only)
+npm install package@^1.2.3  # Use latest stable version
+
+# 3. Re-check for any unstable dependencies
+npm run check-deps
+
+# 4. Run security audit
+npm audit
+
+# 5. Test application thoroughly
+npm run dev && npm test
+```
+
+#### Monitoring and Maintenance
+- **Before each commit**: Run `npm run check-deps`
+- **Weekly**: Run `npm audit` for security vulnerabilities
+- **Monthly**: Check for stable updates to outdated packages with `npm outdated`
+- **Before releases**: Full dependency stability and security review
+- **CI/CD Integration**: Automated stability checks in pipeline
+
+#### Exception Handling
+If unstable dependencies are unavoidable:
+1. Document the business justification in `DEPENDENCY_ANALYSIS.md`
+2. Create isolated testing environment
+3. Implement fallback strategies
+4. Plan migration path to stable version
+5. Get team approval before merging
+6. Add to monitoring for stable releases
+
+#### Current Known Issues
+- **xlsx package**: Known security vulnerabilities with no upstream fix
+  - **Risk**: Prototype Pollution & ReDoS attacks
+  - **Alternatives**: Consider `exceljs`, `papaparse`, or remove if non-critical
+  - **Action**: Monitor for security updates, document risk acceptance
+
+#### Tools and Scripts
+- **`npm run check-deps`**: Automated unstable dependency detection
+- **`scripts/check-stable-deps.js`**: Custom stability validation script
+- **`DEPENDENCY_ANALYSIS.md`**: Comprehensive dependency documentation
+- **`README_DEPENDENCY_ANALYSIS.md`**: Quick reference guide
+
 ### File Structure Rules
 ```
 src/
@@ -313,6 +380,11 @@ type AppAction =
 - Use Context outside of AppProvider
 - Mutate Context state directly
 - Use Redux or other state management libraries
+- **Install alpha, beta, or RC dependencies** ❌
+- **Skip `npm run check-deps` before dependency changes** ❌
+- **Ignore security vulnerabilities from `npm audit`** ❌
+- **Use exact versions without caret (^) for stable deps** ❌
+- **Install dependencies without testing in feature branch** ❌
 
 ### Always Do
 - Follow the established file structure
@@ -328,6 +400,12 @@ type AppAction =
 - Wrap components with AppProvider when needed
 - Use useAppContext() hook for state access
 - Dispatch actions for state updates
+- **Run `npm run check-deps` before any dependency changes** ✅
+- **Check `DEPENDENCY_ANALYSIS.md` for dependency guidance** ✅
+- **Use stable versions only (^1.2.3 format)** ✅
+- **Run `npm audit` weekly for security issues** ✅
+- **Test dependency updates in feature branches** ✅
+- **Document any unavoidable unstable dependencies** ✅
 
 ## Phase-Specific Focus
 
@@ -349,3 +427,4 @@ When working on specific development phases, prioritize:
 - **Phase 6+**: Add invoice state and generation logic
 
 Remember: This is a professional business application that needs to be reliable, secure, and user-friendly. Every feature should be implemented with production quality in mind. The React Context implementation provides a solid foundation for state management while remaining simple and maintainable. 
+
