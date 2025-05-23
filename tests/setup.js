@@ -110,6 +110,20 @@ global.mockElectron = {
   }
 };
 
+// Mock window.electronAPI
+global.electronAPI = {
+  getAppInfo: jest.fn(() => Promise.resolve({
+    name: 'Test App',
+    version: '1.0.0'
+  })),
+  openExternal: jest.fn(),
+  showMessageBox: jest.fn(),
+  store: {
+    set: jest.fn().mockResolvedValue(),
+    get: jest.fn().mockResolvedValue('test-value'),
+  }
+};
+
 // Setup DOM environment for renderer tests
 if (typeof window !== 'undefined') {
   // Mock window.electronAPI for renderer tests
@@ -121,4 +135,25 @@ if (typeof window !== 'undefined') {
     openExternal: jest.fn(),
     showMessageBox: jest.fn(),
   };
-} 
+}
+
+// Setup testing-library
+require('@testing-library/jest-dom');
+
+// Global test setup for Electron and Node.js testing environment
+
+// Mock console methods to keep test output clean
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+global.console = {
+  ...console,
+  log: jest.fn(originalLog),
+  error: jest.fn(originalError),
+  warn: jest.fn(originalWarn),
+};
+
+// Polyfills for Web APIs that may be missing in Node environment
+global.TextEncoder = global.TextEncoder || require('util').TextEncoder;
+global.TextDecoder = global.TextDecoder || require('util').TextDecoder; 

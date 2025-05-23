@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import TimeTrackingNew from './pages/TimeTrackingNew';
 import Projects from './pages/Projects';
@@ -9,104 +9,80 @@ import Invoices from './pages/Invoices';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const Dashboard: React.FC = () => (
-  <div style={{ padding: '2rem', textAlign: 'center' }}>
-    <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Dashboard</h1>
-    <p style={{ color: '#666', marginBottom: '2rem' }}>Welcome to your time tracking dashboard</p>
-    <Link 
-      to="/time-tracking" 
-      style={{
-        backgroundColor: '#2563eb',
-        color: 'white',
-        padding: '0.75rem 1.5rem',
-        borderRadius: '0.5rem',
-        textDecoration: 'none',
-        display: 'inline-block'
-      }}
-    >
-      Go to Time Tracking
-    </Link>
-  </div>
-);
-
-const Navigation: React.FC = () => (
-  <nav style={{
-    backgroundColor: '#1f2937',
-    padding: '1rem',
-    marginBottom: '2rem'
-  }}>
-    <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', gap: '2rem' }}>
-      <Link 
-        to="/" 
-        style={{ 
-          color: 'white', 
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.25rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }}
-      >
-        Dashboard
-      </Link>
+  <div className="max-w-4xl mx-auto px-8 py-12 text-center">
+    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+      Welcome to Aerotage Time Reporting
+    </h1>
+    <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+      Track your time efficiently, manage projects, and generate professional reports with our comprehensive time tracking solution.
+    </p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
       <Link 
         to="/time-tracking" 
-        style={{ 
-          color: 'white', 
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.25rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }}
+        className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
       >
-        Time Tracking
+        <div className="text-2xl mb-2">⏱️</div>
+        <h3 className="font-semibold mb-2">Time Tracking</h3>
+        <p className="text-sm text-blue-100">Start tracking your time with our intuitive timer</p>
       </Link>
       <Link 
         to="/projects" 
-        style={{ 
-          color: 'white', 
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.25rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }}
+        className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
       >
-        Projects
-      </Link>
-      <Link 
-        to="/approvals" 
-        style={{ 
-          color: 'white', 
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.25rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }}
-      >
-        Approvals
+        <div className="text-2xl mb-2">📁</div>
+        <h3 className="font-semibold mb-2">Projects</h3>
+        <p className="text-sm text-green-100">Manage your clients and projects</p>
       </Link>
       <Link 
         to="/reports" 
-        style={{ 
-          color: 'white', 
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.25rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }}
+        className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
       >
-        Reports
+        <div className="text-2xl mb-2">📊</div>
+        <h3 className="font-semibold mb-2">Reports</h3>
+        <p className="text-sm text-purple-100">Generate insights and export data</p>
       </Link>
-      <Link 
-        to="/invoices" 
-        style={{ 
-          color: 'white', 
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.25rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }}
-      >
-        Invoices
-      </Link>
+    </div>
+  </div>
+);
+
+const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }> = ({ to, children, icon }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  
+  return (
+    <Link 
+      to={to}
+      className={`
+        flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
+        ${isActive 
+          ? 'bg-blue-600 text-white' 
+          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+        }
+      `}
+      aria-current={isActive ? 'page' : undefined}
+    >
+      {icon && <span className="text-lg">{icon}</span>}
+      <span>{children}</span>
+    </Link>
+  );
+};
+
+const Navigation: React.FC = () => (
+  <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
+    <div className="max-w-7xl mx-auto px-4">
+      <div className="flex items-center justify-between h-16">
+        <div className="flex items-center space-x-8">
+          <h1 className="text-white text-xl font-bold">Aerotage Time</h1>
+          <div className="flex space-x-1">
+            <NavLink to="/" icon="🏠">Dashboard</NavLink>
+            <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
+            <NavLink to="/projects" icon="📁">Projects</NavLink>
+            <NavLink to="/approvals" icon="✅">Approvals</NavLink>
+            <NavLink to="/reports" icon="📊">Reports</NavLink>
+            <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 );
@@ -116,13 +92,9 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <AppProvider>
         <Router>
-          <div style={{ 
-            minHeight: '100vh', 
-            backgroundColor: '#f3f4f6',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-          }}>
+          <div className="min-h-screen bg-gray-50 font-sans">
             <Navigation />
-            <div style={{ padding: '0 1rem' }}>
+            <main className="flex-1" role="main">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/time-tracking" element={<TimeTrackingNew />} />
@@ -131,7 +103,7 @@ const App: React.FC = () => {
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/invoices" element={<Invoices />} />
               </Routes>
-            </div>
+            </main>
           </div>
         </Router>
       </AppProvider>

@@ -67,8 +67,9 @@ describe('Electron App Structure', () => {
     expect(content).toContain('<head>');
     expect(content).toContain('<body>');
     
-    // Check for renderer script inclusion
-    expect(content).toContain('renderer.js');
+    // Check for the React root div (webpack injects scripts dynamically)
+    expect(content).toContain('id="root"');
+    expect(content).toContain('Aerotage Time Reporting');
   });
 });
 

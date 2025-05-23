@@ -1,10 +1,11 @@
 module.exports = {
   // Test environment
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   
   // Test file patterns
   testMatch: [
     '**/tests/**/*.test.js',
+    '**/tests/**/*.test.jsx',
     '**/tests/**/*.spec.js',
     '**/__tests__/**/*.js'
   ],
@@ -20,6 +21,7 @@ module.exports = {
   // Coverage settings
   collectCoverageFrom: [
     'public/scripts/**/*.js',
+    'src/renderer/**/*.{js,jsx,ts,tsx}',
     '!src/**/node_modules/**',
     '!**/coverage/**',
     '!**/dist/**',
@@ -33,15 +35,22 @@ module.exports = {
   moduleDirectories: ['node_modules', 'src'],
   
   // Transform files
-  transform: {},
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+  },
   
-  // Coverage thresholds (lowered for initial setup)
+  // Module name mapping
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
+  
+  // Coverage thresholds
   coverageThreshold: {
     global: {
-      branches: 50,
-      functions: 50,
-      lines: 50,
-      statements: 50
+      branches: 60,
+      functions: 60,
+      lines: 70,
+      statements: 70
     }
   }
 }; 
