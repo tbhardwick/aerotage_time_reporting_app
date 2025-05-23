@@ -36,6 +36,16 @@
 - **User Roles**: Admin, Manager, Employee
 - **Team Management** (assign users to teams)
 
+### 2.2 User Management & Administration ✅ ENHANCED
+- **User Profile Management** (personal info, contact details, hourly rates)
+- **User Creation & Onboarding** (admin-only functionality)
+- **Role Assignment & Permissions** (Admin, Manager, Employee with granular permissions)
+- **Team Structure Management** (create teams, assign managers, add/remove members)
+- **User Status Management** (active/inactive/suspended users)
+- **Permission Matrix** (role-based access control for all features)
+- **User Activity Monitoring** (login history, last activity tracking)
+- **Bulk User Operations** (bulk import, export, status updates)
+
 ### 2.2 Time Tracking ✅ COMPLETED
 - **Timer Interface** (start/stop/pause) ✅
 - **Manual Time Entry** (add time retroactively) ✅
@@ -52,11 +62,15 @@
 - **Project Status** (active/inactive/completed)
 - **Hourly Rates** (per project, per user, or global)
 
-### 2.4 Team Management
-- **User Profiles** (contact info, hourly rates)
-- **Team Assignment** (users to projects)
-- **Permission Management** (view/edit access)
-- **Manager Dashboard** (team time overview)
+### 2.4 Team Management & User Administration
+- **User Profiles** (contact info, hourly rates, department assignment)
+- **Team Creation & Management** (hierarchical team structure)
+- **Manager Assignment** (team leads with approval permissions)
+- **User Onboarding Workflow** (account creation, initial setup)
+- **Permission Management** (granular view/edit access by role)
+- **Manager Dashboard** (team time overview, user performance metrics)
+- **User Directory** (searchable company directory with contact info)
+- **Deactivation & Offboarding** (secure user removal process)
 
 ### 2.5 Reporting & Analytics
 - **Time Reports** (by user, project, date range)
@@ -94,6 +108,115 @@ type AppAction =
   | { type: 'SET_USER'; payload: AppState['user'] };
 ```
 
+### Enhanced Implementation for Phase 8 ✅ NEW
+```typescript
+// AppContext.tsx - Enhanced with User Management
+interface AppState {
+  timeEntries: TimeEntry[];
+  projects: Project[];
+  clients: Client[];
+  invoices: Invoice[];
+  timer: TimerState;
+  user: User | null;
+  users: User[]; // ✅ NEW - All users in the system
+  teams: Team[]; // ✅ NEW - Team management
+  userSessions: UserSession[]; // ✅ NEW - Session tracking
+  userInvitations: UserInvitation[]; // ✅ NEW - Invitation management
+  permissions: PermissionMatrix; // ✅ NEW - Role-based permissions
+}
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'manager' | 'employee';
+  hourlyRate: number;
+  teamId: string;
+  department?: string;
+  isActive: boolean;
+  contactInfo?: {
+    phone?: string;
+    address?: string;
+    emergencyContact?: string;
+  };
+  profilePicture?: string;
+  jobTitle?: string;
+  startDate: string;
+  lastLogin?: string;
+  permissions: {
+    features: string[];
+    projects: string[];
+  };
+  preferences: {
+    theme: 'light' | 'dark';
+    notifications: boolean;
+    timezone: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  managerId: string;
+  memberIds: string[];
+  department?: string;
+  parentTeamId?: string;
+  permissions: {
+    defaultRole: 'manager' | 'employee';
+    projectAccess: string[];
+  };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+type AppAction = 
+  // Existing actions
+  | { type: 'ADD_TIME_ENTRY'; payload: Omit<TimeEntry, 'id' | 'createdAt'> }
+  | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
+  | { type: 'DELETE_TIME_ENTRY'; payload: string }
+  | { type: 'START_TIMER'; payload: { projectId: string; description: string } }
+  | { type: 'STOP_TIMER' }
+  | { type: 'UPDATE_TIMER_TIME'; payload: number }
+  | { type: 'SET_USER'; payload: AppState['user'] }
+  
+  // ✅ NEW - User Management Actions
+  | { type: 'ADD_USER'; payload: Omit<User, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'UPDATE_USER'; payload: { id: string; updates: Partial<User> } }
+  | { type: 'DELETE_USER'; payload: string }
+  | { type: 'SET_USERS'; payload: User[] }
+  | { type: 'UPDATE_USER_STATUS'; payload: { id: string; isActive: boolean } }
+  | { type: 'BULK_UPDATE_USERS'; payload: { userIds: string[]; updates: Partial<User> } }
+  
+  // ✅ NEW - Team Management Actions
+  | { type: 'ADD_TEAM'; payload: Omit<Team, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'UPDATE_TEAM'; payload: { id: string; updates: Partial<Team> } }
+  | { type: 'DELETE_TEAM'; payload: string }
+  | { type: 'SET_TEAMS'; payload: Team[] }
+  | { type: 'ADD_TEAM_MEMBER'; payload: { teamId: string; userId: string } }
+  | { type: 'REMOVE_TEAM_MEMBER'; payload: { teamId: string; userId: string } }
+  
+  // ✅ NEW - Permission Management Actions
+  | { type: 'UPDATE_USER_PERMISSIONS'; payload: { userId: string; permissions: User['permissions'] } }
+  | { type: 'UPDATE_USER_ROLE'; payload: { userId: string; role: User['role'] } }
+  | { type: 'SET_PERMISSION_MATRIX'; payload: PermissionMatrix }
+  
+  // ✅ NEW - Session Management Actions
+  | { type: 'ADD_USER_SESSION'; payload: UserSession }
+  | { type: 'UPDATE_USER_SESSION'; payload: { sessionId: string; updates: Partial<UserSession> } }
+  | { type: 'LOGOUT_USER_SESSION'; payload: string }
+  
+  // ✅ NEW - Invitation Management Actions
+  | { type: 'SEND_USER_INVITATION'; payload: Omit<UserInvitation, 'id' | 'createdAt'> }
+  | { type: 'ACCEPT_USER_INVITATION'; payload: { invitationId: string; userId: string } }
+  | { type: 'CANCEL_USER_INVITATION'; payload: string };
+```
+
 ### Context Provider Setup ✅
 ```typescript
 // App.tsx - Proper provider wrapping
@@ -129,9 +252,39 @@ dispatch({ type: 'UPDATE_TIME_ENTRY', payload: { id, updates } });
 
 ### Primary Tables
 ```
-Users
+Users ✅ ENHANCED
 - PK: userId
-- email, name, role, hourlyRate, teamId, isActive
+- email, name, role, hourlyRate, teamId, isActive, department
+- contactInfo: { phone, address, emergencyContact }
+- profilePicture, jobTitle, startDate, lastLogin
+- permissions: { features: [], projects: [] }
+- preferences: { theme, notifications, timezone }
+- createdAt, updatedAt, createdBy
+
+Teams ✅ ENHANCED
+- PK: teamId
+- name, description, managerId, memberIds[]
+- department, parentTeamId (for hierarchical structure)
+- permissions: { defaultRole, projectAccess[] }
+- isActive, createdAt, updatedAt, createdBy
+
+UserSessions ✅ NEW
+- PK: sessionId
+- userId, loginTime, lastActivity, ipAddress
+- userAgent, isActive, logoutTime
+- securityFlags: { mfaVerified, passwordChangeRequired }
+
+UserInvitations ✅ NEW
+- PK: invitationId
+- email, invitedBy, role, teamId, status
+- invitationToken, expiresAt, acceptedAt
+- onboardingCompleted, createdAt
+
+UserActivity ✅ NEW
+- PK: activityId
+- userId, action, resource, timestamp
+- details: { oldValue, newValue, metadata }
+- ipAddress, userAgent, sessionId
 
 Clients
 - PK: clientId
@@ -144,10 +297,6 @@ Projects
 TimeEntries
 - PK: timeEntryId
 - userId, projectId, date, startTime, endTime, duration, description, isBillable, status
-
-Teams
-- PK: teamId
-- name, managerId, memberIds[]
 
 Invoices
 - PK: invoiceId
@@ -234,6 +383,49 @@ src/
 - [ ] Performance optimization
 - [ ] Comprehensive testing
 - [ ] Documentation and deployment
+
+### Phase 8: User Management & Administration (Weeks 13-14) ✅ NEW PHASE
+- [ ] **User Profile Management Interface**
+  - Personal information editing (name, email, contact details)
+  - Profile picture upload and management
+  - Hourly rate configuration
+  - Department and team assignment
+  - User preferences and settings
+
+- [ ] **User Creation & Onboarding System**
+  - Admin-only user creation interface
+  - Email invitation system for new users
+  - Initial password setup and account activation
+  - Onboarding checklist and guided setup
+  - Welcome email templates and notifications
+
+- [ ] **Role Assignment & Permission System**
+  - Role selection interface (Admin, Manager, Employee)
+  - Permission matrix configuration
+  - Feature-level access control
+  - Project-specific permissions
+  - Time entry approval permissions by team
+
+- [ ] **Team Structure Management**
+  - Team creation and editing interface
+  - Hierarchical team organization
+  - Manager assignment and delegation
+  - Team member addition and removal
+  - Cross-team collaboration settings
+
+- [ ] **User Status & Activity Management**
+  - User status control (active/inactive/suspended)
+  - Login history and activity tracking
+  - Last activity timestamp monitoring
+  - Session management and timeout settings
+  - Security event logging
+
+- [ ] **Advanced User Administration**
+  - Bulk user import from CSV/Excel
+  - User directory with advanced search
+  - Bulk status updates and operations
+  - User analytics and performance metrics
+  - Deactivation and offboarding workflows
 
 ## 7. Current Implementation Status
 
@@ -376,8 +568,6 @@ npm outdated
 
 📚 **See [DEPENDENCY_ANALYSIS.md](./DEPENDENCY_ANALYSIS.md) for comprehensive analysis**
 
-### Future Dependencies (Deprecated)
-
 ## 9. AWS Backend Structure (Separate Repository)
 
 ### Infrastructure Components
@@ -389,18 +579,43 @@ npm outdated
 - **SES**: Email notifications
 - **CloudWatch**: Logging and monitoring
 
-### API Endpoints
+### API Endpoints ✅ ENHANCED FOR PHASE 8
 ```
 Authentication:
 POST /auth/login
 POST /auth/logout
 POST /auth/refresh
 
-Users:
-GET /users
-POST /users
-PUT /users/{id}
-DELETE /users/{id}
+Users: ✅ ENHANCED
+GET /users                    # List all users (admin/manager only)
+POST /users                   # Create new user (admin only)
+PUT /users/{id}              # Update user profile
+DELETE /users/{id}           # Deactivate user (admin only)
+GET /users/{id}/profile      # Get user profile
+PUT /users/{id}/profile      # Update user profile
+PUT /users/{id}/permissions  # Update user permissions (admin only)
+PUT /users/{id}/role        # Update user role (admin only)
+POST /users/invite          # Send user invitation (admin only)
+GET /users/invitations      # List pending invitations
+
+Teams: ✅ NEW
+GET /teams                   # List all teams
+POST /teams                  # Create new team (admin/manager only)
+PUT /teams/{id}             # Update team details
+DELETE /teams/{id}          # Delete team (admin only)
+POST /teams/{id}/members    # Add team member
+DELETE /teams/{id}/members/{userId}  # Remove team member
+GET /teams/{id}/members     # List team members
+
+Sessions: ✅ NEW
+GET /sessions               # List active sessions (admin only)
+DELETE /sessions/{id}       # Logout specific session
+GET /users/{id}/sessions    # User's active sessions
+POST /users/{id}/logout-all # Logout all user sessions
+
+Activity: ✅ NEW
+GET /activity               # System activity log (admin only)
+GET /users/{id}/activity    # User activity history
 
 Projects:
 GET /projects
@@ -426,14 +641,18 @@ PUT /invoices/{id}
 POST /invoices/{id}/send
 ```
 
-## 10. Security Considerations
+## 10. Security Considerations ✅ ENHANCED FOR PHASE 8
 
 - **Data Encryption**: All data encrypted in transit and at rest
 - **Authentication**: AWS Cognito with MFA
-- **Authorization**: Role-based access control
-- **API Security**: JWT tokens, rate limiting
+- **Authorization**: Enhanced role-based access control with granular permissions
+- **API Security**: JWT tokens, rate limiting, request validation
 - **Local Storage**: Encrypted local data storage
-- **Audit Logging**: Track all user actions
+- **Audit Logging**: Track all user actions and administrative changes
+- **Session Management**: Secure session handling with timeout controls
+- **User Permissions**: Feature-level and project-level access control
+- **Password Policies**: Strong password requirements and rotation
+- **Account Security**: Account lockout, suspicious activity detection
 
 ## 11. Deployment Strategy
 
@@ -456,15 +675,23 @@ POST /invoices/{id}/send
 - **Advanced Analytics**: Machine learning insights
 - **API Access**: Public API for third-party integrations
 - **White-label**: Customizable branding for resellers
+- **Single Sign-On**: Enterprise SSO integration
+- **Advanced Reporting**: Custom report builder
+- **Workflow Automation**: Automated approval and notification rules
 
-## 13. Success Metrics
+## 13. Success Metrics ✅ ENHANCED FOR PHASE 8
 
 - **User Adoption**: Number of active users
 - **Time Tracking Accuracy**: Percentage of billable time captured
 - **Invoice Generation**: Time from work completion to invoice
 - **User Satisfaction**: App store ratings and user feedback
 - **Performance**: App responsiveness and reliability
+- **User Management Efficiency**: Time to onboard new users
+- **Permission Compliance**: Proper access control adherence
+- **Team Productivity**: Manager oversight and team performance metrics
+- **Security Metrics**: Login success rates, security incidents
+- **Administrative Efficiency**: Bulk operations and user management speed
 
 ---
 
-This plan provides a comprehensive roadmap for developing a professional time tracking application that can compete with established solutions while being tailored to Aerotage Design Group's specific needs. The React Context implementation provides a solid foundation for the current scope while remaining scalable for future enhancements. 
+This plan provides a comprehensive roadmap for developing a professional time tracking application that can compete with established solutions while being tailored to Aerotage Design Group's specific needs. The React Context implementation provides a solid foundation for the current scope while remaining scalable for future enhancements. **Phase 8 adds essential user management capabilities** that transform the application into a complete enterprise solution with proper user administration, team management, and security controls.
