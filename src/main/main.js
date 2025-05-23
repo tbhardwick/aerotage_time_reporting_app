@@ -10,6 +10,7 @@ log.transports.file.level = 'info';
 
 // Initialize store for persistent data
 const store = new Store();
+const isDev = process.env.NODE_ENV === 'development';
 
 // Keep a global reference of the window object
 let mainWindow;
@@ -40,8 +41,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true
+      nodeIntegration: isDev,
+      sandbox: !isDev
     },
     icon: path.join(__dirname, '..', '..', 'assets', 'icons', 'icon.png'),
     titleBarStyle: 'hiddenInset', // macOS specific

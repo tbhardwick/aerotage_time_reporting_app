@@ -1,16 +1,20 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
-  entry: './src/renderer/simple-app.js',
-  target: 'electron-renderer',
+  entry: './src/renderer/index.tsx',
+  target: isDev ? 'web' : 'electron-renderer',
   devtool: 'source-map',
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+    fallback: {
+      events: require.resolve('events')
+    }
   },
   module: {
     rules: [
@@ -42,6 +46,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     clean: true,
     publicPath: '/',
+    globalObject: 'this'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -56,7 +61,8 @@ module.exports = {
       directory: path.join(__dirname, 'dist'),
     },
     port: 3000,
-    hot: true,
+    hot: false,
+    liveReload: true,
     historyApiFallback: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
