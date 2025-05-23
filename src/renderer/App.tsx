@@ -4,6 +4,7 @@ import { AppProvider } from './context/AppContext';
 import TimeTrackingNew from './pages/TimeTrackingNew';
 import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
+import Reports from './pages/Reports';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const Dashboard: React.FC = () => (
@@ -23,13 +24,6 @@ const Dashboard: React.FC = () => (
     >
       Go to Time Tracking
     </Link>
-  </div>
-);
-
-const Reports: React.FC = () => (
-  <div style={{ padding: '2rem', textAlign: 'center' }}>
-    <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Reports</h1>
-    <p style={{ color: '#666' }}>View your time tracking reports</p>
   </div>
 );
 
