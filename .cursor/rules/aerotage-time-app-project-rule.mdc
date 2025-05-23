@@ -1,5 +1,351 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# Aerotage Time Reporting Application - Cursor Rules
+
+## Project Overview
+You are developing the Aerotage Time Reporting Application, a professional desktop time tracking and billing application for Aerotage Design Group, Inc. This is an Electron-based desktop app with React/TypeScript frontend and AWS serverless backend.
+
+## Core Architecture Rules
+
+### Technology Stack
+- **Frontend**: Electron + React 18 + TypeScript
+- **State Management**: React Context API with useReducer
+- **Styling**: Tailwind CSS + Headless UI
+- **Forms**: React Hook Form + Zod validation
+- **Date/Time**: date-fns library
+- **Charts**: Chart.js with react-chartjs-2
+- **Backend**: AWS Serverless (Cognito, API Gateway, Lambda, DynamoDB)
+
+### File Structure Rules
+```
+src/
+├── main/                    # Electron main process
+├── renderer/               # React frontend
+│   ├── components/         # Reusable UI components
+│   ├── pages/             # Main application pages
+│   ├── context/           # React Context providers and hooks
+│   │   └── AppContext.tsx # Main application state
+│   ├── services/          # API services
+│   ├── utils/             # Utility functions
+│   └── types/             # TypeScript definitions
+├── preload/               # Electron preload scripts
+└── shared/                # Shared utilities
+```
+
+## Development Guidelines
+
+### Code Quality Standards
+1. **TypeScript**: Use strict TypeScript with proper type definitions
+2. **ESLint**: Follow existing ESLint configuration
+3. **Naming**: Use camelCase for variables/functions, PascalCase for components
+4. **Components**: Create functional components with TypeScript interfaces
+5. **Hooks**: Use React hooks appropriately (useState, useEffect, useContext, custom hooks)
+
+### Component Development Rules
+1. **Structure**: Each component should have its own folder with index.ts export
+2. **Props**: Define TypeScript interfaces for all component props
+3. **Styling**: Use Tailwind CSS classes, avoid inline styles
+4. **Accessibility**: Include proper ARIA labels and semantic HTML
+5. **Reusability**: Create reusable components in `components/common/`
+6. **Context Usage**: Use `useAppContext()` hook for accessing global state
+
+### State Management Rules
+1. **React Context**: Use AppContext with useReducer for global state management
+2. **Local State**: Use useState for component-specific state only
+3. **Context Provider**: Ensure all components needing global state are wrapped with AppProvider
+4. **Actions**: Use typed action objects with dispatch for state updates
+5. **Error Handling**: Always check if context is available before using
+
+### Context Implementation Rules
+1. **Provider Setup**: Wrap app with `<AppProvider>` inside `<ErrorBoundary>`
+2. **Hook Usage**: Always use `useAppContext()` hook, never useContext directly
+3. **Action Types**: Define all actions in TypeScript union types
+4. **Reducer Logic**: Keep reducer functions pure and predictable
+5. **State Structure**: Organize state logically (timeEntries, projects, timer, user)
+
+### API Integration Rules
+1. **AWS Amplify**: Use for authentication and API calls
+2. **Error Handling**: Implement proper error boundaries and try-catch blocks
+3. **Loading States**: Show loading indicators for async operations
+4. **Offline Support**: Handle network connectivity issues gracefully
+5. **Context Integration**: Update context state after successful API calls
+
+## Feature-Specific Rules
+
+### Authentication
+- Use AWS Cognito for all authentication flows
+- Implement proper token refresh mechanisms
+- Store auth state in Context with persistence
+- Handle MFA flows when required
+- Redirect unauthenticated users to login
+
+### Time Tracking ✅ IMPLEMENTED
+- Timer must persist across app restarts
+- Validate time entries before submission
+- Support both timer and manual entry modes
+- Implement auto-save for draft entries
+- Show clear visual feedback for timer state
+- Use Context actions: START_TIMER, STOP_TIMER, UPDATE_TIMER_TIME
+- Automatically create time entries when timer stops
+
+### Project Management
+- Enforce client-project relationships
+- Validate project budgets and rates
+- Implement proper permission checks
+- Support project status workflows
+- Store project data in Context state
+- Use Context for project selection and filtering
+
+### Reporting
+- Use Chart.js for all visualizations
+- Implement proper date range filtering
+- Support multiple export formats (PDF, CSV, Excel)
+- Optimize queries for large datasets
+- Calculate reports from Context state data
+
+### Invoicing
+- Generate invoices from approved time entries only
+- Support customizable invoice templates
+- Implement proper invoice numbering
+- Handle invoice status workflows
+- Integrate with email sending (AWS SES)
+
+## UI/UX Guidelines
+
+### Design System
+- Use Headless UI components as base
+- Implement consistent spacing (Tailwind spacing scale)
+- Use Aerotage brand colors and typography
+- Ensure responsive design for different screen sizes
+- Follow macOS and Windows design guidelines
+
+### User Experience
+- Provide clear feedback for all user actions
+- Implement keyboard shortcuts for common actions
+- Show progress indicators for long operations
+- Use toast notifications for success/error messages
+- Maintain consistent navigation patterns
+
+### Accessibility
+- Ensure keyboard navigation works throughout
+- Use proper heading hierarchy (h1, h2, h3)
+- Provide alt text for images and icons
+- Implement proper focus management
+- Support screen readers with ARIA labels
+
+## Security Rules
+
+### Data Protection
+- Never store sensitive data in localStorage
+- Use secure storage for authentication tokens
+- Implement proper input validation and sanitization
+- Encrypt sensitive data before storage
+- Follow OWASP security guidelines
+
+### API Security
+- Always validate API responses
+- Implement proper error handling for API failures
+- Use HTTPS for all API communications
+- Implement request timeouts and retries
+- Log security events appropriately
+
+## Performance Rules
+
+### Optimization
+- Implement lazy loading for routes and components
+- Use React.memo for expensive components that don't need frequent re-renders
+- Optimize bundle size with code splitting
+- Implement proper caching strategies
+- Monitor and optimize render performance
+
+### Context Performance
+- Use React.memo for components that don't need frequent Context updates
+- Split Context if state becomes too large
+- Optimize reducer logic for complex state updates
+- Only destructure needed state properties in components
+- Avoid unnecessary re-renders with selective state access
+
+### Memory Management
+- Clean up event listeners and timers
+- Properly dispose of subscriptions
+- Avoid memory leaks in useEffect hooks
+- Optimize large list rendering with virtualization
+- Monitor memory usage in development
+
+## Testing Requirements
+
+### Unit Testing
+- Write tests for all utility functions
+- Test component rendering and interactions with Context
+- Mock Context provider in tests
+- Test reducer functions thoroughly
+- Achieve minimum 80% code coverage
+- Use Jest and React Testing Library
+
+### Context Testing
+- Test Context provider initialization
+- Test all reducer actions and state updates
+- Test error handling for missing provider
+- Test component integration with Context
+- Use custom render utilities that wrap with provider
+
+### Integration Testing
+- Test complete user workflows with Context
+- Verify Context state persistence
+- Test timer functionality end-to-end
+- Validate data flow through Context
+- Use Playwright for E2E testing
+
+## Development Workflow
+
+### Git Practices
+- Use conventional commit messages
+- Create feature branches for new development
+- Implement proper code review process
+- Keep commits atomic and focused
+- Write descriptive commit messages
+
+### Code Organization
+- Group related functionality together
+- Keep components small and focused
+- Extract reusable logic into custom hooks
+- Organize imports consistently
+- Remove unused code and imports
+
+## Error Handling
+
+### Context Error Handling
+- Always wrap Context usage in try-catch blocks
+- Implement proper error boundaries around Context provider
+- Handle cases where Context is not available
+- Provide fallback UI for Context errors
+- Log Context-related errors for debugging
+
+### User-Facing Errors
+- Show user-friendly error messages
+- Provide actionable error recovery options
+- Log errors for debugging purposes
+- Implement global error boundaries
+- Handle network connectivity issues
+
+### Development Errors
+- Use proper TypeScript error types
+- Implement comprehensive error logging
+- Provide detailed error context
+- Use error monitoring tools
+- Handle edge cases gracefully
+
+## Specific Implementation Notes
+
+### Timer Functionality ✅ IMPLEMENTED
+- Use high-precision timestamps
+- Implement pause/resume capabilities
+- Handle system sleep/wake events
+- Persist timer state in Context
+- Validate time entry data
+- Real-time timer updates with useEffect intervals
+
+### Context State Structure ✅ IMPLEMENTED
+```typescript
+interface AppState {
+  timeEntries: TimeEntry[];
+  projects: Project[];
+  timer: TimerState;
+  user: User | null;
+}
+
+type AppAction = 
+  | { type: 'ADD_TIME_ENTRY'; payload: Omit<TimeEntry, 'id' | 'createdAt'> }
+  | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
+  | { type: 'DELETE_TIME_ENTRY'; payload: string }
+  | { type: 'START_TIMER'; payload: { projectId: string; description: string } }
+  | { type: 'STOP_TIMER' }
+  | { type: 'UPDATE_TIMER_TIME'; payload: number }
+  | { type: 'SET_USER'; payload: AppState['user'] };
+```
+
+### Data Synchronization
+- Implement optimistic updates in Context
+- Handle offline/online state changes
+- Sync data when connection restored
+- Resolve conflicts appropriately
+- Show sync status to users
+
+### Invoice Generation
+- Use jsPDF for PDF generation
+- Implement proper invoice templates
+- Calculate totals and taxes correctly
+- Handle multiple currencies if needed
+- Generate unique invoice numbers
+
+## Deployment Considerations
+
+### Electron Packaging
+- Configure proper app signing
+- Implement auto-update functionality
+- Optimize app bundle size
+- Handle different OS requirements
+- Test on target platforms
+
+### AWS Integration
+- Use environment-specific configurations
+- Implement proper IAM roles and policies
+- Monitor AWS service usage
+- Handle AWS service limits
+- Implement proper backup strategies
+
+## Prohibited Practices
+
+### Never Do
+- Store passwords or secrets in code
+- Use deprecated React patterns (class components)
+- Implement custom authentication (use Cognito)
+- Ignore TypeScript errors or use 'any' type
+- Skip error handling for async operations
+- Use inline styles instead of Tailwind
+- Create tightly coupled components
+- Ignore accessibility requirements
+- Skip input validation
+- Use console.log in production code
+- Use Context outside of AppProvider
+- Mutate Context state directly
+- Use Redux or other state management libraries
+
+### Always Do
+- Follow the established file structure
+- Use TypeScript interfaces for all data
+- Implement proper error boundaries
+- Test new functionality thoroughly
+- Document complex business logic
+- Use semantic HTML elements
+- Implement loading states
+- Validate user inputs
+- Handle edge cases
+- Follow the development phases in order
+- Wrap components with AppProvider when needed
+- Use useAppContext() hook for state access
+- Dispatch actions for state updates
+
+## Phase-Specific Focus
+
+### Current Phase Guidelines
+When working on specific development phases, prioritize:
+
+**Phase 1 (Foundation)** ✅ COMPLETED: Focus on React/TypeScript setup, basic routing, Context setup
+**Phase 2 (Time Tracking)** ✅ COMPLETED: Implement timer, manual entry, project selection with Context
+**Phase 3 (Project Management)** 🚧 IN PROGRESS: Build client/project CRUD, team management
+**Phase 4 (Approval Workflow)**: Create submission and approval interfaces
+**Phase 5 (Reporting)**: Implement charts, exports, analytics
+**Phase 6 (Invoicing)**: Build invoice generation and management
+**Phase 7 (Polish)**: Focus on UX improvements and testing
+
+### Context Usage Patterns by Phase
+- **Phase 3+**: Extend Context state for clients, teams, and advanced project management
+- **Phase 4+**: Add approval workflow actions and state
+- **Phase 5+**: Add reporting state and computed values
+- **Phase 6+**: Add invoice state and generation logic
+
+Remember: This is a professional business application that needs to be reliable, secure, and user-friendly. Every feature should be implemented with production quality in mind. The React Context implementation provides a solid foundation for state management while remaining simple and maintainable. 

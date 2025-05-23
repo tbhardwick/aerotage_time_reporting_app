@@ -14,7 +14,7 @@ A professional desktop time tracking and billing application built with Electron
 ## Technology Stack
 
 - **Frontend**: React 18 + TypeScript
-- **State Management**: Redux Toolkit + RTK Query
+- **State Management**: React Context API with useReducer
 - **Styling**: Tailwind CSS + Headless UI
 - **Desktop**: Electron
 - **Build Tools**: Webpack + PostCSS
@@ -58,13 +58,61 @@ This will start both the React development server (localhost:3000) and the Elect
 - `npm run lint` - Run ESLint
 - `npm test` - Run tests
 
-## Demo Authentication
+## React Context State Management
 
-The app currently uses mock authentication. Use these credentials to log in:
+The application uses React Context API with useReducer for state management instead of Redux. This provides a simpler, more lightweight solution for the current scope.
 
-- **Admin**: admin@aerotage.com / password123
-- **Manager**: manager@aerotage.com / password123  
-- **Engineer**: engineer@aerotage.com / password123
+### Context Structure
+
+```typescript
+// AppContext.tsx provides:
+interface AppState {
+  timeEntries: TimeEntry[];
+  projects: Project[];
+  timer: TimerState;
+  user: User | null;
+}
+
+// Available actions:
+- ADD_TIME_ENTRY
+- UPDATE_TIME_ENTRY  
+- DELETE_TIME_ENTRY
+- START_TIMER
+- STOP_TIMER
+- UPDATE_TIMER_TIME
+- SET_USER
+```
+
+### Usage in Components
+
+```typescript
+import { useAppContext } from '../context/AppContext';
+
+const MyComponent = () => {
+  const { state, dispatch } = useAppContext();
+  
+  // Access state
+  const { timeEntries, projects, timer } = state;
+  
+  // Dispatch actions
+  dispatch({ type: 'START_TIMER', payload: { projectId, description } });
+};
+```
+
+### Context Provider Setup
+
+The app is properly wrapped with the context provider:
+
+```typescript
+// App.tsx
+<ErrorBoundary>
+  <AppProvider>
+    <Router>
+      {/* App content */}
+    </Router>
+  </AppProvider>
+</ErrorBoundary>
+```
 
 ## Project Structure
 
@@ -80,7 +128,8 @@ src/
 │   │   ├── reports/       # Reporting components
 │   │   └── invoices/      # Invoice components
 │   ├── pages/             # Main application pages
-│   ├── store/             # Redux store and slices
+│   ├── context/           # React Context providers and hooks
+│   │   └── AppContext.tsx # Main application state
 │   ├── services/          # API services
 │   ├── utils/             # Utility functions
 │   └── types/             # TypeScript definitions
@@ -90,24 +139,25 @@ src/
 
 ## Current Status
 
-### ✅ Completed (Phase 1 - Foundation)
+### ✅ Completed (Phase 2 - Core Time Tracking)
 - [x] React + TypeScript setup in Electron
 - [x] Tailwind CSS configuration with pleasing color palette
-- [x] Redux store with persistence
+- [x] React Context state management with useReducer
 - [x] Basic routing and navigation
-- [x] Mock authentication system
-- [x] Beautiful login page
-- [x] Basic layout and dashboard
+- [x] Timer interface implementation with start/stop functionality
+- [x] Project selection and management
+- [x] Time entry creation and management
+- [x] Beautiful time tracking interface
 - [x] TypeScript type definitions
 - [x] Development workflow setup
+- [x] Error boundary implementation
 
 ### 🚧 In Progress
-- Timer interface implementation
+- Advanced time entry features
 - Project and client management
-- Time entry forms and validation
+- Time entry validation and editing
 
-### 📋 Upcoming (Phases 2-7)
-- Core time tracking features
+### 📋 Upcoming (Phases 3-7)
 - Project and client management
 - Approval workflows
 - Reporting and analytics
@@ -129,9 +179,10 @@ The app uses a modern, professional color palette:
 
 1. Follow the established file structure
 2. Use TypeScript interfaces for all data
-3. Implement proper error boundaries
-4. Test new functionality thoroughly
-5. Follow the development phases in order
+3. Use React Context API for state management
+4. Implement proper error boundaries
+5. Test new functionality thoroughly
+6. Follow the development phases in order
 
 ## License
 

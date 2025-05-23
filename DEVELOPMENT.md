@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide covers development workflows, best practices, and advanced topics for the Electron macOS Template.
+This guide covers development workflows, best practices, and advanced topics for the Aerotage Time Reporting Application.
 
 ## Development Workflow
 
@@ -9,7 +9,7 @@ This guide covers development workflows, best practices, and advanced topics for
 1. **Prerequisites**
    ```bash
    # Ensure you have the latest Node.js LTS
-   node --version  # Should be 16+
+   node --version  # Should be 18+
    
    # Install dependencies
    npm install
@@ -20,8 +20,9 @@ This guide covers development workflows, best practices, and advanced topics for
    # Start with hot reload (recommended)
    npm run dev
    
-   # Or start normally
-   npm start
+   # This starts both:
+   # - React development server on localhost:3000
+   # - Electron app with hot reload
    ```
 
 3. **Code Quality**
@@ -30,15 +31,134 @@ This guide covers development workflows, best practices, and advanced topics for
    npm run lint
    
    # Fix linting issues automatically
-   npx eslint src/**/*.js --fix
+   npx eslint src/**/*.{js,ts,tsx} --fix
    ```
+
+## React Context State Management
+
+The application uses React Context API with useReducer for centralized state management. This approach provides a simpler alternative to Redux while maintaining predictable state updates.
+
+### Context Architecture
+
+```typescript
+// src/renderer/context/AppContext.tsx
+interface AppState {
+  timeEntries: TimeEntry[];
+  projects: Project[];
+  timer: TimerState;
+  user: User | null;
+}
+
+type AppAction = 
+  | { type: 'ADD_TIME_ENTRY'; payload: Omit<TimeEntry, 'id' | 'createdAt'> }
+  | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
+  | { type: 'DELETE_TIME_ENTRY'; payload: string }
+  | { type: 'START_TIMER'; payload: { projectId: string; description: string } }
+  | { type: 'STOP_TIMER' }
+  | { type: 'UPDATE_TIMER_TIME'; payload: number }
+  | { type: 'SET_USER'; payload: AppState['user'] };
+```
+
+### Setting Up Context in Components
+
+1. **Provider Setup** (Already configured in App.tsx):
+```typescript
+// App.tsx
+import { AppProvider } from './context/AppContext';
+
+const App = () => (
+  <ErrorBoundary>
+    <AppProvider>
+      <Router>
+        {/* Your app components */}
+      </Router>
+    </AppProvider>
+  </ErrorBoundary>
+);
+```
+
+2. **Using Context in Components**:
+```typescript
+import { useAppContext } from '../context/AppContext';
+
+const MyComponent = () => {
+  const { state, dispatch } = useAppContext();
+  
+  // Access state
+  const { timeEntries, projects, timer, user } = state;
+  
+  // Dispatch actions
+  const handleStartTimer = () => {
+    dispatch({
+      type: 'START_TIMER',
+      payload: { projectId: 'project-1', description: 'Working on feature' }
+    });
+  };
+  
+  const handleAddTimeEntry = () => {
+    dispatch({
+      type: 'ADD_TIME_ENTRY',
+      payload: {
+        projectId: 'project-1',
+        date: new Date().toISOString().split('T')[0],
+        duration: 120,
+        description: 'Completed task',
+        isBillable: true,
+        status: 'draft'
+      }
+    });
+  };
+};
+```
+
+### Adding New State and Actions
+
+1. **Update Types** in AppContext.tsx:
+```typescript
+// Add to AppState interface
+interface AppState {
+  // ... existing properties
+  newFeature: NewFeatureState;
+}
+
+// Add to AppAction union type
+type AppAction = 
+  // ... existing actions
+  | { type: 'UPDATE_NEW_FEATURE'; payload: NewFeatureState };
+```
+
+2. **Update Reducer**:
+```typescript
+function appReducer(state: AppState, action: AppAction): AppState {
+  switch (action.type) {
+    // ... existing cases
+    case 'UPDATE_NEW_FEATURE':
+      return {
+        ...state,
+        newFeature: action.payload
+      };
+    default:
+      return state;
+  }
+}
+```
+
+3. **Update Initial State**:
+```typescript
+const initialState: AppState = {
+  // ... existing properties
+  newFeature: {
+    // initial values
+  }
+};
+```
 
 ## Project Architecture
 
 ### Process Architecture
 - **Main Process** (`src/main/main.js`): Controls app lifecycle, creates renderer processes
 - **Preload Script** (`src/preload/preload.js`): Secure bridge between main and renderer
-- **Renderer Process** (`public/`): UI layer with HTML, CSS, and JavaScript
+- **Renderer Process** (`src/renderer/`): React UI with Context state management
 
 ### Security Model
 This template follows Electron's security best practices:
@@ -54,8 +174,8 @@ This template follows Electron's security best practices:
 **Step 1: Add handler in main process**
 ```javascript
 // In src/main/main.js, add to setupIpcHandlers()
-ipcMain.handle('myFeature:doSomething', async (event, data) => {
-  // Your logic here
+ipcMain.handle('timeTracking:saveEntry', async (event, timeEntry) => {
+  // Save time entry logic
   return result;
 });
 ```
@@ -65,194 +185,233 @@ ipcMain.handle('myFeature:doSomething', async (event, data) => {
 // In src/preload/preload.js, add to electronAPI
 contextBridge.exposeInMainWorld('electronAPI', {
   // ... existing APIs
-  myFeature: {
-    doSomething: (data) => ipcRenderer.invoke('myFeature:doSomething', data)
+  timeTracking: {
+    saveEntry: (timeEntry) => ipcRenderer.invoke('timeTracking:saveEntry', timeEntry)
   }
 });
 ```
 
-**Step 3: Use in renderer**
-```javascript
-// In renderer scripts
-const result = await window.electronAPI.myFeature.doSomething(data);
+**Step 3: Use in renderer with Context**
+```typescript
+// In React component
+const { dispatch } = useAppContext();
+
+const saveTimeEntry = async (entry) => {
+  try {
+    const savedEntry = await window.electronAPI.timeTracking.saveEntry(entry);
+    dispatch({ type: 'ADD_TIME_ENTRY', payload: savedEntry });
+  } catch (error) {
+    console.error('Failed to save time entry:', error);
+  }
+};
 ```
 
-### 2. Adding New Windows
+### 2. Adding New Pages
 
-```javascript
-// In main process
-function createSecondaryWindow() {
-  const secondaryWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
-    parent: mainWindow, // Optional: make it a child window
-    webPreferences: {
-      preload: path.join(__dirname, '..', 'preload', 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true
-    }
-  });
+1. **Create Page Component**:
+```typescript
+// src/renderer/pages/NewPage.tsx
+import React from 'react';
+import { useAppContext } from '../context/AppContext';
+
+const NewPage: React.FC = () => {
+  const { state, dispatch } = useAppContext();
   
-  secondaryWindow.loadFile('path/to/secondary.html');
-  return secondaryWindow;
-}
+  return (
+    <div>
+      {/* Page content */}
+    </div>
+  );
+};
+
+export default NewPage;
 ```
 
-### 3. Adding Menu Items
+2. **Add Route**:
+```typescript
+// In App.tsx
+import NewPage from './pages/NewPage';
 
-```javascript
-// In createMenu() function
-{
-  label: 'My Menu',
-  submenu: [
-    {
-      label: 'My Action',
-      accelerator: 'CmdOrCtrl+M',
-      click: () => {
-        // Handle menu click
-        if (mainWindow) {
-          mainWindow.webContents.send('menu-action', 'myAction');
-        }
-      }
-    }
-  ]
+<Routes>
+  {/* ... existing routes */}
+  <Route path="/new-page" element={<NewPage />} />
+</Routes>
+```
+
+### 3. Adding Context-Aware Components
+
+```typescript
+// src/renderer/components/TimerWidget.tsx
+import React from 'react';
+import { useAppContext } from '../context/AppContext';
+
+const TimerWidget: React.FC = () => {
+  const { state, dispatch } = useAppContext();
+  const { timer } = state;
+  
+  const handleStartTimer = () => {
+    dispatch({
+      type: 'START_TIMER',
+      payload: { projectId: 'current-project', description: 'Working' }
+    });
+  };
+  
+  return (
+    <div>
+      <div>{formatTime(timer.elapsedTime)}</div>
+      <button onClick={handleStartTimer}>
+        {timer.isRunning ? 'Stop' : 'Start'}
+      </button>
+    </div>
+  );
+};
+```
+
+## Error Handling
+
+### Error Boundaries
+The app uses React Error Boundaries to catch and handle errors gracefully:
+
+```typescript
+// ErrorBoundary.tsx (already implemented)
+<ErrorBoundary>
+  <AppProvider>
+    {/* App content */}
+  </AppProvider>
+</ErrorBoundary>
+```
+
+### Context Error Handling
+```typescript
+// In useAppContext hook
+export function useAppContext() {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
 }
 ```
 
 ## Styling and Theming
 
-### CSS Variables
-The template uses CSS custom properties for theming:
-```css
-:root {
-  --primary-color: #007AFF;
-  --background-color: #ffffff;
-  /* ... more variables */
-}
+### Tailwind CSS Configuration
+The app uses Tailwind CSS for styling with a custom configuration:
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #1e1e1e;
-    /* ... dark mode overrides */
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: ['./src/renderer/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0ea5e9',
+        secondary: '#6b7280',
+        // ... custom colors
+      }
+    }
   }
-}
+};
 ```
 
-### macOS-Specific Styling
-- Use `-webkit-app-region: drag` for draggable areas
-- Implement vibrancy with `backdrop-filter: blur()`
-- Follow Apple's Human Interface Guidelines
-
-## Building and Distribution
-
-### Development Builds
-```bash
-npm run build        # Build for current platform
-npm run build:mac    # Build specifically for macOS
-```
-
-### Distribution
-```bash
-npm run dist         # Create distributable packages
-```
-
-### Code Signing
-For distribution outside the App Store:
-1. Get a Developer ID certificate from Apple
-2. Configure signing in `package.json`:
-   ```json
-   "build": {
-     "mac": {
-       "identity": "Developer ID Application: Your Name (TEAM_ID)"
-     }
-   }
-   ```
-
-### App Store Distribution
-1. Get a Mac App Store certificate
-2. Configure for App Store:
-   ```json
-   "build": {
-     "mac": {
-       "target": "mas",
-       "entitlements": "build/entitlements.mas.plist"
-     }
-   }
-   ```
+### Component Styling Best Practices
+- Use Tailwind utility classes for consistent styling
+- Create reusable component variants
+- Follow the established color palette
+- Ensure responsive design
 
 ## Testing
 
+### Testing Context Components
+```typescript
+// Example test setup
+import { render, screen } from '@testing-library/react';
+import { AppProvider } from '../context/AppContext';
+import MyComponent from '../components/MyComponent';
+
+const renderWithContext = (component) => {
+  return render(
+    <AppProvider>
+      {component}
+    </AppProvider>
+  );
+};
+
+test('component uses context correctly', () => {
+  renderWithContext(<MyComponent />);
+  // Test assertions
+});
+```
+
 ### Manual Testing Checklist
 - [ ] App starts without errors
-- [ ] All menu items work
-- [ ] Window resizing and positioning
-- [ ] Dark/light mode switching
-- [ ] File dialogs work
-- [ ] Preferences save/load
-- [ ] App updates (if enabled)
-
-### Automated Testing
-Consider adding:
-- Unit tests for main process logic
-- Integration tests for IPC communication
-- E2E tests with Spectron or Playwright
+- [ ] Context state updates correctly
+- [ ] Timer functionality works
+- [ ] Time entries are created/updated/deleted
+- [ ] Navigation between pages
+- [ ] Error boundaries catch errors
+- [ ] Responsive design on different screen sizes
 
 ## Performance Optimization
 
+### Context Performance
+- Use React.memo for components that don't need frequent re-renders
+- Split context if state becomes too large
+- Optimize reducer logic for complex state updates
+
 ### Bundle Size
-- Use `electron-builder`'s file filtering
-- Exclude unnecessary files from packaging
-- Consider using `asar` archives
-
-### Memory Usage
-- Monitor with Chrome DevTools
-- Avoid memory leaks in IPC handlers
-- Clean up event listeners
-
-### Startup Time
-- Minimize preload script size
-- Lazy load heavy dependencies
-- Use `show: false` and `ready-to-show` event
+- Use dynamic imports for large components
+- Optimize Tailwind CSS purging
+- Monitor bundle size with webpack-bundle-analyzer
 
 ## Debugging
 
-### Main Process
-```bash
-# Start with debugging enabled
-npm start -- --inspect=5858
+### React DevTools
+- Install React Developer Tools browser extension
+- Use Context tab to inspect state
+- Monitor component re-renders
 
-# Or use VS Code launch configuration
+### Context Debugging
+```typescript
+// Add logging to reducer for debugging
+function appReducer(state: AppState, action: AppAction): AppState {
+  console.log('Action dispatched:', action.type, action.payload);
+  console.log('Current state:', state);
+  
+  // ... reducer logic
+  
+  console.log('New state:', newState);
+  return newState;
+}
 ```
 
-### Renderer Process
-- Use Chrome DevTools (Cmd+Option+I)
-- Console logs appear in DevTools
-- Network tab for resource loading
-
 ### Common Issues
-1. **White screen**: Check console for errors, verify file paths
-2. **IPC not working**: Ensure preload script is loaded
-3. **Menu not appearing**: Check menu template syntax
-4. **Build fails**: Verify all required files are included
+1. **Context not available**: Ensure component is wrapped in AppProvider
+2. **State not updating**: Check reducer logic and action types
+3. **Performance issues**: Use React.memo and optimize re-renders
+4. **Type errors**: Ensure TypeScript interfaces are up to date
 
 ## Contributing
 
 ### Code Style
-- Use ESLint configuration provided
+- Use TypeScript for all new code
 - Follow existing naming conventions
-- Add comments for complex logic
+- Use React Context for state management
+- Add proper error handling
+- Write meaningful commit messages
 
 ### Pull Request Process
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
+3. Implement changes with proper Context usage
 4. Test thoroughly
-5. Submit a pull request
+5. Update documentation if needed
+6. Submit a pull request
 
 ## Resources
 
+- [React Context Documentation](https://react.dev/reference/react/useContext)
+- [useReducer Hook](https://react.dev/reference/react/useReducer)
 - [Electron Documentation](https://electronjs.org/docs)
-- [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/macos)
-- [electron-builder Documentation](https://www.electron.build/)
-- [Electron Security Best Practices](https://electronjs.org/docs/tutorial/security) 
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/) 
