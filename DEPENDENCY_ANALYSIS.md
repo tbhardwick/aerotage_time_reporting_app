@@ -87,4 +87,31 @@ After updating and fixing dependencies:
 - Always test thoroughly after dependency updates
 - Consider creating a separate branch for major version updates
 - Monitor for any new pre-release dependencies in future updates
-- **NEW**: xlsx vulnerability requires immediate attention - consider alternatives 
+- **NEW**: xlsx vulnerability requires immediate attention - consider alternatives
+
+## Lessons Learned 📚
+
+### 🔍 **Key Discoveries**
+1. **Alpha Dependencies**: Found `electron-reload@2.0.0-alpha.1` causing potential instability
+2. **Breaking Changes**: `electron-store` v10+ introduced ESM-only requirement (major breaking change)
+3. **Security Vulnerabilities**: `xlsx` package has unresolved security issues
+
+### ✅ **Successful Strategies**
+1. **Automated Detection**: `npm run check-deps` script successfully identified unstable dependencies
+2. **Branch Testing**: Using feature branch prevented main branch contamination
+3. **Rapid Rollback**: Quick reversion when breaking changes discovered
+4. **Documentation**: Comprehensive analysis helps future decision-making
+
+### 🚧 **Process Improvements**
+1. **Major Version Caution**: Always research breaking changes before major updates
+2. **ESM Migration Planning**: Need dedicated phase for CommonJS → ESM conversion
+3. **Security Monitoring**: Regular `npm audit` runs required
+4. **Exception Handling**: Clear process for unavoidable unstable dependencies
+
+### 📋 **Future Actions**
+1. **Weekly Security Audits**: Schedule regular `npm audit` reviews
+2. **ESM Migration Planning**: Plan electron-store v10+ upgrade with full ESM conversion
+3. **xlsx Replacement**: Evaluate secure alternatives for Excel functionality
+4. **Dependency Policies**: Enforce stable-only rule in project guidelines
+
+This analysis demonstrates the critical importance of dependency stability and provides a solid foundation for maintaining a stable, secure application. 
