@@ -5,6 +5,7 @@ import TimeTrackingNew from './pages/TimeTrackingNew';
 import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
 import Reports from './pages/Reports';
+import Invoices from './pages/Invoices';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const Dashboard: React.FC = () => (
@@ -94,6 +95,18 @@ const Navigation: React.FC = () => (
       >
         Reports
       </Link>
+      <Link 
+        to="/invoices" 
+        style={{ 
+          color: 'white', 
+          textDecoration: 'none',
+          padding: '0.5rem 1rem',
+          borderRadius: '0.25rem',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)'
+        }}
+      >
+        Invoices
+      </Link>
     </div>
   </nav>
 );
@@ -116,6 +129,7 @@ const App: React.FC = () => {
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/approvals" element={<Approvals />} />
                 <Route path="/reports" element={<Reports />} />
+                <Route path="/invoices" element={<Invoices />} />
               </Routes>
             </div>
           </div>
