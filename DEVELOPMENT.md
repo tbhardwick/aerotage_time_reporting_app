@@ -34,6 +34,70 @@ This guide covers development workflows, best practices, and advanced topics for
    npx eslint src/**/*.{js,ts,tsx} --fix
    ```
 
+4. **Dependency Management** 🔒
+   ```bash
+   # ALWAYS check dependencies before installing new packages
+   npm run check-deps
+   
+   # Install dependencies (use stable versions only)
+   npm install package@^1.2.3
+   
+   # Re-check after installation
+   npm run check-deps
+   
+   # Run security audit
+   npm audit
+   ```
+
+### Dependency Guidelines
+
+⚠️ **CRITICAL**: This project enforces **stable-only dependencies**.
+
+#### Forbidden Versions
+- ❌ Alpha releases (`2.0.0-alpha.1`)
+- ❌ Beta releases (`3.0.0-beta.2`)
+- ❌ Release candidates (`1.5.0-rc.1`)
+- ❌ Pre-release versions (`4.0.0-pre.3`)
+- ❌ Canary builds (`1.2.0-canary.45`)
+- ❌ Next tags (`@next`)
+- ❌ Dev/snapshot versions
+
+#### Required Process
+1. **Before adding dependencies**:
+   - Run `npm run check-deps` to verify current state
+   - Research the package to ensure it's stable and maintained
+   - Check for security vulnerabilities
+
+2. **Installing dependencies**:
+   ```bash
+   # Use exact stable versions
+   npm install package@^1.2.3
+   
+   # NOT alpha/beta versions
+   npm install package@2.0.0-alpha.1  # ❌ FORBIDDEN
+   ```
+
+3. **After installation**:
+   - Run `npm run check-deps` again
+   - Run `npm audit` for security check
+   - Test the application thoroughly
+   - Update documentation if needed
+
+#### Exception Handling
+If an unstable dependency is absolutely necessary:
+1. Document the business justification in `DEPENDENCY_ANALYSIS.md`
+2. Create isolated testing environment
+3. Implement fallback strategies
+4. Get team approval before merging
+5. Plan migration path to stable version
+
+#### Monitoring
+- **Weekly**: Run `npm audit` for security vulnerabilities
+- **Monthly**: Check `npm outdated` for available stable updates
+- **Before releases**: Full dependency stability and security review
+
+📚 **See [DEPENDENCY_ANALYSIS.md](./DEPENDENCY_ANALYSIS.md) for comprehensive guidelines**
+
 ## React Context State Management
 
 The application uses React Context API with useReducer for centralized state management. This approach provides a simpler alternative to Redux while maintaining predictable state updates.

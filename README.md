@@ -56,7 +56,50 @@ This will start both the React development server (localhost:3000) and the Elect
 - `npm run build:mac` - Build macOS app
 - `npm run dist` - Create distributable packages
 - `npm run lint` - Run ESLint
+- `npm run check-deps` - **Check for unstable dependencies (alpha, beta, RC versions)**
 - `npm test` - Run tests
+
+## Dependency Management 🔒
+
+This project enforces **stable-only dependencies** to ensure reliability and security.
+
+### ⚠️ Dependency Rules
+
+- **Forbidden**: Alpha, beta, RC, canary, next, or dev versions
+- **Required**: Only stable, production-ready packages
+- **Monitoring**: Automated stability checks and security audits
+
+### 🛠️ Dependency Scripts
+
+```bash
+# Check for unstable dependencies
+npm run check-deps
+
+# Security audit
+npm audit
+
+# Check for outdated packages
+npm outdated
+```
+
+### 📋 Before Installing Dependencies
+
+1. **Check stability**: Run `npm run check-deps`
+2. **Install stable version**: Use `npm install package@^1.2.3`
+3. **Re-check**: Run `npm run check-deps` again
+4. **Security audit**: Run `npm audit`
+5. **Test thoroughly**: Ensure app still works
+
+### 📚 Documentation
+
+- **[DEPENDENCY_ANALYSIS.md](./DEPENDENCY_ANALYSIS.md)** - Comprehensive dependency analysis and guidelines
+- **[README_DEPENDENCY_ANALYSIS.md](./README_DEPENDENCY_ANALYSIS.md)** - Quick reference guide
+
+### ✅ Current Status
+
+- All dependencies are using stable versions
+- Automated monitoring is active
+- 1 known security issue (xlsx package) documented and tracked
 
 ## React Context State Management
 

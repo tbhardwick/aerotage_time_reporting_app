@@ -274,47 +274,109 @@ src/
 - Client management system
 - User authentication integration
 
-## 8. Key Dependencies (Current)
+## 8. Key Dependencies & Stability Management
+
+### Current Dependencies ✅ (All Stable Versions)
 
 ```json
 {
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.16.0",
-    "tailwindcss": "^3.3.5",
-    "@types/react": "^18.2.31",
-    "@types/react-dom": "^18.2.14",
-    "typescript": "^5.2.2"
+    "@headlessui/react": "^2.2.4",
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^5.0.1",
+    "@reduxjs/toolkit": "^2.8.2",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "aws-amplify": "^6.14.4",
+    "chart.js": "^4.4.9",
+    "date-fns": "^4.1.0",
+    "electron-log": "^5.2.4",
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.3.9",
+    "jspdf": "^3.0.1",
+    "react": "^19.1.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.56.4",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.6.0",
+    "redux-persist": "^6.0.0",
+    "typescript": "^5.8.3",
+    "xlsx": "^0.18.5",
+    "zod": "^3.25.23"
   },
   "devDependencies": {
-    "electron": "^27.0.0",
-    "webpack": "^5.89.0",
-    "webpack-dev-server": "^4.15.1",
-    "concurrently": "^8.2.2",
-    "electronmon": "^2.0.2"
+    "@playwright/test": "^1.40.0",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "^22.15.21",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "css-loader": "^7.1.2",
+    "electron": "^36.3.1",
+    "electron-builder": "^25.1.8",
+    "electron-reload": "^1.5.0",
+    "electronmon": "^2.0.2",
+    "eslint": "^8.57.0",
+    "events": "^3.3.0",
+    "html-webpack-plugin": "^5.6.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "playwright": "^1.40.0",
+    "postcss": "^8.5.3",
+    "postcss-loader": "^8.1.1",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^3.4.17",
+    "ts-loader": "^9.5.2",
+    "wait-on": "^8.0.3",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
   }
 }
 ```
 
-### Future Dependencies
-```json
-{
-  "planned": {
-    "react-hook-form": "^7.47.0",
-    "zod": "^3.22.4",
-    "@hookform/resolvers": "^3.3.2",
-    "@headlessui/react": "^1.7.17",
-    "@heroicons/react": "^2.0.18",
-    "date-fns": "^2.30.0",
-    "chart.js": "^4.4.0",
-    "react-chartjs-2": "^5.2.0",
-    "aws-amplify": "^5.3.11",
-    "jspdf": "^2.5.1",
-    "xlsx": "^0.18.5"
-  }
-}
+### 🔒 Dependency Stability Management
+
+**Policy**: This project enforces **stable-only dependencies** for maximum reliability.
+
+#### ✅ Stability Achievements
+- **Zero unstable dependencies**: All alpha/beta/RC versions eliminated
+- **Automated monitoring**: `npm run check-deps` script prevents unstable packages
+- **Security tracking**: Regular `npm audit` for vulnerability monitoring
+- **Breaking change management**: Systematic approach to major version updates
+
+#### ⚠️ Known Issues
+- **xlsx package**: Security vulnerabilities (Prototype Pollution & ReDoS)
+  - **Status**: No upstream fix available
+  - **Alternatives**: Evaluating `exceljs` or `papaparse`
+  - **Risk**: Documented and accepted pending replacement
+
+#### 🛠️ Dependency Tools
+```bash
+# Check for unstable dependencies
+npm run check-deps
+
+# Security audit
+npm audit
+
+# Check for updates
+npm outdated
 ```
+
+#### 📋 Recent Dependency Actions
+- ✅ **electron-reload**: Replaced alpha version `2.0.0-alpha.1` → stable `1.5.0`
+- ✅ **electron**: Updated to latest patch `36.3.1`
+- ⚠️ **electron-store**: Reverted from `10.0.1` to `8.2.0` (v10+ is ESM-only breaking change)
+
+#### 🔮 Planned Major Updates
+- **electron-store v10+**: Requires ESM migration (planned for separate phase)
+- **ESLint 9.x**: Major version update (breaking changes)
+- **Tailwind CSS 4.x**: Major version update (significant changes expected)
+
+📚 **See [DEPENDENCY_ANALYSIS.md](./DEPENDENCY_ANALYSIS.md) for comprehensive analysis**
+
+### Future Dependencies (Deprecated)
 
 ## 9. AWS Backend Structure (Separate Repository)
 
