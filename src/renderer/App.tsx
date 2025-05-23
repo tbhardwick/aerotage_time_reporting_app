@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import TimeTrackingNew from './pages/TimeTrackingNew';
+import Projects from './pages/Projects';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const Dashboard: React.FC = () => (
@@ -21,13 +22,6 @@ const Dashboard: React.FC = () => (
     >
       Go to Time Tracking
     </Link>
-  </div>
-);
-
-const Projects: React.FC = () => (
-  <div style={{ padding: '2rem', textAlign: 'center' }}>
-    <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Projects</h1>
-    <p style={{ color: '#666' }}>Manage your projects here</p>
   </div>
 );
 

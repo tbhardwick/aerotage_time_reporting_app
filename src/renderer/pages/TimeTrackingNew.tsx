@@ -75,6 +75,9 @@ const TimeTrackingNew: React.FC = () => {
     });
   };
 
+  // Get active projects only
+  const activeProjects = state.projects.filter(project => project.status === 'active');
+
   const totalTime = state.timeEntries.reduce((total, entry) => total + entry.duration, 0);
   const billableTime = state.timeEntries
     .filter(entry => entry.isBillable)
@@ -158,6 +161,7 @@ const TimeTrackingNew: React.FC = () => {
               fontSize: '0.875rem'
             }}>
               <strong>Current:</strong> {state.projects.find(p => p.id === state.timer.currentProjectId)?.name}<br/>
+              <strong>Client:</strong> {state.projects.find(p => p.id === state.timer.currentProjectId)?.client?.name}<br/>
               <strong>Task:</strong> {state.timer.currentDescription}
             </div>
           )}
@@ -187,12 +191,40 @@ const TimeTrackingNew: React.FC = () => {
             }}
           >
             <option value="">Select a project...</option>
-            {state.projects.filter(p => p.isActive).map(project => (
+            {activeProjects.map(project => (
               <option key={project.id} value={project.id}>
-                {project.name} - {project.client}
+                {project.name} - {project.client?.name || 'Unknown Client'}
               </option>
             ))}
           </select>
+          
+          {/* Project Details */}
+          {selectedProjectId && (
+            <div style={{ 
+              backgroundColor: '#f8fafc', 
+              padding: '0.75rem', 
+              borderRadius: '0.5rem',
+              marginBottom: '1rem',
+              fontSize: '0.875rem'
+            }}>
+              {(() => {
+                const project = state.projects.find(p => p.id === selectedProjectId);
+                return project ? (
+                  <>
+                    <div><strong>Client:</strong> {project.client?.name}</div>
+                    <div><strong>Rate:</strong> ${project.hourlyRate}/hr</div>
+                    {project.description && (
+                      <div><strong>Description:</strong> {project.description}</div>
+                    )}
+                    {project.budget?.hours && (
+                      <div><strong>Budget:</strong> {project.budget.hours} hours</div>
+                    )}
+                  </>
+                ) : null;
+              })()}
+            </div>
+          )}
+          
           <textarea 
             placeholder="What are you working on?"
             value={description}
@@ -284,7 +316,9 @@ const TimeTrackingNew: React.FC = () => {
                         </span>
                       </div>
                       <h4 style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{project?.name || 'Unknown Project'}</h4>
-                      <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem' }}>{project?.client}</p>
+                      <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem' }}>
+                        {project?.client?.name || 'Unknown Client'}
+                      </p>
                       <p style={{ fontSize: '0.875rem' }}>{entry.description}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
@@ -342,7 +376,7 @@ const TimeTrackingNew: React.FC = () => {
         fontSize: '0.875rem',
         fontWeight: '600'
       }}>
-        🎉 React Context State Management - Working!
+        🎉 Phase 3 - Enhanced Project & Client Management!
       </div>
     </div>
   );
