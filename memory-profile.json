@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-05-23T16:59:59.788Z",
+  "memory": {
+    "rss": 38486016,
+    "heapTotal": 5324800,
+    "heapUsed": 4035784,
+    "external": 1466999,
+    "arrayBuffers": 10515,
+    "heapUsagePercentage": 75.79
+  },
+  "leaks": [],
+  "recommendations": [
+    {
+      "category": "Heap Usage",
+      "priority": "Medium",
+      "issue": "Moderate heap usage detected",
+      "recommendation": "Monitor memory usage and optimize heavy components"
+    },
+    {
+      "category": "General",
+      "priority": "Low",
+      "issue": "Component optimization",
+      "recommendation": "Use React.memo for expensive components to prevent unnecessary re-renders"
+    },
+    {
+      "category": "General",
+      "priority": "Low",
+      "issue": "State management",
+      "recommendation": "Consider using useCallback and useMemo for expensive computations"
+    }
+  ],
+  "summary": {
+    "score": 75,
+    "grade": "C",
+    "rssMB": "36.70",
+    "heapUsedMB": "3.85"
+  }
+}

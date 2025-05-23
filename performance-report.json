@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-05-23T16:59:13.262Z",
+  "bundle": {
+    "totalSize": 1894119,
+    "files": [
+      {
+        "file": "354.bundle.js",
+        "category": "Main Bundle",
+        "size": 199435,
+        "sizeKB": "194.76",
+        "sizeMB": "0.19"
+      },
+      {
+        "file": "418.bundle.js",
+        "category": "Main Bundle",
+        "size": 22059,
+        "sizeKB": "21.54",
+        "sizeMB": "0.02"
+      },
+      {
+        "file": "780.bundle.js",
+        "category": "Main Bundle",
+        "size": 155620,
+        "sizeKB": "151.97",
+        "sizeMB": "0.15"
+      },
+      {
+        "file": "bundle.js",
+        "category": "Main Bundle",
+        "size": 1517005,
+        "sizeKB": "1481.45",
+        "sizeMB": "1.45"
+      }
+    ]
+  },
+  "assets": {
+    "totalSize": 6475,
+    "breakdown": {
+      "html": 1726,
+      "styles": 4748,
+      "images": 1
+    }
+  },
+  "recommendations": [
+    {
+      "category": "General",
+      "priority": "Low",
+      "issue": "Performance monitoring",
+      "recommendation": "Implement React DevTools Profiler for component performance monitoring"
+    },
+    {
+      "category": "General",
+      "priority": "Low",
+      "issue": "Memory management",
+      "recommendation": "Use React.memo for expensive components, cleanup event listeners"
+    }
+  ],
+  "summary": {
+    "score": 90,
+    "grade": "A",
+    "totalKB": "1856.05"
+  }
+}

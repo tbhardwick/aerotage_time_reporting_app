@@ -20,7 +20,11 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "analyze-bundle": "webpack --mode production --env analyze",
+    "performance:bundle": "npm run build:renderer && node scripts/analyze-performance.js",
+    "performance:memory": "node scripts/memory-profiler.js",
+    "performance:report": "node scripts/performance-report.js"
   },
   "keywords": [
     "electron",
