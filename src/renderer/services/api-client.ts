@@ -104,11 +104,30 @@ class AerotageApiClient {
 
   private async getAuthToken(): Promise<string> {
     try {
-      const session = await fetchAuthSession();
-      return session.tokens?.idToken?.toString() || '';
+      // Try to get the session with forceRefresh to bypass caching issues
+      const session = await fetchAuthSession({ forceRefresh: false });
+      
+      // Check if we have a valid ID token
+      if (session.tokens?.idToken) {
+        return session.tokens.idToken.toString();
+      }
+      
+      // If we don't have an ID token but have access token, try that
+      if (session.tokens?.accessToken) {
+        return session.tokens.accessToken.toString();
+      }
+      
+      throw new Error('No valid authentication token found');
     } catch (error) {
-      console.error('Failed to get auth token:', error);
-      throw new Error('Authentication required');
+      console.error('Failed to get auth token via fetchAuthSession:', error);
+      
+      // If fetchAuthSession fails due to Identity Pool issues, throw a user-friendly error
+      if (error instanceof Error && error.message?.includes('Invalid identity pool configuration')) {
+        throw new Error('AWS Identity Pool configuration error. Please contact your administrator.');
+      }
+      
+      // For other auth errors, provide a generic message
+      throw new Error('Authentication required. Please sign in again.');
     }
   }
 

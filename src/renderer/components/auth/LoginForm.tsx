@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signIn, confirmSignIn } from 'aws-amplify/auth';
+import { signIn, confirmSignIn, getCurrentUser } from 'aws-amplify/auth';
 import { useAppContext } from '../../context/AppContext';
 import { apiClient } from '../../services/api-client';
 
@@ -87,19 +87,43 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   const handleSuccessfulLogin = async () => {
     try {
-      // Get user data from API
+      // Try to get user data from API
       const userData = await apiClient.getCurrentUser();
       
       // Update context with user data
       dispatch({ type: 'SET_USER', payload: userData });
       
-      // Load initial data in the background
-      // Note: For now, we'll let the individual pages load their data
-      // This avoids type mismatches and keeps the login fast
-      
       onLoginSuccess?.();
     } catch (err: any) {
       console.error('Failed to load user data:', err);
+      
+      // If it's an identity pool error, show a specific message but continue
+      if (err.message?.includes('AWS Identity Pool configuration error')) {
+        setError('Warning: Some features may be limited due to configuration issues. Contact your administrator.');
+      }
+      
+      // Create a minimal user object from Cognito data for now
+      try {
+        const cognitoUser = await getCurrentUser();
+        const minimalUser = {
+          id: cognitoUser.userId || 'unknown',
+          email: cognitoUser.signInDetails?.loginId || 'unknown@example.com',
+          name: cognitoUser.signInDetails?.loginId?.split('@')[0] || 'User',
+          role: 'employee' as const,
+          isActive: true,
+          startDate: new Date().toISOString(),
+          permissions: { features: [], projects: [] },
+          preferences: { theme: 'light' as const, notifications: true, timezone: 'UTC' },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          createdBy: 'system'
+        };
+        
+        dispatch({ type: 'SET_USER', payload: minimalUser });
+      } catch (cognitoErr) {
+        console.error('Failed to get Cognito user data:', cognitoErr);
+      }
+      
       // Continue with login even if data loading fails
       onLoginSuccess?.();
     }
@@ -128,6 +152,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   name="newPassword"
                   type="password"
                   required
+                  autoFocus
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
