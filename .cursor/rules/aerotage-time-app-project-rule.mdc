@@ -3,10 +3,43 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Aerotage Time Reporting Application - Cursor Rules
+# Aerotage Time Reporting Application - Frontend Repository - Cursor Rules
+
+## 🏗️ Repository Architecture Overview
+
+This project uses a **two-repository architecture** to separate concerns:
+
+### 📱 **aerotage_time_reporting_app** (THIS REPOSITORY)
+**Purpose**: Frontend Electron desktop application
+**Contains**: 
+- Electron main process, renderer, and preload scripts
+- React/TypeScript frontend code
+- UI components, pages, and styling
+- State management (React Context)
+- Frontend configuration and build tools
+- Documentation specific to frontend development
+
+### 🚀 **aerotage-time-reporting-api** (SEPARATE REPOSITORY)
+**Purpose**: Backend AWS serverless infrastructure
+**Contains**:
+- AWS CDK infrastructure code (TypeScript)
+- AWS Lambda function implementations
+- DynamoDB table definitions
+- API Gateway configurations
+- Cognito authentication setup
+- CloudWatch monitoring and logging
+- S3 storage buckets
+- Deployment scripts and infrastructure documentation
+
+### 🔄 **Repository Interaction Rules**
+1. **Frontend NEVER contains**: AWS CDK code, Lambda functions, infrastructure definitions
+2. **Backend NEVER contains**: Electron code, React components, frontend styling
+3. **Shared Configuration**: AWS configuration values are maintained in frontend `src/renderer/config/aws-config.ts`
+4. **Development**: Both repositories can be developed independently
+5. **Deployment**: Infrastructure must be deployed before frontend can connect to APIs
 
 ## Project Overview
-You are developing the Aerotage Time Reporting Application, a professional desktop time tracking and billing application for Aerotage Design Group, Inc. This is an Electron-based desktop app with React/TypeScript frontend and AWS serverless backend.
+You are developing the **frontend** of the Aerotage Time Reporting Application, a professional desktop time tracking and billing application for Aerotage Design Group, Inc. This is an Electron-based desktop app with React/TypeScript frontend that connects to an AWS serverless backend (maintained in separate repository).
 
 ## Core Architecture Rules
 
@@ -95,11 +128,15 @@ src/
 │   ├── pages/             # Main application pages
 │   ├── context/           # React Context providers and hooks
 │   │   └── AppContext.tsx # Main application state
-│   ├── services/          # API services
+│   ├── services/          # API client services (connects to backend)
+│   ├── config/            # AWS and API configuration
 │   ├── utils/             # Utility functions
 │   └── types/             # TypeScript definitions
 ├── preload/               # Electron preload scripts
 └── shared/                # Shared utilities
+
+# IMPORTANT: NO infrastructure/ directory in this repo
+# Infrastructure is maintained in aerotage-time-reporting-api repo
 ```
 
 ## Development Guidelines
@@ -134,11 +171,14 @@ src/
 5. **State Structure**: Organize state logically (timeEntries, projects, timer, user)
 
 ### API Integration Rules
-1. **AWS Amplify**: Use for authentication and API calls
-2. **Error Handling**: Implement proper error boundaries and try-catch blocks
-3. **Loading States**: Show loading indicators for async operations
-4. **Offline Support**: Handle network connectivity issues gracefully
-5. **Context Integration**: Update context state after successful API calls
+1. **AWS Amplify**: Use for authentication and API calls to backend
+2. **Configuration**: Backend endpoints configured in `src/renderer/config/aws-config.ts`
+3. **API Client**: Use centralized API client in `src/renderer/services/api-client.ts`
+4. **Error Handling**: Implement proper error boundaries and try-catch blocks
+5. **Loading States**: Show loading indicators for async operations
+6. **Offline Support**: Handle network connectivity issues gracefully
+7. **Context Integration**: Update context state after successful API calls
+8. **Backend Dependency**: Frontend requires backend infrastructure to be deployed first
 
 ## Feature-Specific Rules
 
@@ -350,19 +390,19 @@ type AppAction =
 
 ## Deployment Considerations
 
-### Electron Packaging
-- Configure proper app signing
+### Frontend Deployment
+- Build Electron application for target platforms
+- Configure proper app signing and notarization
 - Implement auto-update functionality
-- Optimize app bundle size
-- Handle different OS requirements
-- Test on target platforms
+- Package with correct backend API endpoints
+- Test against deployed backend infrastructure
 
-### AWS Integration
-- Use environment-specific configurations
-- Implement proper IAM roles and policies
-- Monitor AWS service usage
-- Handle AWS service limits
-- Implement proper backup strategies
+### ⚠️ Backend Deployment (External Dependency)
+**NOTE**: Backend infrastructure is maintained in `aerotage-time-reporting-api` repository
+- Backend must be deployed before frontend development/testing
+- AWS resources (Cognito, API Gateway, Lambda, DynamoDB) managed separately
+- Backend deployment handled via AWS CDK in separate repository
+- Frontend connects to deployed backend via configured endpoints
 
 ## Prohibited Practices
 
@@ -385,6 +425,8 @@ type AppAction =
 - **Ignore security vulnerabilities from `npm audit`** ❌
 - **Use exact versions without caret (^) for stable deps** ❌
 - **Install dependencies without testing in feature branch** ❌
+- **Add AWS CDK or infrastructure code to this repository** ❌
+- **Modify backend infrastructure from this repository** ❌
 
 ### Always Do
 - Follow the established file structure
@@ -406,6 +448,8 @@ type AppAction =
 - **Run `npm audit` weekly for security issues** ✅
 - **Test dependency updates in feature branches** ✅
 - **Document any unavoidable unstable dependencies** ✅
+- **Coordinate with backend repository for infrastructure changes** ✅
+- **Update AWS configuration when backend endpoints change** ✅
 
 ## Phase-Specific Focus
 
