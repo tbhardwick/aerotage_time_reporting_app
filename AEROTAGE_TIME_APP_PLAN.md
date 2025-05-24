@@ -641,6 +641,357 @@ PUT /invoices/{id}
 POST /invoices/{id}/send
 ```
 
+## 9.1 AWS Backend Setup Plan - Detailed Instructions ✅ NEW
+
+### 🎯 **Phase 9: AWS Backend Infrastructure Setup**
+**Timeline**: Weeks 15-16 | **Status**: 📋 **READY TO START**
+
+#### **Prerequisites & Setup Instructions**
+
+##### **Step 1: Repository Structure Decision ✅ RECOMMENDED**
+
+**Create a separate backend repository** with this structure:
+```
+aerotage-time-reporting-api/          # New repository
+├── README.md
+├── package.json
+├── tsconfig.json
+├── .gitignore
+├── .env.example
+├── infrastructure/                   # AWS CDK infrastructure
+│   ├── cdk.json
+│   ├── bin/
+│   │   └── aerotage-time-api.ts     # CDK app entry point
+│   ├── lib/                         # CDK stack definitions
+│   │   ├── cognito-stack.ts         # Authentication
+│   │   ├── api-stack.ts             # API Gateway + Lambda
+│   │   ├── database-stack.ts        # DynamoDB tables
+│   │   ├── storage-stack.ts         # S3 buckets
+│   │   └── monitoring-stack.ts      # CloudWatch
+│   └── test/                        # Infrastructure tests
+├── src/                             # Lambda functions
+│   ├── handlers/                    # API endpoint handlers
+│   │   ├── auth/                    # Authentication endpoints
+│   │   ├── users/                   # User management
+│   │   ├── teams/                   # Team management
+│   │   ├── projects/                # Project endpoints
+│   │   ├── time-entries/            # Time tracking
+│   │   ├── reports/                 # Reporting
+│   │   └── invoices/                # Invoice management
+│   ├── models/                      # Data models
+│   ├── utils/                       # Shared utilities
+│   ├── middleware/                  # Auth & validation middleware
+│   └── types/                       # TypeScript types
+├── tests/                           # Integration & unit tests
+└── docs/                           # API documentation
+```
+
+##### **Step 2: AWS Account & CLI Setup**
+
+**🚀 Install AWS CLI (if not installed):**
+```bash
+# macOS (using Homebrew)
+brew install awscli
+
+# Verify installation
+aws --version
+```
+
+**🔐 Configure AWS Credentials:**
+```bash
+# Configure AWS CLI with your credentials
+aws configure
+
+# You'll need:
+# - AWS Access Key ID
+# - AWS Secret Access Key  
+# - Default region (e.g., us-east-1)
+# - Default output format (json)
+```
+
+**🔑 Set up AWS Profile (recommended for multiple environments):**
+```bash
+# Create profiles for different environments
+aws configure --profile aerotage-dev
+aws configure --profile aerotage-staging  
+aws configure --profile aerotage-prod
+
+# Test access
+aws sts get-caller-identity --profile aerotage-dev
+```
+
+##### **Step 3: Infrastructure as Code Choice**
+
+**✅ RECOMMENDED: AWS CDK (TypeScript)**
+- **Advantages**: Same language as your frontend (TypeScript)
+- **Benefits**: Type safety, better IDE support, familiar syntax
+- **Learning Curve**: Easier for JavaScript/TypeScript developers
+
+**📦 Install AWS CDK:**
+```bash
+# Install CDK globally
+npm install -g aws-cdk
+
+# Verify installation  
+cdk --version
+
+# Bootstrap CDK (one-time setup per AWS account/region)
+cdk bootstrap --profile aerotage-dev
+```
+
+##### **Step 4: Create Backend Repository**
+
+**🚀 Initialize the Backend Repository:**
+```bash
+# Navigate to parent directory
+cd ..
+
+# Create new repository directory
+mkdir aerotage-time-reporting-api
+cd aerotage-time-reporting-api
+
+# Initialize git and npm
+git init
+npm init -y
+
+# Install CDK dependencies
+npm install aws-cdk-lib constructs
+npm install -D typescript @types/node ts-node
+
+# Install Lambda dependencies
+npm install aws-lambda @aws-sdk/client-dynamodb @aws-sdk/client-cognito-identity-provider
+npm install -D @types/aws-lambda
+
+# Create initial CDK app
+cdk init app --language typescript
+```
+
+**📁 Add to Cursor Workspace:**
+```bash
+# In your main Cursor workspace, add the backend folder
+# File > Add Folder to Workspace > Select aerotage-time-reporting-api
+```
+
+##### **Step 5: Environment Configuration**
+
+**🌍 Environment Setup (.env files):**
+```bash
+# .env.development
+AWS_PROFILE=aerotage-dev
+AWS_REGION=us-east-1
+STAGE=dev
+COGNITO_USER_POOL_NAME=aerotage-time-dev
+API_NAME=aerotage-time-api-dev
+
+# .env.staging  
+AWS_PROFILE=aerotage-staging
+AWS_REGION=us-east-1
+STAGE=staging
+COGNITO_USER_POOL_NAME=aerotage-time-staging
+API_NAME=aerotage-time-api-staging
+
+# .env.production
+AWS_PROFILE=aerotage-prod
+AWS_REGION=us-east-1
+STAGE=prod
+COGNITO_USER_POOL_NAME=aerotage-time-prod
+API_NAME=aerotage-time-api-prod
+```
+
+##### **Step 6: Initial Infrastructure Code**
+
+**🏗️ CDK Stack Structure:**
+
+```typescript
+// bin/aerotage-time-api.ts
+import * as cdk from 'aws-cdk-lib';
+import { CognitoStack } from '../lib/cognito-stack';
+import { DatabaseStack } from '../lib/database-stack';
+import { ApiStack } from '../lib/api-stack';
+
+const app = new cdk.App();
+
+const stage = process.env.STAGE || 'dev';
+
+// Cognito User Pool
+const cognitoStack = new CognitoStack(app, `AerotageAuth-${stage}`, {
+  stage,
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});
+
+// DynamoDB Tables
+const databaseStack = new DatabaseStack(app, `AerotageDB-${stage}`, {
+  stage,
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});
+
+// API Gateway + Lambda
+const apiStack = new ApiStack(app, `AerotageAPI-${stage}`, {
+  stage,
+  userPool: cognitoStack.userPool,
+  tables: databaseStack.tables,
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});
+```
+
+##### **Step 7: Development Workflow**
+
+**📝 Package.json Scripts:**
+```json
+{
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy:dev": "cdk deploy --all --profile aerotage-dev",
+    "deploy:staging": "cdk deploy --all --profile aerotage-staging", 
+    "deploy:prod": "cdk deploy --all --profile aerotage-prod",
+    "destroy:dev": "cdk destroy --all --profile aerotage-dev",
+    "test": "jest",
+    "lint": "eslint . --ext .ts"
+  }
+}
+```
+
+**🚀 Deployment Commands:**
+```bash
+# Development environment
+npm run deploy:dev
+
+# Staging environment  
+npm run deploy:staging
+
+# Production environment
+npm run deploy:prod
+```
+
+##### **Step 8: Frontend Integration**
+
+**🔗 Update Frontend AWS Amplify Configuration:**
+```typescript
+// src/aws-config.ts
+import { Amplify } from 'aws-amplify';
+
+const awsConfig = {
+  Auth: {
+    region: process.env.AWS_REGION || 'us-east-1',
+    userPoolId: process.env.USER_POOL_ID,
+    userPoolWebClientId: process.env.USER_POOL_CLIENT_ID,
+  },
+  API: {
+    endpoints: [
+      {
+        name: 'AerotageTimeAPI',
+        endpoint: process.env.API_ENDPOINT,
+        region: process.env.AWS_REGION || 'us-east-1',
+      },
+    ],
+  },
+};
+
+Amplify.configure(awsConfig);
+```
+
+##### **Step 9: API Development Plan**
+
+**📋 Implementation Priority:**
+1. **Authentication APIs** (login, logout, token refresh)
+2. **User Management APIs** (CRUD, invitations)
+3. **Team Management APIs** (teams, members)
+4. **Project & Client APIs** (existing frontend features)
+5. **Time Entry APIs** (timer integration)
+6. **Reporting APIs** (charts and exports)
+7. **Invoice APIs** (generation and management)
+
+##### **Step 10: Security & Monitoring**
+
+**🔐 Security Configuration:**
+```typescript
+// API Gateway with Cognito Authorization
+const api = new apigateway.RestApi(this, 'API', {
+  restApiName: `aerotage-time-api-${stage}`,
+  defaultCorsPreflightOptions: {
+    allowOrigins: apigateway.Cors.ALL_ORIGINS,
+    allowMethods: apigateway.Cors.ALL_METHODS,
+  },
+});
+
+const auth = new apigateway.CognitoUserPoolsAuthorizer(this, 'Authorizer', {
+  cognitoUserPools: [userPool],
+});
+```
+
+**📊 CloudWatch Monitoring:**
+```typescript
+// Lambda function with monitoring
+const lambda = new lambda.Function(this, 'Handler', {
+  // ... configuration
+  environment: {
+    LOG_LEVEL: 'INFO',
+  },
+});
+
+// CloudWatch alarms
+new cloudwatch.Alarm(this, 'ErrorAlarm', {
+  metric: lambda.metricErrors(),
+  threshold: 5,
+  evaluationPeriods: 2,
+});
+```
+
+#### **🎯 Next Steps - Implementation Plan**
+
+##### **Week 15: Infrastructure Foundation**
+1. **Day 1-2**: Set up AWS CLI, create backend repo
+2. **Day 3-4**: Implement Cognito and DynamoDB stacks
+3. **Day 5**: Deploy development environment and test
+
+##### **Week 16: API Development**  
+1. **Day 1-2**: Authentication endpoints
+2. **Day 3-4**: User management APIs
+3. **Day 5**: Frontend integration and testing
+
+##### **Week 17: Feature APIs**
+1. **Day 1-2**: Project and Client APIs
+2. **Day 3-4**: Time Entry APIs
+3. **Day 5**: Testing and validation
+
+##### **Week 18: Advanced Features**
+1. **Day 1-2**: Reporting APIs
+2. **Day 3-4**: Invoice APIs
+3. **Day 5**: Production deployment
+
+#### **📚 Additional Resources**
+
+**📖 Documentation Links:**
+- [AWS CDK TypeScript Guide](https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html)
+- [AWS Cognito User Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
+- [API Gateway with Lambda](https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-lambda-integration.html)
+- [DynamoDB Best Practices](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html)
+
+**🔧 Useful Commands:**
+```bash
+# CDK Commands
+cdk diff                    # Show changes
+cdk synth                   # Generate CloudFormation
+cdk deploy --hotswap        # Fast deployment for Lambda changes
+cdk destroy                 # Clean up resources
+
+# AWS CLI Commands  
+aws cognito-idp list-users --user-pool-id <pool-id>
+aws dynamodb scan --table-name <table-name>
+aws logs tail /aws/lambda/<function-name> --follow
+```
+
 ## 10. Security Considerations ✅ ENHANCED FOR PHASE 8
 
 - **Data Encryption**: All data encrypted in transit and at rest
