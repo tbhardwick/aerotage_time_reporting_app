@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-ro
 import { Amplify } from 'aws-amplify';
 import { signOut } from 'aws-amplify/auth';
 import { AppProvider } from './context/AppContext';
+import { DataInitializer } from './components/common/DataInitializer';
 import TimeTrackingNew from './pages/TimeTrackingNew';
 import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
@@ -128,24 +129,26 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <AppProvider>
-        <ProtectedRoute>
-          <Router>
-            <div className="min-h-screen bg-gray-50 font-sans">
-              <Navigation />
-              <main className="flex-1" role="main">
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/time-tracking" element={<TimeTrackingNew />} />
-                  <Route path="/projects" element={<Projects />} />
-                  <Route path="/approvals" element={<Approvals />} />
-                  <Route path="/reports" element={<Reports />} />
-                  <Route path="/invoices" element={<Invoices />} />
-                  <Route path="/users" element={<Users />} />
-                </Routes>
-              </main>
-            </div>
-          </Router>
-        </ProtectedRoute>
+        <DataInitializer>
+          <ProtectedRoute>
+            <Router>
+              <div className="min-h-screen bg-gray-50 font-sans">
+                <Navigation />
+                <main className="flex-1" role="main">
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/time-tracking" element={<TimeTrackingNew />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/approvals" element={<Approvals />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/invoices" element={<Invoices />} />
+                    <Route path="/users" element={<Users />} />
+                  </Routes>
+                </main>
+              </div>
+            </Router>
+          </ProtectedRoute>
+        </DataInitializer>
       </AppProvider>
     </ErrorBoundary>
   );

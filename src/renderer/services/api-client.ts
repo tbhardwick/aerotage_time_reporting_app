@@ -144,25 +144,71 @@ class AerotageApiClient {
         ...options.headers,
       };
 
-      let response;
+      let restResponse;
       switch (method) {
         case 'GET':
-          response = await get({ apiName: this.apiName, path, options: { headers, ...options } });
+          restResponse = await get({ apiName: this.apiName, path, options: { headers, ...options } });
           break;
         case 'POST':
-          response = await post({ apiName: this.apiName, path, options: { headers, body: options.body, ...options } });
+          restResponse = await post({ apiName: this.apiName, path, options: { headers, body: options.body, ...options } });
           break;
         case 'PUT':
-          response = await put({ apiName: this.apiName, path, options: { headers, body: options.body, ...options } });
+          restResponse = await put({ apiName: this.apiName, path, options: { headers, body: options.body, ...options } });
           break;
         case 'DELETE':
-          response = await del({ apiName: this.apiName, path, options: { headers, ...options } });
+          restResponse = await del({ apiName: this.apiName, path, options: { headers, ...options } });
           break;
         default:
           throw new Error(`Unsupported method: ${method}`);
       }
 
-      return response.response as T;
+      // Debug: Log the raw response to understand its structure
+      console.log(`🔍 Raw API response for ${method} ${path}:`, restResponse);
+
+      // Amplify v6 returns {response: Promise, cancel: function}
+      // We need to await the response Promise first
+      const response = await restResponse.response;
+      
+      console.log(`🔍 Awaited response for ${method} ${path}:`, response);
+
+      // Handle different response formats
+      let responseData;
+      
+      // Check if response has a body property
+      if (response && typeof response === 'object' && 'body' in response) {
+        const body = (response as any).body;
+        
+        // If body is a ReadableStream, read it
+        if (body instanceof ReadableStream) {
+          const reader = body.getReader();
+          const decoder = new TextDecoder();
+          let result = '';
+          let done = false;
+          
+          while (!done) {
+            const { value, done: readerDone } = await reader.read();
+            done = readerDone;
+            if (value) {
+              result += decoder.decode(value, { stream: !done });
+            }
+          }
+          
+          // Parse the JSON string
+          responseData = result ? JSON.parse(result) : null;
+        } else if (typeof body === 'string') {
+          // If body is already a string, parse it
+          responseData = JSON.parse(body);
+        } else {
+          // If body is already parsed JSON
+          responseData = body;
+        }
+      } else {
+        // Direct response
+        responseData = response;
+      }
+
+      console.log(`✅ Parsed API data for ${method} ${path}:`, responseData);
+      return responseData as T;
     } catch (error) {
       console.error(`API Error (${method} ${path}):`, error);
       throw error;

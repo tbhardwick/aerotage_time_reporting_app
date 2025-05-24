@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { signIn, confirmSignIn, getCurrentUser, resetPassword, confirmResetPassword } from 'aws-amplify/auth';
+import { signIn, confirmSignIn, getCurrentUser, resetPassword, confirmResetPassword, resendSignUpCode, AuthError } from 'aws-amplify/auth';
 import { useAppContext } from '../../context/AppContext';
 import { apiClient } from '../../services/api-client';
 import { handlePasswordResetErrors, validatePasswordPolicy, formatPasswordErrors } from '../../utils/passwordResetErrors';
+import { useDataLoader } from '../../hooks/useDataLoader';
 
 interface LoginFormProps {
   onLoginSuccess?: () => void;
@@ -10,6 +11,7 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const { dispatch } = useAppContext();
+  const { loadAllData } = useDataLoader();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -126,44 +128,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   const handleSuccessfulLogin = async () => {
     try {
-      // Try to get user data from API
-      const userData = await apiClient.getCurrentUser();
-      
-      // Update context with user data
-      dispatch({ type: 'SET_USER', payload: userData });
-      
+      // Load user data and all application data
+      await loadAllData();
       onLoginSuccess?.();
     } catch (err: any) {
-      console.error('Failed to load user data:', err);
+      console.error('Failed to load application data:', err);
       
       // If it's an identity pool error, show a specific message but continue
       if (err.message?.includes('AWS Identity Pool configuration error')) {
         setError('Warning: Some features may be limited due to configuration issues. Contact your administrator.');
+      } else {
+        setError('Failed to load application data. Please try refreshing the page.');
       }
       
-      // Create a minimal user object from Cognito data for now
-      try {
-        const cognitoUser = await getCurrentUser();
-        const minimalUser = {
-          id: cognitoUser.userId || 'unknown',
-          email: cognitoUser.signInDetails?.loginId || 'unknown@example.com',
-          name: cognitoUser.signInDetails?.loginId?.split('@')[0] || 'User',
-          role: 'employee' as const,
-          isActive: true,
-          startDate: new Date().toISOString(),
-          permissions: { features: [], projects: [] },
-          preferences: { theme: 'light' as const, notifications: true, timezone: 'UTC' },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          createdBy: 'system'
-        };
-        
-        dispatch({ type: 'SET_USER', payload: minimalUser });
-      } catch (cognitoErr) {
-        console.error('Failed to get Cognito user data:', cognitoErr);
-      }
-      
-      // Continue with login even if data loading fails
+      // Continue with login even if data loading fails partially
       onLoginSuccess?.();
     }
   };

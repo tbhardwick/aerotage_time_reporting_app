@@ -4,15 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
 import { ClockIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { useAppContext } from '../../context/AppContext';
 import { TimeEntryForm } from '../../types';
-
-// Mock projects data - same as ProjectSelector
-const mockProjects = [
-  { id: '1', name: 'Website Redesign', client: 'Acme Corp' },
-  { id: '2', name: 'Mobile App Development', client: 'TechStart Inc' },
-  { id: '3', name: 'Brand Identity', client: 'Creative Studio' },
-  { id: '4', name: 'E-commerce Platform', client: 'Retail Plus' },
-];
 
 const timeEntrySchema = z.object({
   projectId: z.string().min(1, 'Project is required'),
@@ -30,6 +23,8 @@ interface ManualTimeEntryProps {
 }
 
 const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel }) => {
+  const { state } = useAppContext();
+  const { projects } = state;
   const [useTimeRange, setUseTimeRange] = useState(false);
   
   const {
@@ -99,9 +94,9 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select a project...</option>
-            {mockProjects.map((project) => (
+            {projects.map((project) => (
               <option key={project.id} value={project.id}>
-                {project.name} - {project.client}
+                {project.name} - {project.client?.name || 'Unknown Client'}
               </option>
             ))}
           </select>

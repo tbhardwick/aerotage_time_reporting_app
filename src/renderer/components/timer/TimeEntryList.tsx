@@ -1,95 +1,7 @@
 import React, { useState } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
 import { ClockIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { TimeEntry } from '../../types';
-
-// Mock time entries data
-const mockTimeEntries: TimeEntry[] = [
-  {
-    id: '1',
-    userId: 'user1',
-    projectId: '1',
-    date: format(new Date(), 'yyyy-MM-dd'),
-    duration: 120,
-    description: 'Working on homepage design',
-    isBillable: true,
-    status: 'draft',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    project: { 
-      id: '1',
-      clientId: 'client1',
-      name: 'Website Redesign',
-      status: 'active' as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      client: { 
-        id: 'client1',
-        name: 'Acme Corp',
-        contactInfo: {},
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } 
-    }
-  },
-  {
-    id: '2',
-    userId: 'user1',
-    projectId: '2',
-    date: format(new Date(Date.now() - 86400000), 'yyyy-MM-dd'), // Yesterday
-    duration: 180,
-    description: 'Mobile app wireframes',
-    isBillable: true,
-    status: 'submitted',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    project: { 
-      id: '2',
-      clientId: 'client2',
-      name: 'Mobile App Development',
-      status: 'active' as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      client: { 
-        id: 'client2',
-        name: 'TechStart Inc',
-        contactInfo: {},
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } 
-    }
-  },
-  {
-    id: '3',
-    userId: 'user1',
-    projectId: '1',
-    date: format(new Date(Date.now() - 172800000), 'yyyy-MM-dd'), // 2 days ago
-    duration: 90,
-    description: 'Client feedback review',
-    isBillable: false,
-    status: 'approved',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    project: { 
-      id: '1',
-      clientId: 'client1',
-      name: 'Website Redesign',
-      status: 'active' as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      client: { 
-        id: 'client1',
-        name: 'Acme Corp',
-        contactInfo: {},
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } 
-    }
-  },
-];
+import { useAppContext, TimeEntry } from '../../context/AppContext';
 
 interface TimeEntryListProps {
   onEdit?: (entry: TimeEntry) => void;
@@ -98,6 +10,8 @@ interface TimeEntryListProps {
 }
 
 const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmit }) => {
+  const { state } = useAppContext();
+  const { timeEntries, projects } = state;
   const [viewMode, setViewMode] = useState<'daily' | 'weekly'>('daily');
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -124,7 +38,7 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
 
   const getEntriesForDate = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return mockTimeEntries.filter(entry => entry.date === dateStr);
+    return timeEntries.filter(entry => entry.date === dateStr);
   };
 
   const getWeeklyEntries = () => {
@@ -145,6 +59,12 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
 
   const getBillableDuration = (entries: TimeEntry[]) => {
     return entries.filter(entry => entry.isBillable).reduce((sum, entry) => sum + entry.duration, 0);
+  };
+
+  // Get project name for display
+  const getProjectName = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    return project ? `${project.name} (${project.client?.name || 'Unknown Client'})` : 'Unknown Project';
   };
 
   return (
@@ -259,8 +179,7 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
                                   {entry.isBillable ? 'Billable' : 'Non-billable'}
                                 </span>
                               </div>
-                              <h4 className="font-medium text-gray-900">{entry.project?.name}</h4>
-                              <p className="text-sm text-gray-600 mb-1">{entry.project?.client?.name}</p>
+                              <h4 className="font-medium text-gray-900">{getProjectName(entry.projectId)}</h4>
                               <p className="text-sm text-gray-800">{entry.description}</p>
                             </div>
                             
@@ -328,7 +247,7 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
                     {entries.map((entry) => (
                       <div key={entry.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
                         <div className="flex-1">
-                          <p className="font-medium text-sm text-gray-900">{entry.project?.name}</p>
+                          <p className="font-medium text-sm text-gray-900">{getProjectName(entry.projectId)}</p>
                           <p className="text-xs text-gray-600">{entry.description}</p>
                         </div>
                         <div className="flex items-center space-x-2">

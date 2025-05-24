@@ -211,317 +211,14 @@ type AppAction =
   | { type: 'SET_LOADING'; payload: { key: string; loading: boolean } }
   | { type: 'SET_ERROR'; payload: { key: string; error: string | null } };
 
-// Initial state with mock data for development
+// Initial state - now clean with no mock data
 const initialState: AppState = {
-  timeEntries: [
-    {
-      id: '1',
-      projectId: '1',
-      date: new Date().toISOString().split('T')[0],
-      duration: 120,
-      description: 'Working on homepage design',
-      isBillable: true,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-    },
-    // Submitted entries for approval workflow testing
-    {
-      id: '2',
-      projectId: '2',
-      date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
-      duration: 180,
-      description: 'Mobile app wireframes and user flow design',
-      isBillable: true,
-      status: 'submitted',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      submittedAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-      submittedBy: '3', // Bob Johnson (employee)
-    },
-    {
-      id: '3',
-      projectId: '1',
-      date: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
-      duration: 240,
-      description: 'Client meeting and requirements gathering',
-      isBillable: true,
-      status: 'submitted',
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      submittedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-      submittedBy: '3', // Bob Johnson (employee)
-    },
-    // Approved entry
-    {
-      id: '4',
-      projectId: '3',
-      date: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
-      duration: 300,
-      description: 'Logo concepts and brand color exploration',
-      isBillable: true,
-      status: 'approved',
-      createdAt: new Date(Date.now() - 259200000).toISOString(),
-      submittedAt: new Date(Date.now() - 86400000).toISOString(),
-      submittedBy: '3', // Bob Johnson (employee)
-      approverId: '2', // Jane Smith (manager)
-      approvedAt: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
-      comment: 'Great work on the logo concepts!',
-    },
-    // Rejected entry
-    {
-      id: '5',
-      projectId: '2',
-      date: new Date(Date.now() - 345600000).toISOString().split('T')[0], // 4 days ago
-      duration: 60,
-      description: 'Internal team meeting',
-      isBillable: false,
-      status: 'rejected',
-      createdAt: new Date(Date.now() - 345600000).toISOString(),
-      submittedAt: new Date(Date.now() - 259200000).toISOString(),
-      submittedBy: '3', // Bob Johnson (employee)
-      approverId: '2', // Jane Smith (manager)
-      rejectedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-      comment: 'This should not be billable to the client. Please resubmit as non-billable time.',
-    },
-    // More draft entries for testing bulk submission
-    {
-      id: '6',
-      projectId: '1',
-      date: new Date().toISOString().split('T')[0],
-      duration: 90,
-      description: 'Code review and testing',
-      isBillable: true,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: '7',
-      projectId: '3',
-      date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
-      duration: 150,
-      description: 'Typography selection and layout design',
-      isBillable: true,
-      status: 'draft',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-    },
-  ],
-  clients: [
-    {
-      id: '1',
-      name: 'Acme Corporation',
-      contactInfo: {
-        email: 'contact@acme.com',
-        phone: '+1 (555) 123-4567',
-        address: '123 Business St, Suite 100, New York, NY 10001',
-      },
-      billingAddress: '123 Business St, Suite 100, New York, NY 10001',
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      name: 'TechStart Inc',
-      contactInfo: {
-        email: 'hello@techstart.com',
-        phone: '+1 (555) 987-6543',
-        address: '456 Innovation Ave, San Francisco, CA 94105',
-      },
-      billingAddress: '456 Innovation Ave, San Francisco, CA 94105',
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      name: 'Creative Studio',
-      contactInfo: {
-        email: 'info@creativestudio.com',
-        phone: '+1 (555) 456-7890',
-      },
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ],
-  projects: [
-    {
-      id: '1',
-      clientId: '1',
-      name: 'Website Redesign',
-      description: 'Complete redesign of the company website with modern UI/UX',
-      budget: {
-        hours: 200,
-        amount: 30000,
-      },
-      hourlyRate: 150,
-      status: 'active',
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      clientId: '2',
-      name: 'Mobile App Development',
-      description: 'Native iOS and Android app development',
-      budget: {
-        hours: 400,
-        amount: 50000,
-      },
-      hourlyRate: 125,
-      status: 'active',
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      clientId: '3',
-      name: 'Brand Identity',
-      description: 'Logo design and brand guidelines',
-      budget: {
-        hours: 80,
-        amount: 8000,
-      },
-      hourlyRate: 100,
-      status: 'active',
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ],
-  users: [
-    {
-      id: '1',
-      email: 'john@aerotage.com',
-      name: 'John Doe',
-      role: 'admin',
-      hourlyRate: 150,
-      department: 'Administration',
-      isActive: true,
-      contactInfo: {
-        phone: '+1 (555) 123-4567',
-        address: '123 Admin St, Suite 100, New York, NY 10001',
-        emergencyContact: 'Jane Doe (Spouse) - +1 (555) 123-4568',
-      },
-      profilePicture: undefined,
-      jobTitle: 'System Administrator',
-      startDate: new Date(Date.now() - 31536000000).toISOString(), // 1 year ago
-      lastLogin: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-      permissions: {
-        features: ['timeTracking', 'approvals', 'reporting', 'invoicing', 'userManagement', 'projectManagement'],
-        projects: ['1', '2', '3'], // Access to all projects
-      },
-      preferences: {
-        theme: 'light',
-        notifications: true,
-        timezone: 'America/New_York',
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: '1', // Self-created (admin)
-    },
-    {
-      id: '2',
-      email: 'jane@aerotage.com',
-      name: 'Jane Smith',
-      role: 'manager',
-      hourlyRate: 125,
-      teamId: '1',
-      department: 'Design',
-      isActive: true,
-      contactInfo: {
-        phone: '+1 (555) 234-5678',
-        address: '456 Design Ave, Suite 200, San Francisco, CA 94105',
-        emergencyContact: 'Mike Smith (Husband) - +1 (555) 234-5679',
-      },
-      profilePicture: undefined,
-      jobTitle: 'Design Team Manager',
-      startDate: new Date(Date.now() - 15768000000).toISOString(), // 6 months ago
-      lastLogin: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-      permissions: {
-        features: ['timeTracking', 'approvals', 'reporting', 'projectManagement'],
-        projects: ['1', '2', '3'], // Access to team projects
-      },
-      preferences: {
-        theme: 'dark',
-        notifications: true,
-        timezone: 'America/Los_Angeles',
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: '1', // Created by admin
-    },
-    {
-      id: '3',
-      email: 'bob@aerotage.com',
-      name: 'Bob Johnson',
-      role: 'employee',
-      hourlyRate: 100,
-      teamId: '1',
-      department: 'Design',
-      isActive: true,
-      contactInfo: {
-        phone: '+1 (555) 345-6789',
-        address: '789 Creative Blvd, Austin, TX 73301',
-        emergencyContact: 'Alice Johnson (Sister) - +1 (555) 345-6790',
-      },
-      profilePicture: undefined,
-      jobTitle: 'UI/UX Designer',
-      startDate: new Date(Date.now() - 7884000000).toISOString(), // 3 months ago
-      lastLogin: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-      permissions: {
-        features: ['timeTracking'],
-        projects: ['1', '2', '3'], // Access to assigned projects
-      },
-      preferences: {
-        theme: 'light',
-        notifications: false,
-        timezone: 'America/Chicago',
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: '1', // Created by admin
-    },
-  ],
-  teams: [
-    {
-      id: '1',
-      name: 'Design Team',
-      description: 'Responsible for UI/UX design and visual elements',
-      managerId: '2',
-      memberIds: ['2', '3'],
-      department: 'Design',
-      parentTeamId: undefined,
-      permissions: {
-        defaultRole: 'employee',
-        projectAccess: ['1', '2', '3'],
-      },
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: '1', // Created by admin
-    },
-  ],
-  invoices: [
-    // Mock invoice data for development
-    {
-      id: '1',
-      invoiceNumber: 'INV-2024-001',
-      clientId: '1',
-      projectIds: ['1'],
-      timeEntryIds: ['4'], // Approved entry
-      amount: 750.00, // 5 hours at $150/hr
-      tax: 75.00, // 10% tax
-      totalAmount: 825.00,
-      status: 'sent',
-      issueDate: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
-      dueDate: new Date(Date.now() + 1296000000).toISOString().split('T')[0], // 15 days from now
-      sentDate: new Date(Date.now() - 172800000).toISOString(),
-      notes: 'Logo design and brand exploration work',
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      updatedAt: new Date(Date.now() - 172800000).toISOString(),
-    },
-  ],
+  timeEntries: [],
+  clients: [],
+  projects: [],
+  users: [],
+  teams: [],
+  invoices: [],
   timer: {
     isRunning: false,
     startTime: null,
@@ -619,7 +316,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_TIME_ENTRIES':
       return {
         ...state,
-        timeEntries: action.payload,
+        timeEntries: Array.isArray(action.payload) ? action.payload : [],
       };
 
     // Approval Workflow Actions
@@ -791,7 +488,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_PROJECTS':
       return {
         ...state,
-        projects: action.payload.map(project => populateProjectWithClient(project, state.clients)),
+        projects: Array.isArray(action.payload) 
+          ? action.payload.map(project => populateProjectWithClient(project, state.clients))
+          : [],
       };
 
     // Client Actions
@@ -832,11 +531,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'SET_CLIENTS':
+      const clients = Array.isArray(action.payload) ? action.payload : [];
       return {
         ...state,
-        clients: action.payload,
+        clients,
         // Re-populate projects with updated client data
-        projects: state.projects.map(project => populateProjectWithClient(project, action.payload)),
+        projects: state.projects.map(project => populateProjectWithClient(project, clients)),
       };
 
     // User Actions
@@ -879,7 +579,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_USERS':
       return {
         ...state,
-        users: action.payload,
+        users: Array.isArray(action.payload) ? action.payload : [],
       };
 
     // Team Actions
@@ -916,7 +616,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_TEAMS':
       return {
         ...state,
-        teams: action.payload,
+        teams: Array.isArray(action.payload) ? action.payload : [],
       };
 
     // Invoice Actions
@@ -953,7 +653,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_INVOICES':
       return {
         ...state,
-        invoices: action.payload,
+        invoices: Array.isArray(action.payload) ? action.payload : [],
       };
 
     case 'GENERATE_INVOICE':
