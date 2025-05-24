@@ -57,15 +57,15 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
     port: 3000,
-    hot: false,
+    hot: true,
     liveReload: true,
     historyApiFallback: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
+    },
+    client: {
+      overlay: false,
     },
   },
 }; 
