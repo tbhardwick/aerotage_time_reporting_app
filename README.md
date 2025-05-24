@@ -1,23 +1,31 @@
-# Aerotage Time Reporting API
+# Aerotage Time Reporting Application
 
-AWS Serverless backend API for the Aerotage Time Reporting Application.
+Professional desktop time tracking and billing application built with Electron, React, and TypeScript for Aerotage Design Group, Inc.
 
-## Architecture
+## 🏗️ Architecture
 
-- **Authentication**: AWS Cognito User Pools
-- **API**: AWS API Gateway + Lambda Functions
-- **Database**: Amazon DynamoDB
-- **File Storage**: Amazon S3
-- **Email**: Amazon SES
-- **Infrastructure**: AWS CDK (TypeScript)
+This is the **frontend repository** in a two-repository architecture:
 
-## Getting Started
+- **Frontend** (this repo): Electron desktop application with React/TypeScript
+- **Backend**: AWS serverless infrastructure ([aerotage-time-reporting-api](https://github.com/aerotage/aerotage-time-reporting-api))
+
+### Technology Stack
+
+- **Desktop Framework**: Electron
+- **Frontend**: React 18 + TypeScript
+- **State Management**: React Context API
+- **Styling**: Tailwind CSS + Headless UI
+- **Forms**: React Hook Form + Zod validation
+- **Charts**: Chart.js with react-chartjs-2
+- **Backend Integration**: AWS Amplify (connects to serverless API)
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-1. AWS CLI installed and configured
-2. Node.js 18+ and npm
-3. AWS CDK CLI installed globally
+1. **Node.js 18+** and npm
+2. **Backend Infrastructure**: Deploy the [backend API](https://github.com/aerotage/aerotage-time-reporting-api) first
+3. **AWS Configuration**: Update `src/renderer/config/aws-config.ts` with backend endpoints
 
 ### Installation
 
@@ -25,90 +33,118 @@ AWS Serverless backend API for the Aerotage Time Reporting Application.
 # Install dependencies
 npm install
 
-# Install CDK globally (if not already installed)
-npm install -g aws-cdk
+# Start development server
+npm run dev
 
-# Bootstrap CDK (one-time per AWS account/region)
-cdk bootstrap --profile aerotage-dev
-```
-
-### Development
-
-```bash
-# Build TypeScript
+# Build for production
 npm run build
 
-# Watch for changes
-npm run watch
-
-# Run tests
-npm test
-
-# Deploy to development
-npm run deploy:dev
-
-# View CloudFormation changes
-npm run diff
+# Package for distribution
+npm run package
 ```
 
-### Environment Setup
-
-Create environment-specific configuration:
+### Development Scripts
 
 ```bash
 # Development
-export AWS_PROFILE=aerotage-dev
-export STAGE=dev
+npm run dev                # Start Electron app in development
+npm run dev:frontend       # Start frontend only
+npm run dev:main           # Start main process only
 
-# Deploy
-npm run deploy:dev
+# Testing
+npm test                   # Run Jest tests
+npm run test:coverage      # Run tests with coverage
+npm run test:e2e          # Run Playwright e2e tests
+
+# Building & Packaging
+npm run build             # Build for production
+npm run package           # Package for current platform
+npm run package:all       # Package for all platforms
+
+# Code Quality
+npm run lint              # Run ESLint
+npm run lint:fix          # Fix ESLint issues
+npm run check-deps        # Check for unstable dependencies
 ```
 
-## API Endpoints
+## 📱 Application Features
 
-- **Authentication**: `/auth/*`
-- **Users**: `/users/*`
-- **Teams**: `/teams/*`
-- **Projects**: `/projects/*`
-- **Time Entries**: `/time-entries/*`
-- **Reports**: `/reports/*`
-- **Invoices**: `/invoices/*`
+### ✅ Implemented
+- **Time Tracking**: Timer functionality with manual entry support
+- **Project Management**: Create and manage projects and clients
+- **User Authentication**: AWS Cognito integration
+- **Real-time Timer**: Persistent timer across app restarts
+- **Data Export**: CSV and PDF export capabilities
+- **Professional UI**: Modern, responsive design
 
-## Deployment
+### 🚧 In Development
+- **Team Management**: User roles and permissions
+- **Approval Workflow**: Time entry approval process
+- **Advanced Reporting**: Custom reports and analytics
+- **Invoice Generation**: Automated invoice creation
 
-- **Development**: `npm run deploy:dev`
-- **Staging**: `npm run deploy:staging`
-- **Production**: `npm run deploy:prod`
+## 🛡️ Security & Quality
 
-## Testing
+- **TypeScript**: Strict type checking for reliability
+- **Dependency Management**: Automated stability checking (`npm run check-deps`)
+- **Authentication**: Secure AWS Cognito integration
+- **Local Storage**: Encrypted data storage
+- **Content Security Policy**: Secure Electron configuration
 
-```bash
-# Run all tests
-npm test
+## 📚 Documentation
 
-# Run tests in watch mode
-npm run test:watch
-```
+Comprehensive documentation is available in the [`docs/`](./docs/) directory:
 
-## Infrastructure
+- **[Development Guide](./docs/DEVELOPMENT.md)** - Setup and development workflow
+- **[Testing Guide](./docs/TESTING.md)** - Testing strategies and examples
+- **[React Context Setup](./docs/REACT_CONTEXT_SETUP.md)** - State management architecture
+- **[Dependency Analysis](./docs/DEPENDENCY_ANALYSIS.md)** - Dependency management and security
 
-The infrastructure is defined using AWS CDK and includes:
+### Architecture Documentation
+- **[Project Plan](./AEROTAGE_TIME_APP_PLAN.md)** - Comprehensive project roadmap
+- **[Progress Tracking](./aerotage_Time_app_plan_progress.md)** - Development progress
 
-- **Cognito User Pool**: Authentication and user management
-- **DynamoDB Tables**: Data storage with GSI for efficient queries
-- **API Gateway**: RESTful API with Cognito authorization
-- **Lambda Functions**: Business logic for all endpoints
-- **S3 Buckets**: File storage for invoices and reports
-- **CloudWatch**: Monitoring, logging, and alerting
+## 🔄 Backend Integration
 
-## Environment Variables
+This frontend connects to a separate AWS serverless backend:
 
-Copy `.env.example` to `.env.development`, `.env.staging`, and `.env.production` and configure:
+1. **Deploy Backend**: Follow setup instructions in [aerotage-time-reporting-api](https://github.com/aerotage/aerotage-time-reporting-api)
+2. **Configure Frontend**: Update `src/renderer/config/aws-config.ts` with:
+   - API Gateway URLs
+   - Cognito User Pool IDs
+   - S3 bucket names
+3. **Test Connection**: Run the application and verify authentication works
 
-- `AWS_PROFILE`: AWS CLI profile to use
-- `AWS_REGION`: AWS region for deployment
-- `STAGE`: Environment stage (dev, staging, prod)
+## 📦 Distribution
 
-## License
+### Desktop Platforms
+- **macOS**: Code-signed and notarized `.dmg` files
+- **Windows**: Code-signed `.exe` installers
+- **Linux**: `.AppImage` and `.deb` packages
 
-Copyright (c) 2025 Aerotage Design Group, Inc 
+### Auto-Updates
+- Automatic update detection and installation
+- Rollback capabilities for failed updates
+- User-controlled update scheduling
+
+## 🧪 Testing
+
+- **Unit Tests**: Jest with React Testing Library
+- **Integration Tests**: API integration testing
+- **E2E Tests**: Playwright for full application workflows
+- **Performance Tests**: Memory and CPU usage monitoring
+
+## 🤝 Contributing
+
+1. Follow the development guidelines in [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md)
+2. Run `npm run check-deps` before committing to ensure dependency stability
+3. Maintain test coverage above 80%
+4. Use conventional commit messages
+
+## 📄 License
+
+Copyright (c) 2025 Aerotage Design Group, Inc.
+
+---
+
+**Professional Time Tracking Made Simple** - Built with enterprise-grade security and modern desktop technologies. 
