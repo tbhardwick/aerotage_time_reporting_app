@@ -8,6 +8,22 @@ export const awsConfig = {
   userPoolClientId: '148r35u6uultp1rmfdu22i8amb',
   identityPoolId: 'us-east-1:d79776bb-4b8e-4654-a10a-a45b1adaa787',
   
+  // Password reset configuration
+  passwordResetConfig: {
+    enabled: true,
+    codeDeliveryMethod: 'EMAIL',
+    codeExpirationMinutes: 15,
+  },
+  
+  // Password policy for frontend validation
+  passwordPolicy: {
+    minLength: 8,
+    requireLowercase: true,
+    requireUppercase: true,
+    requireDigits: true,
+    requireSymbols: false, // Optional per backend configuration
+  },
+  
   // Optional: S3 Buckets (for file uploads)
   storageBucket: 'aerotage-time-storage-dev',
   invoicesBucket: 'aerotage-time-invoices-dev',
