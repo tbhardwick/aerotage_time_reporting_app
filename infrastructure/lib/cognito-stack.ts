@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 export interface CognitoStackProps extends cdk.StackProps {
@@ -141,6 +142,73 @@ export class CognitoStack extends cdk.Stack {
           providerName: this.userPool.userPoolProviderName,
         },
       ],
+    });
+
+    // Create IAM Role for authenticated users
+    const authenticatedRole = new iam.Role(this, 'CognitoDefaultAuthenticatedRole', {
+      assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
+        StringEquals: {
+          'cognito-identity.amazonaws.com:aud': this.identityPool.ref,
+        },
+        'ForAnyValue:StringLike': {
+          'cognito-identity.amazonaws.com:amr': 'authenticated',
+        },
+      }, 'sts:AssumeRoleWithWebIdentity'),
+      inlinePolicies: {
+        CognitoIdentityPoolPolicy: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              actions: [
+                'mobileanalytics:PutEvents',
+                'cognito-sync:*',
+                'cognito-identity:*',
+              ],
+              resources: ['*'],
+            }),
+            // Add API Gateway permissions if needed
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              actions: [
+                'execute-api:Invoke',
+              ],
+              resources: ['*'], // You can make this more specific based on your API Gateway ARN
+            }),
+          ],
+        }),
+      },
+    });
+
+    // Create IAM Role for unauthenticated users (even though we don't allow them, it's still required)
+    const unauthenticatedRole = new iam.Role(this, 'CognitoDefaultUnauthenticatedRole', {
+      assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
+        StringEquals: {
+          'cognito-identity.amazonaws.com:aud': this.identityPool.ref,
+        },
+        'ForAnyValue:StringLike': {
+          'cognito-identity.amazonaws.com:amr': 'unauthenticated',
+        },
+      }, 'sts:AssumeRoleWithWebIdentity'),
+      inlinePolicies: {
+        CognitoIdentityPoolPolicy: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              effect: iam.Effect.DENY,
+              actions: ['*'],
+              resources: ['*'],
+            }),
+          ],
+        }),
+      },
+    });
+
+    // Attach roles to Identity Pool
+    new cognito.CfnIdentityPoolRoleAttachment(this, 'IdentityPoolRoleAttachment', {
+      identityPoolId: this.identityPool.ref,
+      roles: {
+        authenticated: authenticatedRole.roleArn,
+        unauthenticated: unauthenticatedRole.roleArn,
+      },
     });
 
     // Create Admin Group
