@@ -72,16 +72,27 @@ npm run check-deps        # Check for unstable dependencies
 ### ✅ Implemented
 - **Time Tracking**: Timer functionality with manual entry support
 - **Project Management**: Create and manage projects and clients
-- **User Authentication**: AWS Cognito integration
+- **User Authentication**: AWS Cognito integration with password reset
+- **Password Reset**: Complete email-based password reset flow with security best practices
 - **Real-time Timer**: Persistent timer across app restarts
 - **Data Export**: CSV and PDF export capabilities
-- **Professional UI**: Modern, responsive design
+- **Professional UI**: Modern, responsive design with enhanced UX
+- **Error Handling**: Comprehensive error handling with user-friendly messages
+- **Security Features**: No user existence revelation, rate limiting, password policy enforcement
 
 ### 🚧 In Development
 - **Team Management**: User roles and permissions
 - **Approval Workflow**: Time entry approval process
 - **Advanced Reporting**: Custom reports and analytics
 - **Invoice Generation**: Automated invoice creation
+
+### 🔐 Security Features
+- **Password Reset**: Secure email-based reset with 6-digit codes
+- **Password Policy**: Enforced complexity requirements (8+ chars, uppercase, lowercase, numbers)
+- **Code Expiration**: 15-minute expiration for reset codes
+- **Rate Limiting**: Built-in protection against abuse
+- **No Information Leakage**: Security-compliant error messages
+- **Client-side Validation**: Real-time password policy checking
 
 ## 🛡️ Security & Quality
 
@@ -99,6 +110,11 @@ Comprehensive documentation is available in the [`docs/`](./docs/) directory:
 - **[Testing Guide](./docs/TESTING.md)** - Testing strategies and examples
 - **[React Context Setup](./docs/REACT_CONTEXT_SETUP.md)** - State management architecture
 - **[Dependency Analysis](./docs/DEPENDENCY_ANALYSIS.md)** - Dependency management and security
+
+### Password Reset Documentation
+- **[Frontend Implementation](./docs/FRONTEND_PASSWORD_RESET_IMPLEMENTATION.md)** - Complete implementation guide
+- **[Backend Requirements](./docs/PASSWORD_RESET_BACKEND_REQUIREMENTS.md)** - Backend team requirements
+- **[Integration Guide](./FRONTEND_PASSWORD_RESET_INTEGRATION_GUIDE.md)** - End-to-end integration instructions
 
 ### Architecture Documentation
 - **[Project Plan](./AEROTAGE_TIME_APP_PLAN.md)** - Comprehensive project roadmap
