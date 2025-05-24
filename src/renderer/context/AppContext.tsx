@@ -162,6 +162,7 @@ type AppAction =
   | { type: 'ADD_TIME_ENTRY'; payload: Omit<TimeEntry, 'id' | 'createdAt'> }
   | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
   | { type: 'DELETE_TIME_ENTRY'; payload: string }
+  | { type: 'SET_TIME_ENTRIES'; payload: TimeEntry[] }
   
   // Approval Workflow Actions
   | { type: 'SUBMIT_TIME_ENTRIES'; payload: string[] } // Array of time entry IDs
@@ -528,23 +529,49 @@ const initialState: AppState = {
     currentDescription: '',
     elapsedTime: 0,
   },
-  user: {
-    id: '1',
-    email: 'john@aerotage.com',
-    name: 'John Doe',
-    role: 'admin',
-    hourlyRate: 150,
-    department: 'Administration',
-    isActive: true,
-    contactInfo: {
-      phone: '+1 (555) 123-4567',
-      address: '123 Admin St, Suite 100, New York, NY 10001',
-      emergencyContact: 'Jane Doe (Spouse) - +1 (555) 123-4568',
+  user: null, // Will be set after authentication
+  userSessions: [],
+  userInvitations: [],
+  userActivity: [],
+  permissions: {
+    roles: {
+      admin: {
+        features: ['timeTracking', 'approvals', 'reporting', 'invoicing', 'userManagement', 'projectManagement', 'clientManagement'],
+        permissions: {
+          canCreateUsers: true,
+          canEditUsers: true,
+          canDeleteUsers: true,
+          canViewAllReports: true,
+        }
+      },
+      manager: {
+        features: ['timeTracking', 'approvals', 'reporting', 'projectManagement'],
+        permissions: {
+          canCreateUsers: false,
+          canEditUsers: false,
+          canDeleteUsers: false,
+          canViewAllReports: false,
+        }
+      },
+      employee: {
+        features: ['timeTracking'],
+        permissions: {
+          canCreateUsers: false,
+          canEditUsers: false,
+          canDeleteUsers: false,
+          canViewAllReports: false,
+        }
+      }
     },
-    profilePicture: undefined,
-    jobTitle: 'System Administrator',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    features: {
+      timeTracking: true,
+      approvals: true,
+      reporting: true,
+      invoicing: true,
+      userManagement: true,
+      projectManagement: true,
+      clientManagement: true,
+    }
   },
   loading: {},
   errors: {},
@@ -587,6 +614,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         timeEntries: state.timeEntries.filter(entry => entry.id !== action.payload),
+      };
+
+    case 'SET_TIME_ENTRIES':
+      return {
+        ...state,
+        timeEntries: action.payload,
       };
 
     // Approval Workflow Actions

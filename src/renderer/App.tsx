@@ -1,5 +1,7 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Amplify } from 'aws-amplify';
+import { signOut } from 'aws-amplify/auth';
 import { AppProvider } from './context/AppContext';
 import TimeTrackingNew from './pages/TimeTrackingNew';
 import Projects from './pages/Projects';
@@ -8,6 +10,11 @@ import Reports from './pages/Reports';
 import Invoices from './pages/Invoices';
 import Users from './pages/Users';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { amplifyConfig } from './config/aws-config';
+
+// Configure AWS Amplify
+Amplify.configure(amplifyConfig);
 
 const Dashboard: React.FC = () => (
   <div className="max-w-4xl mx-auto px-8 py-12 text-center">
@@ -76,47 +83,69 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }
   );
 };
 
-const Navigation: React.FC = () => (
-  <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
-    <div className="max-w-7xl mx-auto px-4">
-      <div className="flex items-center justify-between h-16">
-        <div className="flex items-center space-x-8">
-          <h1 className="text-white text-xl font-bold">Aerotage Time</h1>
-          <div className="flex space-x-1">
-            <NavLink to="/" icon="🏠">Dashboard</NavLink>
-            <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
-            <NavLink to="/projects" icon="📁">Projects</NavLink>
-            <NavLink to="/approvals" icon="✅">Approvals</NavLink>
-            <NavLink to="/reports" icon="📊">Reports</NavLink>
-            <NavLink to="/invoices" icon="📄">Invoices</NavLink>
-            <NavLink to="/users" icon="👥">Users</NavLink>
+const Navigation: React.FC = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      // Reload the page to reset the app state
+      window.location.reload();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  return (
+    <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-8">
+            <h1 className="text-white text-xl font-bold">Aerotage Time</h1>
+            <div className="flex space-x-1">
+              <NavLink to="/" icon="🏠">Dashboard</NavLink>
+              <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
+              <NavLink to="/projects" icon="📁">Projects</NavLink>
+              <NavLink to="/approvals" icon="✅">Approvals</NavLink>
+              <NavLink to="/reports" icon="📊">Reports</NavLink>
+              <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+              <NavLink to="/users" icon="👥">Users</NavLink>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <button
+              onClick={handleLogout}
+              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>
-    </div>
-  </nav>
-);
+    </nav>
+  );
+};
 
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <AppProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50 font-sans">
-            <Navigation />
-            <main className="flex-1" role="main">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/time-tracking" element={<TimeTrackingNew />} />
-                <Route path="/projects" element={<Projects />} />
-                <Route path="/approvals" element={<Approvals />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/users" element={<Users />} />
-              </Routes>
-            </main>
-          </div>
-        </Router>
+        <ProtectedRoute>
+          <Router>
+            <div className="min-h-screen bg-gray-50 font-sans">
+              <Navigation />
+              <main className="flex-1" role="main">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/time-tracking" element={<TimeTrackingNew />} />
+                  <Route path="/projects" element={<Projects />} />
+                  <Route path="/approvals" element={<Approvals />} />
+                  <Route path="/reports" element={<Reports />} />
+                  <Route path="/invoices" element={<Invoices />} />
+                  <Route path="/users" element={<Users />} />
+                </Routes>
+              </main>
+            </div>
+          </Router>
+        </ProtectedRoute>
       </AppProvider>
     </ErrorBoundary>
   );

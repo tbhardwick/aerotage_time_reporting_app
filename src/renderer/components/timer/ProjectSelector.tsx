@@ -1,30 +1,29 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { updateProject, updateDescription } from '../../store/slices/timerSlice';
-import { selectTimerState } from '../../store/slices/timerSlice';
-
-// Mock projects data - in real app this would come from API
-const mockProjects = [
-  { id: '1', name: 'Website Redesign', client: 'Acme Corp' },
-  { id: '2', name: 'Mobile App Development', client: 'TechStart Inc' },
-  { id: '3', name: 'Brand Identity', client: 'Creative Studio' },
-  { id: '4', name: 'E-commerce Platform', client: 'Retail Plus' },
-];
+import { useAppContext } from '../../context/AppContext';
 
 const ProjectSelector: React.FC = () => {
-  const dispatch = useDispatch();
-  const timerState = useSelector(selectTimerState);
+  const { state, dispatch } = useAppContext();
+  const { timer, projects } = state;
 
   const handleProjectChange = (projectId: string) => {
-    dispatch(updateProject(projectId));
+    // Update timer state with selected project
+    dispatch({ 
+      type: 'START_TIMER', 
+      payload: { projectId, description: timer.currentDescription }
+    });
   };
 
   const handleDescriptionChange = (description: string) => {
-    dispatch(updateDescription(description));
+    if (timer.currentProjectId) {
+      dispatch({ 
+        type: 'START_TIMER', 
+        payload: { projectId: timer.currentProjectId, description }
+      });
+    }
   };
 
-  const selectedProject = mockProjects.find(p => p.id === timerState.currentProjectId);
+  const selectedProject = projects.find(p => p.id === timer.currentProjectId);
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
@@ -37,14 +36,14 @@ const ProjectSelector: React.FC = () => {
         </label>
         <div className="relative">
           <select
-            value={timerState.currentProjectId || ''}
+            value={timer.currentProjectId || ''}
             onChange={(e) => handleProjectChange(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
           >
             <option value="">Select a project...</option>
-            {mockProjects.map((project) => (
+            {projects.map((project) => (
               <option key={project.id} value={project.id}>
-                {project.name} - {project.client}
+                {project.name} - {project.client?.name || 'Unknown Client'}
               </option>
             ))}
           </select>
@@ -58,7 +57,7 @@ const ProjectSelector: React.FC = () => {
           Task Description
         </label>
         <textarea
-          value={timerState.currentDescription}
+          value={timer.currentDescription}
           onChange={(e) => handleDescriptionChange(e.target.value)}
           placeholder="What are you working on?"
           rows={3}
@@ -73,12 +72,12 @@ const ProjectSelector: React.FC = () => {
             <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
             <div>
               <p className="font-medium text-blue-900">{selectedProject.name}</p>
-              <p className="text-sm text-blue-700">{selectedProject.client}</p>
+              <p className="text-sm text-blue-700">{selectedProject.client?.name || 'Unknown Client'}</p>
             </div>
           </div>
-          {timerState.currentDescription && (
+          {timer.currentDescription && (
             <p className="text-sm text-blue-800 mt-2 italic">
-              "{timerState.currentDescription}"
+              "{timer.currentDescription}"
             </p>
           )}
         </div>

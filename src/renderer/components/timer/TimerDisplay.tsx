@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/24/solid';
-import { startTimer, pauseTimer, resumeTimer, stopTimer } from '../../store/slices/timerSlice';
-import { selectTimerState, selectCurrentDuration } from '../../store/slices/timerSlice';
+import { useAppContext } from '../../context/AppContext';
 
 interface TimerDisplayProps {
   onTimeEntry?: (entry: { projectId: string; duration: number; description: string }) => void;
 }
 
 const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
-  const dispatch = useDispatch();
-  const timerState = useSelector(selectTimerState);
-  const currentDuration = useSelector(selectCurrentDuration);
-  const [displayTime, setDisplayTime] = useState(0);
+  const { state, dispatch } = useAppContext();
+  const { timer } = state;
+  const [displayTime, setDisplayTime] = useState(timer.elapsedTime);
 
   // Update display time every second when timer is running
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (timerState.isRunning) {
+    if (timer.isRunning) {
       interval = setInterval(() => {
-        setDisplayTime(currentDuration);
+        const now = Date.now();
+        const startTime = timer.startTime ? new Date(timer.startTime).getTime() : now;
+        const elapsedMinutes = Math.floor((now - startTime) / 60000);
+        setDisplayTime(elapsedMinutes);
+        dispatch({ type: 'UPDATE_TIMER_TIME', payload: elapsedMinutes });
       }, 1000);
     } else {
-      setDisplayTime(currentDuration);
+      setDisplayTime(timer.elapsedTime);
     }
     return () => clearInterval(interval);
-  }, [timerState.isRunning, currentDuration]);
+  }, [timer.isRunning, timer.startTime, timer.elapsedTime, dispatch]);
 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -34,34 +35,38 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
   };
 
   const handleStart = () => {
-    if (!timerState.currentProjectId) {
+    if (!timer.currentProjectId) {
       alert('Please select a project first');
       return;
     }
-    dispatch(startTimer({
-      projectId: timerState.currentProjectId,
-      description: timerState.currentDescription
-    }));
+    dispatch({ 
+      type: 'START_TIMER', 
+      payload: {
+        projectId: timer.currentProjectId,
+        description: timer.currentDescription
+      }
+    });
   };
 
   const handlePause = () => {
-    dispatch(pauseTimer());
+    // For simplicity, we'll treat pause as stop for now
+    handleStop();
   };
 
   const handleResume = () => {
-    dispatch(resumeTimer());
+    handleStart();
   };
 
   const handleStop = () => {
-    if (displayTime > 0 && timerState.currentProjectId) {
+    if (displayTime > 0 && timer.currentProjectId) {
       // Save time entry
       onTimeEntry?.({
-        projectId: timerState.currentProjectId,
+        projectId: timer.currentProjectId,
         duration: displayTime,
-        description: timerState.currentDescription
+        description: timer.currentDescription
       });
     }
-    dispatch(stopTimer());
+    dispatch({ type: 'STOP_TIMER' });
     setDisplayTime(0);
   };
 
@@ -73,11 +78,11 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
         </div>
         
         <div className="flex justify-center space-x-4">
-          {!timerState.isRunning ? (
+          {!timer.isRunning ? (
             <button
               onClick={displayTime > 0 ? handleResume : handleStart}
               className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              disabled={!timerState.currentProjectId}
+              disabled={!timer.currentProjectId}
             >
               <PlayIcon className="w-5 h-5 mr-2" />
               {displayTime > 0 ? 'Resume' : 'Start'}
@@ -103,7 +108,7 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
           )}
         </div>
         
-        {!timerState.currentProjectId && (
+        {!timer.currentProjectId && (
           <p className="text-sm text-red-600 mt-4">
             Please select a project to start tracking time
           </p>
