@@ -22,20 +22,20 @@ export const amplifyConfig = {
       userPoolId: awsConfig.userPoolId,
       userPoolClientId: awsConfig.userPoolClientId,
       identityPoolId: awsConfig.identityPoolId,
-    }
+    },
   },
   API: {
     REST: {
       AerotageAPI: {
         endpoint: awsConfig.apiGatewayUrl,
         region: awsConfig.region,
-      }
-    }
+      },
+    },
   },
   Storage: {
     S3: {
       bucket: awsConfig.storageBucket,
       region: awsConfig.region,
-    }
-  }
+    },
+  },
 }; 

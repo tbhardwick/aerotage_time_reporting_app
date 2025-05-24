@@ -71,9 +71,9 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }
       className={`
         flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
         ${isActive 
-          ? 'bg-blue-600 text-white' 
-          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-        }
+      ? 'bg-blue-600 text-white' 
+      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+    }
       `}
       aria-current={isActive ? 'page' : undefined}
     >

@@ -15,6 +15,10 @@
     "dist": "npm run build:renderer && electron-builder --mac --publish=never",
     "postinstall": "electron-builder install-app-deps",
     "lint": "eslint src/**/*.{js,ts,tsx}",
+    "lint:fix": "eslint src/**/*.{js,ts,tsx} --fix",
+    "lint:check": "eslint src/**/*.{js,ts,tsx} --max-warnings 0",
+    "lint:report": "eslint src/**/*.{js,ts,tsx} --format html --output-file ./coverage/eslint-report.html",
+    "lint:staged": "eslint --fix",
     "check-deps": "node scripts/check-stable-deps.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -55,11 +59,17 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ]
     }
@@ -79,6 +89,8 @@
     "@types/node": "^22.15.21",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^29.7.0",
     "concurrently": "^9.1.2",
@@ -88,6 +100,8 @@
     "electron-reload": "^1.5.0",
     "electronmon": "^2.0.2",
     "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "events": "^3.3.0",
     "html-webpack-plugin": "^5.6.3",
     "identity-obj-proxy": "^3.0.0",

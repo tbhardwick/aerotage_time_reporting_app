@@ -134,7 +134,7 @@ class AerotageApiClient {
   private async request<T>(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     path: string, 
-    options: any = {}
+    options: any = {},
   ): Promise<T> {
     try {
       const token = await this.getAuthToken();
@@ -205,13 +205,13 @@ class AerotageApiClient {
 
   async approveTimeEntries(timeEntryIds: string[], comments?: string): Promise<void> {
     return this.request<void>('POST', '/time-entries/approve', { 
-      body: { timeEntryIds, comments } 
+      body: { timeEntryIds, comments }, 
     });
   }
 
   async rejectTimeEntries(timeEntryIds: string[], comments: string): Promise<void> {
     return this.request<void>('POST', '/time-entries/reject', { 
-      body: { timeEntryIds, comments } 
+      body: { timeEntryIds, comments }, 
     });
   }
 
@@ -322,7 +322,7 @@ class AerotageApiClient {
   async exportReport(type: 'pdf' | 'csv' | 'excel', filters: any): Promise<Blob> {
     const response = await this.request<any>('POST', '/reports/export', { 
       body: { type, filters },
-      headers: { 'Accept': 'application/octet-stream' }
+      headers: { 'Accept': 'application/octet-stream' },
     });
     return response;
   }
