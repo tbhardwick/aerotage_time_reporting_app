@@ -5,6 +5,7 @@
 
 import { apiClient } from '../services/api-client';
 import { profileApi } from '../services/profileApi';
+import { sessionBootstrap } from '../services/sessionBootstrap';
 import { getCurrentUser } from 'aws-amplify/auth';
 
 /**
@@ -138,12 +139,98 @@ export const testCurrentAuthState = async () => {
   }
 };
 
+/**
+ * Test the session bootstrap fix - specifically for the chicken-and-egg solution
+ */
+export const testSessionBootstrapFix = async () => {
+  console.group('🐣 Testing Session Bootstrap Fix (Chicken-and-Egg Solution)');
+  
+  try {
+    console.log('📋 This test verifies the backend bootstrap fix:');
+    console.log('   1. New users can create their first session');
+    console.log('   2. Session creation works despite session validation');
+    console.log('   3. Subsequent API calls work after session creation');
+    console.log('');
+    
+    // Get current user info
+    const user = await getCurrentUser();
+    const userId = user.userId || user.username;
+    console.log('👤 Testing bootstrap for user:', userId);
+    
+    // Clear any existing session to simulate new user
+    console.log('🧹 Clearing existing session data to simulate new user...');
+    localStorage.removeItem('currentSessionId');
+    localStorage.removeItem('loginTime');
+    
+    // Test session bootstrap
+    console.log('🚀 Testing session bootstrap...');
+    try {
+      const bootstrapResult = await sessionBootstrap.bootstrapSession();
+      
+      if (bootstrapResult.success) {
+        console.log('✅ Session bootstrap SUCCEEDED!');
+        console.log(`   📝 Session ID: ${bootstrapResult.sessionId}`);
+        console.log('   🎉 Backend chicken-and-egg fix is working!');
+        
+        // Test that APIs now work
+        console.log('🔧 Testing API calls with new session...');
+        try {
+          const projects = await apiClient.getProjects();
+          console.log('✅ API call succeeded after bootstrap');
+          console.log(`   📊 Projects loaded: ${projects.length}`);
+          
+          // Test profile API
+          const profile = await profileApi.getUserProfile(userId);
+          console.log('✅ Profile API succeeded after bootstrap');
+          console.log(`   👤 Profile loaded: ${profile.name}`);
+          
+          console.log('');
+          console.log('🎉 BOOTSTRAP FIX IS WORKING PERFECTLY!');
+          console.log('   ✅ Session creation succeeded');
+          console.log('   ✅ Subsequent API calls work');
+          console.log('   ✅ No manual intervention required');
+          
+        } catch (apiError: any) {
+          console.log('❌ API calls failed after bootstrap:', apiError.message);
+          console.log('⚠️  Bootstrap created session but APIs still blocked');
+        }
+        
+      } else if (bootstrapResult.requiresManualResolution) {
+        console.log('⚠️  Session bootstrap still requires manual resolution');
+        console.log(`   📄 Error: ${bootstrapResult.error}`);
+        console.log('');
+        console.log('🤔 This suggests:');
+        console.log('   1. Backend fix may not be fully deployed');
+        console.log('   2. Lambda authorizer still blocking session creation');
+        console.log('   3. Additional backend configuration needed');
+        
+      } else {
+        console.log('❌ Session bootstrap failed unexpectedly');
+        console.log(`   📄 Error: ${bootstrapResult.error}`);
+      }
+      
+    } catch (bootstrapError: any) {
+      console.error('❌ Session bootstrap threw error:', bootstrapError.message);
+      console.log('');
+      console.log('🔍 If you see CORS/NetworkError, this means:');
+      console.log('   - Session validation is working (good!)');
+      console.log('   - But bootstrap fix is not yet active (needs backend update)');
+    }
+    
+  } catch (error) {
+    console.error('❌ Bootstrap test failed:', error);
+  } finally {
+    console.groupEnd();
+  }
+};
+
 // Make functions available globally for debugging
 declare global {
   interface Window {
     sessionValidation: {
       testSessionValidation: typeof testSessionValidation;
       testCurrentAuthState: typeof testCurrentAuthState;
+      testSessionBootstrapFix: typeof testSessionBootstrapFix;
     };
   }
 }
@@ -152,6 +239,7 @@ declare global {
 if (process.env.NODE_ENV === 'development') {
   window.sessionValidation = {
     testSessionValidation,
-    testCurrentAuthState
+    testCurrentAuthState,
+    testSessionBootstrapFix
   };
 } 

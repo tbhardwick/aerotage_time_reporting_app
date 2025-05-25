@@ -52,11 +52,13 @@ class SessionBootstrapService {
         console.log(`🔄 Bootstrap attempt ${attempt}/${this.maxRetries}`);
         
         try {
-          // Attempt 1: Try normal session creation
+          // Attempt 1: Try normal session creation (should work if backend fix is deployed)
           if (attempt === 1) {
+            console.log('🎯 Attempting normal session creation (testing backend bootstrap fix)...');
             const session = await this.attemptNormalSessionCreation(userId);
             if (session) {
-              console.log('✅ Normal session creation succeeded');
+              console.log('🎉 Normal session creation succeeded - backend bootstrap fix is working!');
+              console.log(`✅ Session ID: ${session.id}`);
               return { success: true, sessionId: session.id };
             }
           }
@@ -100,13 +102,16 @@ class SessionBootstrapService {
         }
       }
       
-      // All attempts failed - this is likely the expected behavior
-      console.log('⚠️ All bootstrap attempts failed - session validation is working as designed');
-      console.log('📋 This indicates the backend session validation is properly rejecting unauthorized requests');
+      // All attempts failed - could be expected if backend fix not deployed
+      console.log('⚠️ All bootstrap attempts failed');
+      console.log('🔍 This could mean:');
+      console.log('   1. Backend bootstrap fix not yet deployed');
+      console.log('   2. Lambda authorizer still blocking session creation');
+      console.log('   3. Session validation working but bootstrap not configured');
       
       return {
         success: false,
-        error: 'Session validation is active but no session record exists',
+        error: 'Session bootstrap failed - backend fix may not be deployed yet',
         requiresManualResolution: true
       };
       
