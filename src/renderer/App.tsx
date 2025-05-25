@@ -111,7 +111,11 @@ const Navigation: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo and Desktop Navigation */}
           <div className="flex items-center">
-            <h1 className="text-white text-xl font-bold mr-8">Aerotage Time</h1>
+            <img 
+              src="/assets/logos/aerotage_logo.svg" 
+              alt="Aerotage Time" 
+              className="h-8 w-auto mr-8"
+            />
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex lg:space-x-1">
