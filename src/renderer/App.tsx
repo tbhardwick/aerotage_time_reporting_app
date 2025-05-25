@@ -105,7 +105,8 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
+    <>
+      <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
       <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
         <div className="flex items-center justify-between h-16">
           {/* Logo and Desktop Navigation */}
@@ -151,48 +152,49 @@ const Navigation: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Navigation Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-md mt-2">
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/" icon="🏠">Dashboard</NavLink>
-              </div>
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
-              </div>
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/projects" icon="📁">Projects</NavLink>
-              </div>
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/approvals" icon="✅">Approvals</NavLink>
-              </div>
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/reports" icon="📊">Reports</NavLink>
-              </div>
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/invoices" icon="📄">Invoices</NavLink>
-              </div>
-              <div onClick={() => setIsMobileMenuOpen(false)}>
-                <NavLink to="/users" icon="👥">Users</NavLink>
-              </div>
-              <div className="border-t border-gray-700 pt-2 mt-2">
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    handleLogout();
-                  }}
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-sm font-medium w-full text-left transition-colors duration-200"
-                >
-                  Sign Out
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </nav>
+
+    {/* Mobile Navigation Menu - Outside nav to avoid width constraints */}
+    <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+      isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+    }`}>
+      <div className={`mx-4 sm:mx-6 lg:mx-8 ${isMac ? 'ml-20 mr-4 sm:mr-6 lg:mr-8' : ''} px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-md shadow-lg border border-gray-700`}>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/" icon="🏠">Dashboard</NavLink>
+        </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
+        </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/projects" icon="📁">Projects</NavLink>
+        </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/approvals" icon="✅">Approvals</NavLink>
+        </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/reports" icon="📊">Reports</NavLink>
+        </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+        </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/users" icon="👥">Users</NavLink>
+        </div>
+        <div className="border-t border-gray-700 pt-2 mt-2">
+          <button
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleLogout();
+            }}
+            className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-sm font-medium w-full text-left transition-colors duration-200"
+          >
+            Sign Out
+          </button>
+                </div>
+      </div>
+    </div>
+    </>
   );
 };
 
