@@ -156,10 +156,17 @@ const Navigation: React.FC = () => {
     </nav>
 
     {/* Mobile Navigation Menu - Outside nav to avoid width constraints */}
-    <div className={`lg:hidden transition-all duration-300 ease-in-out ${
+    <div className={`lg:hidden transition-all duration-300 ease-in-out relative z-50 ${
       isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
     }`} style={{ overflow: isMobileMenuOpen ? 'visible' : 'hidden' }}>
-      <div className={`mx-4 sm:mx-6 lg:mx-8 ${isMac ? 'ml-20 mr-4 sm:mr-6 lg:mr-8' : ''} mt-2 px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-lg shadow-lg border border-gray-700`}>
+      {/* Subtle backdrop when menu is open */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm -z-10"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+      <div className={`mx-4 sm:mx-6 lg:mx-8 ${isMac ? 'ml-20 mr-4 sm:mr-6 lg:mr-8' : ''} mt-2 px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-lg shadow-2xl border border-gray-700`}>
         <div onClick={() => setIsMobileMenuOpen(false)}>
           <NavLink to="/" icon="🏠">Dashboard</NavLink>
         </div>
