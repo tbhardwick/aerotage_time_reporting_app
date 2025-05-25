@@ -116,6 +116,7 @@ const Navigation: React.FC = () => {
                   src="/assets/logos/aerotage_logo.svg" 
                   alt="Aerotage Time" 
                   className="h-10 w-auto"
+                  style={{ filter: 'contrast(1.3) saturate(1.2)' }}
                 />
               </div>
             
