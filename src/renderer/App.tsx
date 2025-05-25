@@ -111,11 +111,11 @@ const Navigation: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo and Desktop Navigation */}
             <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as any}>
-              <div className="bg-white rounded-md px-3 py-1 mr-8">
+              <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-3 py-1 mr-8 shadow-sm border border-white border-opacity-20">
                 <img 
                   src="/assets/logos/aerotage_logo.svg" 
                   alt="Aerotage Time" 
-                  className="h-6 w-auto"
+                  className="h-10 w-auto"
                 />
               </div>
             
