@@ -1,6 +1,6 @@
 export const awsConfig = {
   // API Gateway
-  apiGatewayUrl: 'https://0sty9mf3f7.execute-api.us-east-1.amazonaws.com/dev/',
+  apiGatewayUrl: 'https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev',
   
   // Cognito Authentication
   region: 'us-east-1',

@@ -20,7 +20,7 @@ aws cognito-idp list-users --user-pool-id us-east-1_EsdlgX9Qg
 ### 2. API Gateway Endpoint
 ```bash
 # Test the API endpoint is accessible
-curl -X GET https://0sty9mf3f7.execute-api.us-east-1.amazonaws.com/dev/health
+curl -X GET https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev/health
 ```
 
 ### 3. DynamoDB Tables

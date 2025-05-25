@@ -58,7 +58,7 @@ const awsConfig = {
     endpoints: [
       {
         name: 'AerotageTimeAPI',
-        endpoint: 'https://0sty9mf3f7.execute-api.us-east-1.amazonaws.com/dev',
+        endpoint: 'https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev',
         region: 'us-east-1'
       }
     ]
@@ -76,7 +76,7 @@ export default awsConfig;
 | **User Pool ID** | `us-east-1_EsdlgX9Qg` | Cognito authentication |
 | **User Pool Client ID** | `148r35u6uultp1rmfdu22i8amb` | Frontend app client |
 | **Identity Pool ID** | `us-east-1:d79776bb-4b8e-4654-a10a-a45b1adaa787` | AWS resource access |
-| **API Gateway URL** | `https://0sty9mf3f7.execute-api.us-east-1.amazonaws.com/dev` | Backend API calls |
+| **API Gateway URL** | `https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev` | Backend API calls |
 | **Password Reset** | ✅ Enabled | Email-based reset |
 | **Email Limit** | 50/day | Cognito free tier |
 

@@ -70,8 +70,8 @@ console.log('Current user:', await getCurrentUser());
 **Check**:
 ```bash
 # Test endpoints manually
-curl -X GET https://0sty9mf3f7.execute-api.us-east-1.amazonaws.com/dev/projects
-curl -X GET https://0sty9mf3f7.execute-api.us-east-1.amazonaws.com/dev/clients
+curl -X GET https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev/projects
+curl -X GET https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev/clients
 ```
 
 **Solution**: Deploy missing Lambda functions in backend
