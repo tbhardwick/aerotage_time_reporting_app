@@ -104,48 +104,48 @@ const Navigation: React.FC = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  return (
+    return (
     <>
-      <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
-      <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
-        <div className="flex items-center justify-between h-16">
-          {/* Logo and Desktop Navigation */}
-          <div className="flex items-center">
-            <img 
-              src="/assets/logos/aerotage_logo.svg" 
-              alt="Aerotage Time" 
-              className="h-8 w-auto mr-8"
-            />
+      <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation" style={{ WebkitAppRegion: 'drag' } as any}>
+        <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
+          <div className="flex items-center justify-between h-16">
+            {/* Logo and Desktop Navigation */}
+            <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as any}>
+              <img 
+                src="/assets/logos/aerotage_logo.svg" 
+                alt="Aerotage Time" 
+                className="h-8 w-auto mr-8 brightness-0 invert"
+              />
             
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex lg:space-x-1">
-              <NavLink to="/" icon="🏠">Dashboard</NavLink>
-              <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
-              <NavLink to="/projects" icon="📁">Projects</NavLink>
-              <NavLink to="/approvals" icon="✅">Approvals</NavLink>
-              <NavLink to="/reports" icon="📊">Reports</NavLink>
-              <NavLink to="/invoices" icon="📄">Invoices</NavLink>
-              <NavLink to="/users" icon="👥">Users</NavLink>
+                          {/* Desktop Navigation */}
+              <div className="hidden lg:flex lg:space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+                <NavLink to="/" icon="🏠">Dashboard</NavLink>
+                <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
+                <NavLink to="/projects" icon="📁">Projects</NavLink>
+                <NavLink to="/approvals" icon="✅">Approvals</NavLink>
+                <NavLink to="/reports" icon="📊">Reports</NavLink>
+                <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+                <NavLink to="/users" icon="👥">Users</NavLink>
+              </div>
             </div>
-          </div>
 
-          {/* Desktop Sign Out */}
-          <div className="hidden lg:flex lg:items-center">
-            <button
-              onClick={handleLogout}
-              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-            >
-              Sign Out
-            </button>
-          </div>
+            {/* Desktop Sign Out */}
+            <div className="hidden lg:flex lg:items-center" style={{ WebkitAppRegion: 'no-drag' } as any}>
+              <button
+                onClick={handleLogout}
+                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+              >
+                Sign Out
+              </button>
+            </div>
 
-          {/* Mobile menu button */}
-          <div className="lg:hidden">
-            <button
-              onClick={toggleMobileMenu}
-              className="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
-              aria-label="Toggle mobile menu"
-            >
+            {/* Mobile menu button */}
+            <div className="lg:hidden" style={{ WebkitAppRegion: 'no-drag' } as any}>
+              <button
+                onClick={toggleMobileMenu}
+                className="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                aria-label="Toggle mobile menu"
+              >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMobileMenuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
