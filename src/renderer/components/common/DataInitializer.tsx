@@ -1,6 +1,9 @@
-import React, { useEffect, ReactNode, useRef } from 'react';
+import React, { useEffect, ReactNode, useRef, useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { useDataLoader } from '../../hooks/useDataLoader';
+import SessionBootstrapError from '../SessionBootstrapError';
+import { sessionBootstrap, type BootstrapResult } from '../../services/sessionBootstrap';
+import { signOut } from 'aws-amplify/auth';
 
 interface DataInitializerProps {
   children: ReactNode;
@@ -11,6 +14,8 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
   const { loadAllData } = useDataLoader();
   const { user, loading, errors } = state;
   const hasLoadedRef = useRef(false);
+  const [bootstrapError, setBootstrapError] = useState<BootstrapResult | null>(null);
+  const [isRetryingBootstrap, setIsRetryingBootstrap] = useState(false);
 
   console.log('🔍 DataInitializer render:', {
     user: user ? `${user.email} (${user.id})` : null,
@@ -37,6 +42,24 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
       }
     });
 
+    // Check for session bootstrap errors first
+    if (user) {
+      const storedBootstrapError = localStorage.getItem('sessionBootstrapError');
+      if (storedBootstrapError) {
+        try {
+          const errorData = JSON.parse(storedBootstrapError) as BootstrapResult;
+          if (errorData.requiresManualResolution && !errorData.success) {
+            console.log('🚨 Detected session bootstrap error requiring manual resolution');
+            setBootstrapError(errorData);
+            return; // Don't proceed with normal data loading
+          }
+        } catch (error) {
+          console.warn('Failed to parse stored bootstrap error:', error);
+          localStorage.removeItem('sessionBootstrapError');
+        }
+      }
+    }
+
     // Prevent multiple loads
     if (hasLoadedRef.current) {
       console.log('⏭️ Data already loaded, skipping');
@@ -54,6 +77,67 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
       });
     }
   }, [user, loading.initialLoad, errors.initialLoad, loadAllData]);
+
+  // Handler for retrying session bootstrap
+  const handleBootstrapRetry = async () => {
+    setIsRetryingBootstrap(true);
+    try {
+      console.log('🔄 Retrying session bootstrap...');
+      const result = await sessionBootstrap.bootstrapSession();
+      
+      if (result.success) {
+        console.log('✅ Bootstrap retry successful');
+        localStorage.removeItem('sessionBootstrapError');
+        setBootstrapError(null);
+        // Reset data loading flag and try again
+        hasLoadedRef.current = false;
+        loadAllData();
+      } else {
+        console.log('❌ Bootstrap retry failed:', result.error);
+        setBootstrapError(result);
+        if (result.requiresManualResolution) {
+          localStorage.setItem('sessionBootstrapError', JSON.stringify(result));
+        }
+      }
+    } catch (error) {
+      console.error('❌ Bootstrap retry error:', error);
+      setBootstrapError({
+        success: false,
+        error: error instanceof Error ? error.message : 'Retry failed',
+        requiresManualResolution: true
+      });
+    } finally {
+      setIsRetryingBootstrap(false);
+    }
+  };
+
+  // Handler for logout
+  const handleBootstrapLogout = async () => {
+    try {
+      console.log('🚪 Logging out due to bootstrap error...');
+      localStorage.removeItem('sessionBootstrapError');
+      localStorage.removeItem('currentSessionId');
+      localStorage.removeItem('loginTime');
+      await signOut();
+      window.location.reload();
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+      // Force reload anyway
+      window.location.reload();
+    }
+  };
+
+  // Show session bootstrap error if it exists
+  if (bootstrapError && bootstrapError.requiresManualResolution) {
+    console.log('🚨 Showing session bootstrap error screen');
+    return (
+      <SessionBootstrapError
+        onRetry={handleBootstrapRetry}
+        onLogout={handleBootstrapLogout}
+        isRetrying={isRetryingBootstrap}
+      />
+    );
+  }
 
   // Show loading state while initial data is being loaded
   if (user && loading.initialLoad) {

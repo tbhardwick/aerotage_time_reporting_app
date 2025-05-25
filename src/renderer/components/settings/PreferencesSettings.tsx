@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
+import { useUserPreferences } from '../../hooks';
+import { UpdateUserPreferencesRequest } from '../../types/user-profile-api';
 
 interface PreferencesFormData {
   theme: 'light' | 'dark';
@@ -12,6 +14,9 @@ interface PreferencesFormData {
   reminderInterval: number; // in minutes
   workingHoursStart: string;
   workingHoursEnd: string;
+  dailyGoal: number; // hours
+  weeklyGoal: number; // hours
+  goalNotifications: boolean;
   currency: string;
   dateFormat: string;
   timeFormat: '12h' | '24h';
@@ -51,6 +56,16 @@ const dateFormats = [
 const PreferencesSettings: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const { user } = state;
+  
+  // Use the preferences API hook
+  const { 
+    preferences, 
+    loading: preferencesLoading, 
+    error: preferencesError, 
+    updating, 
+    updatePreferences, 
+    refetch 
+  } = useUserPreferences(user?.id || null);
 
   const [formData, setFormData] = useState<PreferencesFormData>({
     theme: 'light',
@@ -63,27 +78,51 @@ const PreferencesSettings: React.FC = () => {
     reminderInterval: 15, // 15 minutes
     workingHoursStart: '09:00',
     workingHoursEnd: '17:00',
+    dailyGoal: 8.0,
+    weeklyGoal: 40.0,
+    goalNotifications: true,
     currency: 'USD',
     dateFormat: 'MM/DD/YYYY',
     timeFormat: '12h',
   });
 
-  const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Initialize form data when user is loaded
+  // Debug logging
   useEffect(() => {
-    if (user) {
-      setFormData(prevData => ({
-        ...prevData,
-        theme: user.preferences?.theme || 'light',
-        notifications: user.preferences?.notifications ?? true,
-        timezone: user.preferences?.timezone || 'UTC',
-        // Note: Additional preferences would come from user.preferences object
-        // For now, using defaults as these extended preferences aren't in the User type yet
-      }));
+    console.log('🔍 PreferencesSettings debug:', {
+      userId: user?.id,
+      preferencesLoading,
+      preferencesError,
+      hasPreferences: !!preferences,
+      preferencesData: preferences ? { theme: preferences.theme, timezone: preferences.timezone } : null
+    });
+  }, [user?.id, preferencesLoading, preferencesError, preferences]);
+
+  // Initialize form data when preferences are loaded
+  useEffect(() => {
+    if (preferences) {
+      console.log('📝 Initializing form data with preferences:', preferences);
+      setFormData({
+        theme: preferences.theme,
+        notifications: preferences.notifications,
+        timezone: preferences.timezone,
+        defaultTimeEntryDuration: preferences.timeTracking.defaultTimeEntryDuration,
+        autoStartTimer: preferences.timeTracking.autoStartTimer,
+        showTimerInMenuBar: preferences.timeTracking.showTimerInMenuBar,
+        defaultBillableStatus: preferences.timeTracking.defaultBillableStatus,
+        reminderInterval: preferences.timeTracking.reminderInterval,
+        workingHoursStart: preferences.timeTracking.workingHours.start,
+        workingHoursEnd: preferences.timeTracking.workingHours.end,
+        dailyGoal: preferences.timeTracking.timeGoals.daily,
+        weeklyGoal: preferences.timeTracking.timeGoals.weekly,
+        goalNotifications: preferences.timeTracking.timeGoals.notifications,
+        currency: preferences.formatting.currency,
+        dateFormat: preferences.formatting.dateFormat,
+        timeFormat: preferences.formatting.timeFormat,
+      });
     }
-  }, [user]);
+  }, [preferences]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -99,58 +138,199 @@ const PreferencesSettings: React.FC = () => {
     e.preventDefault();
     if (!user) return;
 
-    setIsSaving(true);
+    console.log('💾 Submitting preferences with form data:', formData);
+
     setMessage(null);
 
     try {
-      // Update user preferences in context
-      dispatch({
-        type: 'UPDATE_USER',
-        payload: {
-          id: user.id,
-          updates: {
-            preferences: {
-              theme: formData.theme,
-              notifications: formData.notifications,
-              timezone: formData.timezone,
-              // Additional preferences would be added here when backend supports them
-            },
-            updatedAt: new Date().toISOString(),
+      // Prepare the update request according to API structure
+      const updates: UpdateUserPreferencesRequest = {
+        theme: formData.theme,
+        notifications: formData.notifications,
+        timezone: formData.timezone,
+        timeTracking: {
+          defaultTimeEntryDuration: formData.defaultTimeEntryDuration,
+          autoStartTimer: formData.autoStartTimer,
+          showTimerInMenuBar: formData.showTimerInMenuBar,
+          defaultBillableStatus: formData.defaultBillableStatus,
+          reminderInterval: formData.reminderInterval,
+          workingHours: {
+            start: formData.workingHoursStart,
+            end: formData.workingHoursEnd,
+          },
+          timeGoals: {
+            daily: formData.dailyGoal,
+            weekly: formData.weeklyGoal,
+            notifications: formData.goalNotifications,
           },
         },
-      });
+        formatting: {
+          currency: formData.currency,
+          dateFormat: formData.dateFormat,
+          timeFormat: formData.timeFormat,
+        },
+      };
 
-      // Also update the current user in the state
+      // Call the API to update preferences
+      const updatedPreferences = await updatePreferences(updates);
+
+      // Update the current user in the context with relevant preferences
       dispatch({
         type: 'SET_USER',
         payload: {
           ...user,
           preferences: {
-            theme: formData.theme,
-            notifications: formData.notifications,
-            timezone: formData.timezone,
+            theme: updatedPreferences.theme,
+            notifications: updatedPreferences.notifications,
+            timezone: updatedPreferences.timezone,
           },
-          updatedAt: new Date().toISOString(),
+          updatedAt: updatedPreferences.updatedAt,
         },
       });
 
       setMessage({ type: 'success', text: 'Preferences updated successfully!' });
 
-      // TODO: Make API call to update preferences on backend
-      // await apiClient.updateUserPreferences(user.id, formData);
-
     } catch (error) {
       console.error('Error updating preferences:', error);
-      setMessage({ type: 'error', text: 'Failed to update preferences. Please try again.' });
-    } finally {
-      setIsSaving(false);
+      setMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Failed to update preferences. Please try again.' 
+      });
     }
   };
 
-  if (!user) {
+  // Show loading state
+  if (preferencesLoading && !preferences) {
     return (
       <div className="text-center py-8">
         <p className="text-neutral-500">Loading preferences...</p>
+      </div>
+    );
+  }
+
+  // Show error state - but handle "new user" case specially  
+  if (preferencesError && !preferences) {
+    // If it's a 404/preferences not found, show defaults and allow saving
+    if (preferencesError.includes('Failed to load preferences')) {
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="text-center py-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+              <div className="text-2xl mb-2">⚙️</div>
+              <h2 className="text-lg font-semibold text-blue-900 mb-2">Set Up Your Preferences</h2>
+              <p className="text-blue-700 text-sm">
+                We'll use sensible defaults, but you can customize everything to your liking.
+              </p>
+            </div>
+          </div>
+
+          {/* Show the preferences form with defaults */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Messages */}
+            {message && (
+              <div className={`p-4 rounded-lg ${
+                message.type === 'success' 
+                  ? 'bg-green-50 text-green-800 border border-green-200' 
+                  : 'bg-red-50 text-red-800 border border-red-200'
+              }`}>
+                {message.text}
+              </div>
+            )}
+
+            {/* Basic Preferences */}
+            <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
+              <h3 className="text-md font-medium text-gray-900 border-b border-gray-200 pb-2">
+                Essential Settings
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="theme" className="block text-sm font-medium text-gray-700 mb-1">
+                    Theme
+                  </label>
+                  <select
+                    id="theme"
+                    name="theme"
+                    value={formData.theme}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-1">
+                    Timezone
+                  </label>
+                  <select
+                    id="timezone"
+                    name="timezone"
+                    value={formData.timezone}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  >
+                    {timezones.map(tz => (
+                      <option key={tz} value={tz}>{tz}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="notifications"
+                  name="notifications"
+                  checked={formData.notifications}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="notifications" className="ml-2 text-sm text-gray-700">
+                  Enable notifications
+                </label>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={updating}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+              >
+                {updating ? 'Saving Preferences...' : 'Save My Preferences'}
+              </button>
+            </div>
+          </form>
+        </div>
+      );
+    }
+
+    // For other errors, show the regular error state
+    return (
+      <div className="text-center py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-red-800 mb-2">Failed to load preferences</p>
+          <p className="text-red-600 text-sm mb-4">{preferencesError}</p>
+          <button
+            onClick={refetch}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no preferences available
+  if (!preferences && !preferencesLoading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-neutral-500">No preferences data available</p>
       </div>
     );
   }
@@ -422,10 +602,10 @@ const PreferencesSettings: React.FC = () => {
         <div className="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-200">
           <button
             type="submit"
-            disabled={isSaving}
+            disabled={updating}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
           >
-            {isSaving ? 'Saving...' : 'Save Preferences'}
+            {updating ? 'Saving...' : 'Save Preferences'}
           </button>
         </div>
       </form>

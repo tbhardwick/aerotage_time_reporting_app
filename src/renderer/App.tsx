@@ -15,6 +15,10 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { amplifyConfig } from './config/aws-config';
 
+// Import session test utilities for development
+import './utils/sessionTestUtils';
+import './utils/sessionDebugUtils';
+
 // Configure AWS Amplify
 Amplify.configure(amplifyConfig);
 

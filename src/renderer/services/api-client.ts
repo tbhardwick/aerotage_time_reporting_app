@@ -1,5 +1,6 @@
 import { get, post, put, del } from 'aws-amplify/api';
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
+import { authErrorHandler } from './authErrorHandler';
 
 export interface TimeEntry {
   id: string;
@@ -340,27 +341,83 @@ class AerotageApiClient {
           
           console.log(`🔍 Error body:`, errorBody);
           
-          // Extract meaningful error message
-          if (errorBody) {
-            if (typeof errorBody === 'object') {
-              // Handle nested error structure: { success: false, error: { code: "...", message: "..." } }
-              if (errorBody.error && typeof errorBody.error === 'object') {
-                errorMessage = errorBody.error.message || errorBody.error.code || 'Server error';
-              } else {
-                errorMessage = errorBody.message || errorBody.error || errorBody.errorMessage || `HTTP ${statusCode} Error`;
-              }
-              errorDetails = errorBody;
+          // Handle enhanced backend session validation errors
+          const statusCodeNum = parseInt(statusCode.toString(), 10);
+          if (statusCodeNum === 401) {
+            errorMessage = 'Authentication token is invalid or expired. Please sign in again.';
+            
+            // Handle authentication error automatically
+            const authError = { 
+              code: 'AUTHENTICATION_FAILED', 
+              statusCode: 401, 
+              shouldLogout: true, 
+              message: errorMessage 
+            };
+            authErrorHandler.handleAuthError(authError).catch(console.error);
+            
+          } else if (statusCodeNum === 403) {
+            // Check if this is a session validation error
+            if (errorBody && (
+              errorBody.message?.includes('No active sessions') ||
+              errorBody.error?.message?.includes('No active sessions') ||
+              errorBody.message?.includes('session') ||
+              errorBody.error?.message?.includes('session')
+            )) {
+              errorMessage = 'Your session has been terminated. Please sign in again.';
+              
+              // Handle session termination error automatically
+              const sessionError = { 
+                code: 'SESSION_TERMINATED', 
+                statusCode: 403, 
+                shouldLogout: true, 
+                message: errorMessage 
+              };
+              authErrorHandler.handleAuthError(sessionError).catch(console.error);
+              
             } else {
-              errorMessage = errorBody;
+              errorMessage = 'Access denied. You do not have permission to perform this action.';
             }
           } else {
-            errorMessage = `HTTP ${statusCode} Error`;
+            // Extract meaningful error message for other status codes
+            if (errorBody) {
+              if (typeof errorBody === 'object') {
+                // Handle nested error structure: { success: false, error: { code: "...", message: "..." } }
+                if (errorBody.error && typeof errorBody.error === 'object') {
+                  errorMessage = errorBody.error.message || errorBody.error.code || 'Server error';
+                } else {
+                  errorMessage = errorBody.message || errorBody.error || errorBody.errorMessage || `HTTP ${statusCode} Error`;
+                }
+                errorDetails = errorBody;
+              } else {
+                errorMessage = errorBody;
+              }
+            } else {
+              errorMessage = `HTTP ${statusCode} Error`;
+            }
           }
         } else if (error?.message) {
           errorMessage = error.message;
         }
       } catch (parseError) {
         console.warn('Failed to parse error response:', parseError);
+      }
+
+      // Check for session validation errors (including CORS/network errors)
+      if (this.isSessionValidationError(error)) {
+        console.log('🔍 Detected session validation error, triggering automatic logout');
+        
+        const sessionError = { 
+          code: 'SESSION_VALIDATION_FAILED', 
+          statusCode: statusCode === 'unknown' ? 403 : parseInt(statusCode.toString(), 10), 
+          shouldLogout: true, 
+          message: 'Your session is no longer valid. Please sign in again.' 
+        };
+        
+        // Handle session validation error automatically
+        authErrorHandler.handleAuthError(sessionError).catch(console.error);
+        
+        // Update error message for user
+        errorMessage = 'Your session is no longer valid. Please sign in again.';
       }
 
       // Create a more descriptive error
@@ -377,6 +434,33 @@ class AerotageApiClient {
 
       throw apiError;
     }
+  }
+
+  /**
+   * Enhanced error detection for session validation issues
+   * Handles cases where CORS blocks the actual HTTP status codes
+   */
+  private isSessionValidationError(error: any): boolean {
+    const errorMessage = error?.message || '';
+    
+    // Network errors when backend is rejecting authorization
+    if (errorMessage.includes('NetworkError: A network error has occurred')) {
+      return true;
+    }
+    
+    // CORS errors often indicate authorization rejection
+    if (errorMessage.includes('CORS') || errorMessage.includes('Access-Control-Allow-Origin')) {
+      return true;
+    }
+    
+    // Specific backend validation error patterns
+    if (errorMessage.includes('No active sessions') || 
+        errorMessage.includes('session has been terminated') ||
+        errorMessage.includes('Authentication required')) {
+      return true;
+    }
+    
+    return false;
   }
 
   // Authentication methods

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
+import { useUserProfile } from '../../hooks';
+import { UpdateUserProfileRequest } from '../../types/user-profile-api';
 
 interface ProfileFormData {
   name: string;
@@ -15,6 +17,16 @@ interface ProfileFormData {
 const ProfileSettings: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const { user } = state;
+  
+  // Use the profile API hook
+  const { 
+    profile, 
+    loading: profileLoading, 
+    error: profileError, 
+    updating, 
+    updateProfile, 
+    refetch 
+  } = useUserProfile(user?.id || null);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     name: '',
@@ -28,24 +40,35 @@ const ProfileSettings: React.FC = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Initialize form data when user is loaded
+  // Debug logging
   useEffect(() => {
-    if (user) {
+    console.log('🔍 ProfileSettings debug:', {
+      userId: user?.id,
+      profileLoading,
+      profileError,
+      hasProfile: !!profile,
+      profileData: profile ? { name: profile.name, email: profile.email } : null
+    });
+  }, [user?.id, profileLoading, profileError, profile]);
+
+  // Initialize form data when profile is loaded
+  useEffect(() => {
+    if (profile) {
+      console.log('📝 Initializing form data with profile:', profile);
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        jobTitle: user.jobTitle || '',
-        department: user.department || '',
-        hourlyRate: user.hourlyRate || '',
-        phone: user.contactInfo?.phone || '',
-        address: user.contactInfo?.address || '',
-        emergencyContact: user.contactInfo?.emergencyContact || '',
+        name: profile.name || '',
+        email: profile.email || '',
+        jobTitle: profile.jobTitle || '',
+        department: profile.department || '',
+        hourlyRate: profile.hourlyRate || '',
+        phone: profile.contactInfo?.phone || '',
+        address: profile.contactInfo?.address || '',
+        emergencyContact: profile.contactInfo?.emergencyContact || '',
       });
     }
-  }, [user]);
+  }, [profile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -59,86 +82,240 @@ const ProfileSettings: React.FC = () => {
     e.preventDefault();
     if (!user) return;
 
-    setIsSaving(true);
+    console.log('💾 Submitting profile with form data:', formData);
+
     setMessage(null);
 
     try {
-      // Update user in context
-      dispatch({
-        type: 'UPDATE_USER',
-        payload: {
-          id: user.id,
-          updates: {
-            name: formData.name,
-            jobTitle: formData.jobTitle,
-            department: formData.department,
-            hourlyRate: typeof formData.hourlyRate === 'number' ? formData.hourlyRate : undefined,
-            contactInfo: {
-              ...user.contactInfo,
-              phone: formData.phone,
-              address: formData.address,
-              emergencyContact: formData.emergencyContact,
-            },
-            updatedAt: new Date().toISOString(),
-          },
+      // Prepare the update request
+      const updates: UpdateUserProfileRequest = {
+        name: formData.name,
+        jobTitle: formData.jobTitle || undefined,
+        department: formData.department || undefined,
+        hourlyRate: typeof formData.hourlyRate === 'number' ? formData.hourlyRate : undefined,
+        contactInfo: {
+          phone: formData.phone || undefined,
+          address: formData.address || undefined,
+          emergencyContact: formData.emergencyContact || undefined,
         },
-      });
+      };
 
-      // Also update the current user in the state
+      // Call the API to update the profile
+      const updatedProfile = await updateProfile(updates);
+
+      // Update the current user in the context with the API response
       dispatch({
         type: 'SET_USER',
         payload: {
           ...user,
-          name: formData.name,
-          jobTitle: formData.jobTitle,
-          department: formData.department,
-          hourlyRate: typeof formData.hourlyRate === 'number' ? formData.hourlyRate : undefined,
-          contactInfo: {
-            ...user.contactInfo,
-            phone: formData.phone,
-            address: formData.address,
-            emergencyContact: formData.emergencyContact,
-          },
-          updatedAt: new Date().toISOString(),
+          name: updatedProfile.name,
+          jobTitle: updatedProfile.jobTitle,
+          department: updatedProfile.department,
+          hourlyRate: updatedProfile.hourlyRate,
+          contactInfo: updatedProfile.contactInfo,
+          updatedAt: updatedProfile.updatedAt,
         },
       });
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setIsEditing(false);
 
-      // TODO: Make API call to update profile on backend
-      // await apiClient.updateUserProfile(user.id, formData);
-
     } catch (error) {
       console.error('Error updating profile:', error);
-      setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
-    } finally {
-      setIsSaving(false);
+      setMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Failed to update profile. Please try again.' 
+      });
     }
   };
 
   const handleCancel = () => {
     // Reset form data to original values
-    if (user) {
+    if (profile) {
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        jobTitle: user.jobTitle || '',
-        department: user.department || '',
-        hourlyRate: user.hourlyRate || '',
-        phone: user.contactInfo?.phone || '',
-        address: user.contactInfo?.address || '',
-        emergencyContact: user.contactInfo?.emergencyContact || '',
+        name: profile.name || '',
+        email: profile.email || '',
+        jobTitle: profile.jobTitle || '',
+        department: profile.department || '',
+        hourlyRate: profile.hourlyRate || '',
+        phone: profile.contactInfo?.phone || '',
+        address: profile.contactInfo?.address || '',
+        emergencyContact: profile.contactInfo?.emergencyContact || '',
       });
     }
     setIsEditing(false);
     setMessage(null);
   };
 
-  if (!user) {
+  // Show loading state
+  if (profileLoading && !profile) {
     return (
       <div className="text-center py-8">
         <p className="text-neutral-500">Loading profile...</p>
+      </div>
+    );
+  }
+
+  // Show error state - but handle "new user" case specially
+  if (profileError && !profile) {
+    // If it's a 404/profile not found, show a "create profile" interface
+    if (profileError.includes('Failed to load profile')) {
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="text-center py-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+              <div className="text-4xl mb-4">👋</div>
+              <h2 className="text-lg font-semibold text-blue-900 mb-2">Welcome to Aerotage!</h2>
+              <p className="text-blue-700 text-sm mb-4">
+                It looks like this is your first time here. Let's set up your profile.
+              </p>
+              <button
+                onClick={() => {
+                  // Initialize with basic user data for a new profile
+                  setFormData({
+                    name: user?.name || '',
+                    email: user?.email || '',
+                    jobTitle: '',
+                    department: '',
+                    hourlyRate: '',
+                    phone: '',
+                    address: '',
+                    emergencyContact: '',
+                  });
+                  setIsEditing(true);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                Create My Profile
+              </button>
+            </div>
+          </div>
+          
+          {/* Show the form if editing */}
+          {isEditing && (
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Create Your Profile</h3>
+                
+                {/* Messages */}
+                {message && (
+                  <div className={`p-4 rounded-lg mb-4 ${
+                    message.type === 'success' 
+                      ? 'bg-green-50 text-green-800 border border-green-200' 
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}>
+                    {message.text}
+                  </div>
+                )}
+
+                {/* Basic Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm text-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-1">
+                      Job Title
+                    </label>
+                    <input
+                      type="text"
+                      id="jobTitle"
+                      name="jobTitle"
+                      value={formData.jobTitle}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                      Department
+                    </label>
+                    <input
+                      type="text"
+                      id="department"
+                      name="department"
+                      value={formData.department}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    disabled={updating}
+                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updating}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+                  >
+                    {updating ? 'Creating Profile...' : 'Create Profile'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
+      );
+    }
+
+    // For other errors, show the regular error state
+    return (
+      <div className="text-center py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-red-800 mb-2">Failed to load profile</p>
+          <p className="text-red-600 text-sm mb-4">{profileError}</p>
+          <button
+            onClick={refetch}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no profile available
+  if (!profile && !profileLoading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-neutral-500">No profile data available</p>
       </div>
     );
   }
@@ -285,7 +462,7 @@ const ProfileSettings: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={user.role}
+                value={profile?.role || ''}
                 disabled
                 className="w-full px-3 py-2 border border-neutral-200 bg-neutral-50 rounded-lg text-sm text-neutral-500 capitalize"
               />
@@ -366,17 +543,17 @@ const ProfileSettings: React.FC = () => {
             <button
               type="button"
               onClick={handleCancel}
-              disabled={isSaving}
+              disabled={updating}
               className="px-4 py-2 text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors duration-200 disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={updating}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
             >
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {updating ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         )}

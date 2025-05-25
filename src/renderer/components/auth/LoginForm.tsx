@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { signIn, confirmSignIn, getCurrentUser, resetPassword, confirmResetPassword, resendSignUpCode, AuthError } from 'aws-amplify/auth';
 import { useAppContext } from '../../context/AppContext';
 import { apiClient } from '../../services/api-client';
+import { profileApi } from '../../services/profileApi';
+import { sessionBootstrap } from '../../services/sessionBootstrap';
 import { handlePasswordResetErrors, validatePasswordPolicy, formatPasswordErrors } from '../../utils/passwordResetErrors';
 import { useDataLoader } from '../../hooks/useDataLoader';
 
@@ -127,12 +129,45 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   const handleSuccessfulLogin = async () => {
+    console.log('🚀 handleSuccessfulLogin called');
     try {
       // Load user data and all application data
+      console.log('📊 Loading application data...');
       await loadAllData();
+      console.log('✅ Application data loaded successfully');
+      
+      // Bootstrap session for enhanced session validation
+      console.log('🚀 Attempting session bootstrap...');
+      try {
+        const bootstrapResult = await sessionBootstrap.bootstrapSession();
+        
+        if (bootstrapResult.success) {
+          console.log('✅ Session bootstrap successful:', bootstrapResult.sessionId);
+          // Clear any previous bootstrap errors
+          localStorage.removeItem('sessionBootstrapError');
+        } else if (bootstrapResult.requiresManualResolution) {
+          console.log('⚠️ Session bootstrap requires manual resolution:', bootstrapResult.error);
+          // Store the bootstrap error to show the special error screen
+          localStorage.setItem('sessionBootstrapError', JSON.stringify(bootstrapResult));
+        } else {
+          console.log('❌ Session bootstrap failed but continuing:', bootstrapResult.error);
+          localStorage.removeItem('sessionBootstrapError');
+        }
+        
+      } catch (bootstrapError) {
+        console.error('❌ Session bootstrap error:', bootstrapError);
+        // Store error for later handling
+        localStorage.setItem('sessionBootstrapError', JSON.stringify({
+          success: false,
+          error: bootstrapError instanceof Error ? bootstrapError.message : 'Bootstrap failed',
+          requiresManualResolution: true
+        }));
+      }
+      
+      console.log('🎉 Login process completed, calling onLoginSuccess');
       onLoginSuccess?.();
     } catch (err: any) {
-      console.error('Failed to load application data:', err);
+      console.error('❌ Failed in handleSuccessfulLogin:', err);
       
       // If it's an identity pool error, show a specific message but continue
       if (err.message?.includes('AWS Identity Pool configuration error')) {
@@ -142,6 +177,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       }
       
       // Continue with login even if data loading fails partially
+      console.log('🔄 Continuing with login despite errors');
       onLoginSuccess?.();
     }
   };
