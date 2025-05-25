@@ -11,6 +11,7 @@ import {
   UserSession,
 } from '../types/user-profile-api';
 import { authErrorHandler } from './authErrorHandler';
+import { decodeJWTPayload } from '../utils/jwt';
 
 const API_BASE_URL = 'https://0z6kxagbh2.execute-api.us-east-1.amazonaws.com/dev';
 
@@ -38,6 +39,14 @@ class ProfileApiService {
       }
 
       console.log('✅ Token retrieved successfully, length:', token.length);
+      
+      // Debug: Decode token to see what user ID it contains
+      const tokenPayload = decodeJWTPayload(token);
+      if (tokenPayload) {
+        console.log('🔍 Token contains user ID:', tokenPayload.sub);
+        console.log('🔍 Token email:', tokenPayload.email);
+      }
+      
       return {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
@@ -66,6 +75,8 @@ class ProfileApiService {
 
   private async handleApiResponse<T>(response: Response): Promise<T> {
     const data = await response.json();
+    console.log('🔍 handleApiResponse - Response status:', response.status);
+    console.log('🔍 handleApiResponse - Response data:', data);
     
     if (!response.ok) {
       // Handle enhanced backend session validation errors
@@ -81,7 +92,11 @@ class ProfileApiService {
       } else if (response.status === 403) {
         // Check if this is a session validation error
         const errorMessage = data.error?.message || data.message || '';
-        if (errorMessage.includes('No active sessions') || errorMessage.includes('session')) {
+        
+        // Only trigger logout for session-related 403 errors
+        if (errorMessage.includes('No active sessions') || 
+            errorMessage.includes('session has been terminated') ||
+            errorMessage.includes('Authentication required')) {
           const sessionError = new Error('Your session has been terminated. Please sign in again.');
           (sessionError as any).code = 'SESSION_TERMINATED';
           (sessionError as any).statusCode = 403;
@@ -91,6 +106,10 @@ class ProfileApiService {
           await authErrorHandler.handleAuthError(sessionError);
           throw sessionError;
         }
+        
+        // For user permission errors (like "You can only access your own preferences"),
+        // don't trigger logout - just let it fall through to normal API error handling
+        console.log('🔍 403 error is a permission error, not a session error:', errorMessage);
       }
 
       const apiError: ApiError = {
@@ -239,6 +258,24 @@ class ProfileApiService {
       return result;
     } catch (error) {
       console.error('❌ Failed to fetch user preferences:', error);
+      console.log('🔍 Error type:', typeof error);
+      console.log('🔍 Error structure:', error);
+      
+      // Handle specific error cases
+      if (error && typeof error === 'object' && 'code' in error) {
+        const apiError = error as ApiError;
+        console.log('🔍 API Error code:', apiError.code);
+        console.log('🔍 API Error message:', apiError.message);
+        
+        switch (apiError.code) {
+          case 'UNAUTHORIZED_PROFILE_ACCESS':
+            console.log('🔍 Handling UNAUTHORIZED_PROFILE_ACCESS - not triggering logout');
+            throw new Error('You do not have permission to access these preferences. Please contact your administrator.');
+          default:
+            throw new Error(apiError.message || 'Failed to load preferences.');
+        }
+      }
+      
       if (error instanceof Error && error.message.includes('Authentication')) {
         throw error;
       }

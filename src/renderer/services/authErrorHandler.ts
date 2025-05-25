@@ -49,9 +49,36 @@ class AuthErrorHandler {
       return true;
     }
 
-    // HTTP status codes that indicate session/auth failure
-    if (error.statusCode === 401 || error.statusCode === 403) {
+    // 401 errors always indicate authentication failure
+    if (error.statusCode === 401) {
       return true;
+    }
+
+    // For 403 errors, only logout if it's a session-related error, not a permission error
+    if (error.statusCode === 403) {
+      // Check if this is a session validation error vs a permission error
+      const message = error.message || '';
+      
+      // Session-related 403 errors that should trigger logout
+      if (message.includes('No active sessions') || 
+          message.includes('session has been terminated') ||
+          message.includes('Authentication required') ||
+          message.includes('session is no longer valid')) {
+        return true;
+      }
+      
+      // Permission-related 403 errors that should NOT trigger logout
+      if (message.includes('You can only access your own') ||
+          message.includes('You do not have permission') ||
+          message.includes('Access denied') ||
+          message.includes('UNAUTHORIZED_PROFILE_ACCESS')) {
+        console.log('🔍 AuthErrorHandler: 403 is a permission error, not triggering logout:', message);
+        return false;
+      }
+      
+      // If we can't determine the type of 403 error, err on the side of caution and don't logout
+      console.log('🔍 AuthErrorHandler: Unknown 403 error type, not triggering logout:', message);
+      return false;
     }
 
     // Legacy authentication error patterns

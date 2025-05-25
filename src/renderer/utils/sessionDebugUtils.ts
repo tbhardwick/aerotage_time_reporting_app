@@ -5,6 +5,26 @@
 
 import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 import { profileApi } from '../services/profileApi';
+import { decodeJWTPayload } from './jwt';
+
+/**
+ * Get user ID from JWT token (consistent with backend expectations)
+ */
+const getUserIdFromToken = async (): Promise<string> => {
+  const session = await fetchAuthSession({ forceRefresh: false });
+  const token = session.tokens?.idToken?.toString();
+  
+  if (!token) {
+    throw new Error('No authentication token available');
+  }
+  
+  const tokenPayload = decodeJWTPayload(token);
+  if (!tokenPayload || !tokenPayload.sub) {
+    throw new Error('Invalid token payload');
+  }
+  
+  return tokenPayload.sub;
+};
 
 /**
  * Debug session state and token validity
@@ -26,14 +46,15 @@ export const debugSessionState = async () => {
     // 2. Check current user
     console.log('2. Checking current user...');
     const user = await getCurrentUser();
+    const userId = await getUserIdFromToken();
     console.log('Current user:', {
-      userId: user.userId || user.username,
+      amplifyUserId: user.userId || user.username,
+      jwtUserId: userId,
       username: user.username
     });
     
     // 3. Check backend sessions list
     console.log('3. Checking backend sessions...');
-    const userId = user.userId || user.username;
     const sessions = await profileApi.getUserSessions(userId);
     console.log('Backend sessions:', sessions.length);
     sessions.forEach((session, index) => {
@@ -79,7 +100,7 @@ export const testTerminatedSession = async () => {
   
   try {
     const user = await getCurrentUser();
-    const userId = user.userId || user.username;
+    const userId = await getUserIdFromToken();
     
     console.log('🔍 Testing API calls after session termination with enhanced backend validation...');
     console.log('📄 Expected behavior: All API calls should now FAIL with 401/403 errors');
@@ -144,7 +165,7 @@ export const testTokenRefresh = async () => {
     
     // Try API call after refresh
     const user = await getCurrentUser();
-    const userId = user.userId || user.username;
+    const userId = await getUserIdFromToken();
     await profileApi.getUserProfile(userId);
     console.log('✅ API call after refresh: SUCCESS');
     
@@ -163,7 +184,7 @@ export const runBackendValidationTest = async () => {
   
   try {
     const user = await getCurrentUser();
-    const userId = user.userId || user.username;
+    const userId = await getUserIdFromToken();
     
     console.log('📋 Running tests as specified in BACKEND_SESSION_VALIDATION_IMPLEMENTATION.md');
     console.log('👤 User ID:', userId);
@@ -238,7 +259,7 @@ export const testSessionTimeout = async () => {
   
   try {
     const user = await getCurrentUser();
-    const userId = user.userId || user.username;
+    const userId = await getUserIdFromToken();
     
     console.log('⏰ Testing session timeout behavior...');
     console.log('📝 Note: This test depends on backend session timeout settings');

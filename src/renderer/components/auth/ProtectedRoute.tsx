@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getCurrentUser } from 'aws-amplify/auth';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import { LoginForm } from './LoginForm';
 import { useAppContext } from '../../context/AppContext';
+import { decodeJWTPayload } from '../../utils/jwt';
+import { clearBootstrapErrorIfLoggedIn } from '../../utils/bootstrapUtils';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,10 +24,26 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       const amplifyUser = await getCurrentUser();
       console.log('🔍 Amplify user:', amplifyUser);
       
-      // Extract user information from Amplify user
-      const userId = amplifyUser.userId || amplifyUser.username;
-      const email = amplifyUser.signInDetails?.loginId || 'user@example.com';
-      const name = amplifyUser.signInDetails?.loginId?.split('@')[0] || 'Test User';
+      // Get the JWT token to extract the correct user ID
+      const session = await fetchAuthSession({ forceRefresh: false });
+      const token = session.tokens?.idToken?.toString();
+      
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+      
+      // Extract user ID from JWT token (this matches what backend expects)
+      const tokenPayload = decodeJWTPayload(token);
+      if (!tokenPayload || !tokenPayload.sub) {
+        throw new Error('Invalid token payload');
+      }
+      
+      const userId = tokenPayload.sub;
+      const email = tokenPayload.email || amplifyUser.signInDetails?.loginId || 'user@example.com';
+      const name = tokenPayload.name || amplifyUser.signInDetails?.loginId?.split('@')[0] || 'Test User';
+      
+      console.log('🔍 User ID from token:', userId);
+      console.log('🔍 Email from token:', email);
       
       // Create user object for context
       const user = {
@@ -59,6 +78,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       
       // Set user in context
       dispatch({ type: 'SET_USER', payload: user });
+      
+      // Clear any old bootstrap errors since user is successfully authenticated
+      clearBootstrapErrorIfLoggedIn();
+      
       setIsAuthenticated(true);
     } catch (error) {
       console.error('❌ Authentication failed:', error);

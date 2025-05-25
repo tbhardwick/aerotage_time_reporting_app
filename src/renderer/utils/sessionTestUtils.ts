@@ -4,7 +4,27 @@
  */
 
 import { profileApi } from '../services/profileApi';
-import { getCurrentUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
+import { decodeJWTPayload } from './jwt';
+
+/**
+ * Get user ID from JWT token (consistent with backend expectations)
+ */
+const getUserIdFromToken = async (): Promise<string> => {
+  const session = await fetchAuthSession({ forceRefresh: false });
+  const token = session.tokens?.idToken?.toString();
+  
+  if (!token) {
+    throw new Error('No authentication token available');
+  }
+  
+  const tokenPayload = decodeJWTPayload(token);
+  if (!tokenPayload || !tokenPayload.sub) {
+    throw new Error('Invalid token payload');
+  }
+  
+  return tokenPayload.sub;
+};
 
 /**
  * Test session creation functionality
@@ -16,14 +36,15 @@ export const testSessionCreation = async () => {
   try {
     console.log('1. Getting current user...');
     const cognitoUser = await getCurrentUser();
-    const userId = cognitoUser.userId || cognitoUser.username;
+    const userId = await getUserIdFromToken();
     
     if (!userId) {
       console.error('❌ No user ID found');
       return false;
     }
     
-    console.log('✅ User ID:', userId);
+    console.log('✅ User ID (from JWT):', userId);
+    console.log('✅ Amplify User ID:', cognitoUser.userId || cognitoUser.username);
     
     console.log('2. Creating session...');
     const session = await profileApi.createSession(userId, {
@@ -81,7 +102,7 @@ export const testSessionsList = async () => {
   
   try {
     const cognitoUser = await getCurrentUser();
-    const userId = cognitoUser.userId || cognitoUser.username;
+    const userId = await getUserIdFromToken();
     
     if (!userId) {
       console.error('❌ No user ID found');

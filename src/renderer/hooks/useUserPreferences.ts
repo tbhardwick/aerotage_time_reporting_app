@@ -17,7 +17,21 @@ export const useUserPreferences = (userId: string | null) => {
       const preferencesData = await profileApi.getUserPreferences(userId);
       setPreferences(preferencesData);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load preferences';
+      console.error('useUserPreferences: Error fetching preferences:', err);
+      
+      let errorMessage = 'Failed to load preferences';
+      
+      // Handle specific error cases
+      if (err instanceof Error) {
+        if (err.message.includes('You do not have permission')) {
+          errorMessage = 'Permission denied. Please contact your administrator.';
+        } else if (err.message.includes('Authentication')) {
+          errorMessage = err.message; // Pass through auth errors
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
       setError(errorMessage);
       setPreferences(null);
     } finally {

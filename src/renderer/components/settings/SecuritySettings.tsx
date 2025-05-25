@@ -265,7 +265,8 @@ const SecuritySettings: React.FC = () => {
   if (!user) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-500">Loading security settings...</p>
+        <p className="text-neutral-500">Please wait while we load your user information...</p>
+        <p className="text-sm text-neutral-400 mt-2">If this persists, please refresh the page.</p>
       </div>
     );
   }

@@ -4,8 +4,9 @@
  * Solves the chicken-and-egg problem of needing a session to create a session
  */
 
-import { getCurrentUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import { profileApi } from './profileApi';
+import { decodeJWTPayload } from '../utils/jwt';
 
 export interface BootstrapResult {
   success: boolean;
@@ -42,9 +43,21 @@ class SessionBootstrapService {
       console.group('🚀 Session Bootstrap Process');
       console.log('📋 Attempting to create initial session after authentication');
       
+      // Get user ID from JWT token (consistent with backend expectations)
       const user = await getCurrentUser();
-      const userId = user.userId || user.username;
+      const session = await fetchAuthSession({ forceRefresh: false });
+      const token = session.tokens?.idToken?.toString();
       
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+      
+      const tokenPayload = decodeJWTPayload(token);
+      if (!tokenPayload || !tokenPayload.sub) {
+        throw new Error('Invalid token payload');
+      }
+      
+      const userId = tokenPayload.sub;
       console.log('👤 Bootstrapping session for user:', userId);
       
       // Try multiple approaches to create a session

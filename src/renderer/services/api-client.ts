@@ -1,6 +1,7 @@
 import { get, post, put, del } from 'aws-amplify/api';
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import { authErrorHandler } from './authErrorHandler';
+import { decodeJWTPayload } from '../utils/jwt';
 
 export interface TimeEntry {
   id: string;
@@ -465,8 +466,21 @@ class AerotageApiClient {
 
   // Authentication methods
   async getCurrentUser(): Promise<User> {
-    const cognitoUser = await getCurrentUser();
-    return this.request<User>('GET', `/users/${cognitoUser.userId}`);
+    // Get user ID from JWT token (consistent with backend expectations)
+    const session = await fetchAuthSession({ forceRefresh: false });
+    const token = session.tokens?.idToken?.toString();
+    
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    
+    const tokenPayload = decodeJWTPayload(token);
+    if (!tokenPayload || !tokenPayload.sub) {
+      throw new Error('Invalid token payload');
+    }
+    
+    const userId = tokenPayload.sub;
+    return this.request<User>('GET', `/users/${userId}`);
   }
 
   // Time Entries API

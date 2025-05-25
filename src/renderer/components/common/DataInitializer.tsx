@@ -48,10 +48,21 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
       if (storedBootstrapError) {
         try {
           const errorData = JSON.parse(storedBootstrapError) as BootstrapResult;
-          if (errorData.requiresManualResolution && !errorData.success) {
+          
+          // Only show bootstrap error if:
+          // 1. It requires manual resolution AND
+          // 2. It's not successful AND
+          // 3. We don't have any existing session data (indicating this is a fresh login)
+          const hasExistingSession = localStorage.getItem('currentSessionId');
+          
+          if (errorData.requiresManualResolution && !errorData.success && !hasExistingSession) {
             console.log('🚨 Detected session bootstrap error requiring manual resolution');
             setBootstrapError(errorData);
             return; // Don't proceed with normal data loading
+          } else {
+            // Clear old bootstrap errors if we have a session or if the error is resolved
+            console.log('🧹 Clearing old bootstrap error - user has session or error is resolved');
+            localStorage.removeItem('sessionBootstrapError');
           }
         } catch (error) {
           console.warn('Failed to parse stored bootstrap error:', error);
