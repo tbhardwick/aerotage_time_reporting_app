@@ -85,20 +85,16 @@ const TimeTrackingNew: React.FC = () => {
   const nonBillableTime = totalTime - billableTime;
 
   return (
-    <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
+    <div className="space-y-6">
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div>
         <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
           Time Tracking
         </h1>
         <p style={{ color: '#4b5563' }}>Track your time and manage your daily work activities</p>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-        gap: '1.5rem' 
-      }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Timer Section */}
         <div style={{ 
           backgroundColor: 'white', 
@@ -243,13 +239,7 @@ const TimeTrackingNew: React.FC = () => {
         </div>
 
         {/* Time Entries */}
-        <div style={{ 
-          backgroundColor: 'white', 
-          padding: '1.5rem', 
-          borderRadius: '0.5rem', 
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          gridColumn: '1 / -1'
-        }}>
+        <div className="bg-white p-6 rounded-lg shadow-md col-span-full">
           <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>
             Time Entries
           </h3>

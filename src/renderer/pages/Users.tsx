@@ -61,10 +61,9 @@ export const Users: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
           <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
           <p className="mt-2 text-sm text-gray-600">
             Manage users and send invitations to new team members
@@ -213,7 +212,6 @@ export const Users: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 };
