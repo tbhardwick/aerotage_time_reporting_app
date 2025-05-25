@@ -106,7 +106,7 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isMac ? 'pl-20 sm:pl-6 lg:pl-8' : ''}`}>
+      <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
         <div className="flex items-center justify-between h-16">
           {/* Logo and Desktop Navigation */}
           <div className="flex items-center">
