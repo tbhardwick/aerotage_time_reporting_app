@@ -224,4 +224,52 @@ export interface Notification {
   message: string;
   duration?: number;
   createdAt: string;
+}
+
+// Electron API Types
+export interface ElectronAPI {
+  // App info
+  getVersion: () => Promise<string>;
+  getName: () => Promise<string>;
+  
+  // Window controls
+  minimizeWindow: () => void;
+  maximizeWindow: () => void;
+  closeWindow: () => void;
+  
+  // Theme
+  onThemeChanged: (callback: (isDark: boolean) => void) => void;
+  getTheme: () => Promise<string>;
+  setTheme: (theme: string) => void;
+  
+  // Preferences
+  onOpenPreferences: (callback: () => void) => void;
+  
+  // Deep linking
+  onDeepLink: (callback: (url: string) => void) => void;
+  
+  // File operations
+  openFile: () => Promise<any>;
+  saveFile: (content: any) => Promise<any>;
+  
+  // Store operations
+  store: {
+    get: (key: string) => Promise<any>;
+    set: (key: string, value: any) => Promise<void>;
+    delete: (key: string) => Promise<void>;
+    clear: () => Promise<void>;
+  };
+  
+  // Platform info
+  platform: string;
+  isMac: boolean;
+  isWindows: boolean;
+  isLinux: boolean;
+}
+
+// Extend the Window interface to include electronAPI
+declare global {
+  interface Window {
+    electronAPI: ElectronAPI;
+  }
 } 

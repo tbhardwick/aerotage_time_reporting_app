@@ -95,9 +95,12 @@ const Navigation: React.FC = () => {
     }
   };
 
+  // Check if we're on macOS to adjust for window controls
+  const isMac = window.electronAPI?.isMac || false;
+
   return (
     <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className={`max-w-7xl mx-auto px-4 ${isMac ? 'pl-20' : ''}`}>
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
             <h1 className="text-white text-xl font-bold">Aerotage Time</h1>
