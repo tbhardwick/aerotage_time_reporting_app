@@ -109,27 +109,15 @@ const Navigation: React.FC = () => {
       <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation" style={{ WebkitAppRegion: 'drag' } as any}>
         <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
           <div className="flex items-center justify-between h-16">
-            {/* Logo and Desktop Navigation */}
-            <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as any}>
-              <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-3 py-1 mr-8 shadow-sm border border-white border-opacity-20">
-                <img 
-                  src="/assets/logos/aerotage_logo.svg" 
-                  alt="Aerotage Time" 
-                  className="h-10 w-auto"
-                  style={{ filter: 'contrast(1.3) saturate(1.2)' }}
-                />
-              </div>
-            
-                          {/* Desktop Navigation */}
-              <div className="hidden lg:flex lg:space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
-                <NavLink to="/" icon="🏠">Dashboard</NavLink>
-                <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
-                <NavLink to="/projects" icon="📁">Projects</NavLink>
-                <NavLink to="/approvals" icon="✅">Approvals</NavLink>
-                <NavLink to="/reports" icon="📊">Reports</NavLink>
-                <NavLink to="/invoices" icon="📄">Invoices</NavLink>
-                <NavLink to="/users" icon="👥">Users</NavLink>
-              </div>
+                        {/* Desktop Navigation */}
+            <div className="hidden lg:flex lg:space-x-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+              <NavLink to="/" icon="🏠">Dashboard</NavLink>
+              <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
+              <NavLink to="/projects" icon="📁">Projects</NavLink>
+              <NavLink to="/approvals" icon="✅">Approvals</NavLink>
+              <NavLink to="/reports" icon="📊">Reports</NavLink>
+              <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+              <NavLink to="/users" icon="👥">Users</NavLink>
             </div>
 
             {/* Desktop Sign Out */}
