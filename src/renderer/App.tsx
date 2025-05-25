@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { signOut } from 'aws-amplify/auth';
@@ -70,7 +70,7 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }
     <Link 
       to={to}
       className={`
-        flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
+        flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
         ${isActive 
       ? 'bg-blue-600 text-white' 
       : 'text-gray-300 hover:bg-gray-700 hover:text-white'
@@ -85,6 +85,8 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }
 };
 
 const Navigation: React.FC = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -98,13 +100,20 @@ const Navigation: React.FC = () => {
   // Check if we're on macOS to adjust for window controls
   const isMac = window.electronAPI?.isMac || false;
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation">
-      <div className={`max-w-7xl mx-auto px-4 ${isMac ? 'pl-20' : ''}`}>
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isMac ? 'pl-20 sm:pl-6 lg:pl-8' : ''}`}>
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-8">
-            <h1 className="text-white text-xl font-bold">Aerotage Time</h1>
-            <div className="flex space-x-1">
+          {/* Logo and Desktop Navigation */}
+          <div className="flex items-center">
+            <h1 className="text-white text-xl font-bold mr-8">Aerotage Time</h1>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex lg:space-x-1">
               <NavLink to="/" icon="🏠">Dashboard</NavLink>
               <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
               <NavLink to="/projects" icon="📁">Projects</NavLink>
@@ -114,7 +123,9 @@ const Navigation: React.FC = () => {
               <NavLink to="/users" icon="👥">Users</NavLink>
             </div>
           </div>
-          <div className="flex items-center">
+
+          {/* Desktop Sign Out */}
+          <div className="hidden lg:flex lg:items-center">
             <button
               onClick={handleLogout}
               className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
@@ -122,7 +133,64 @@ const Navigation: React.FC = () => {
               Sign Out
             </button>
           </div>
+
+          {/* Mobile menu button */}
+          <div className="lg:hidden">
+            <button
+              onClick={toggleMobileMenu}
+              className="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+              aria-label="Toggle mobile menu"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-md mt-2">
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/" icon="🏠">Dashboard</NavLink>
+              </div>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/time-tracking" icon="⏱️">Time Tracking</NavLink>
+              </div>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/projects" icon="📁">Projects</NavLink>
+              </div>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/approvals" icon="✅">Approvals</NavLink>
+              </div>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/reports" icon="📊">Reports</NavLink>
+              </div>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/invoices" icon="📄">Invoices</NavLink>
+              </div>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/users" icon="👥">Users</NavLink>
+              </div>
+              <div className="border-t border-gray-700 pt-2 mt-2">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-sm font-medium w-full text-left transition-colors duration-200"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
