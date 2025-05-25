@@ -10,6 +10,7 @@ import { Approvals } from './pages/Approvals';
 import Reports from './pages/Reports';
 import Invoices from './pages/Invoices';
 import Users from './pages/Users';
+import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { amplifyConfig } from './config/aws-config';
@@ -118,6 +119,7 @@ const Navigation: React.FC = () => {
               <NavLink to="/reports" icon="📊">Reports</NavLink>
               <NavLink to="/invoices" icon="📄">Invoices</NavLink>
               <NavLink to="/users" icon="👥">Users</NavLink>
+              <NavLink to="/settings" icon="⚙️">Settings</NavLink>
             </div>
 
             {/* Desktop Sign Out */}
@@ -183,6 +185,9 @@ const Navigation: React.FC = () => {
         <div onClick={() => setIsMobileMenuOpen(false)}>
           <NavLink to="/users" icon="👥">Users</NavLink>
         </div>
+        <div onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink to="/settings" icon="⚙️">Settings</NavLink>
+        </div>
         <div className="border-t border-gray-700 pt-2 mt-2">
           <button
             onClick={() => {
@@ -218,6 +223,7 @@ const App: React.FC = () => {
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/invoices" element={<Invoices />} />
                     <Route path="/users" element={<Users />} />
+                    <Route path="/settings" element={<Settings />} />
                   </Routes>
                 </main>
               </div>

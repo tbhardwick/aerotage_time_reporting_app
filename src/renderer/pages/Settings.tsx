@@ -1,17 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
+import SettingsLayout from '../components/settings/SettingsLayout';
+import { ProfileSettings, PreferencesSettings, SecuritySettings, NotificationSettings } from '../components/settings';
 
 const Settings: React.FC = () => {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Settings</h1>
-        <p className="text-neutral-600">Configure your application preferences</p>
-      </div>
+  const [activeTab, setActiveTab] = useState('profile');
 
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <p className="text-neutral-600">Settings configuration coming soon...</p>
-      </div>
-    </div>
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'profile':
+        return <ProfileSettings />;
+      case 'preferences':
+        return <PreferencesSettings />;
+      case 'security':
+        return <SecuritySettings />;
+      case 'notifications':
+        return <NotificationSettings />;
+      default:
+        return <ProfileSettings />;
+    }
+  };
+
+  return (
+    <SettingsLayout>
+      <SettingsLayout.Content 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+      >
+        {renderTabContent()}
+      </SettingsLayout.Content>
+    </SettingsLayout>
   );
 };
 
