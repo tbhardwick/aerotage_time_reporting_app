@@ -159,10 +159,10 @@ const Navigation: React.FC = () => {
     <div className={`lg:hidden transition-all duration-300 ease-in-out relative z-50 ${
       isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
     }`} style={{ overflow: isMobileMenuOpen ? 'visible' : 'hidden' }}>
-      {/* Subtle backdrop when menu is open */}
+      {/* Subtle backdrop when menu is open - starts below nav */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm -z-10"
+          className="fixed top-16 left-0 right-0 bottom-0 bg-black bg-opacity-10 backdrop-blur-sm -z-10"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
