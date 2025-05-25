@@ -200,6 +200,13 @@ type AppAction =
   | { type: 'DELETE_TEAM'; payload: string }
   | { type: 'SET_TEAMS'; payload: Team[] }
   
+  // User Invitation Actions
+  | { type: 'SET_USER_INVITATIONS'; payload: UserInvitation[] }
+  | { type: 'ADD_USER_INVITATION'; payload: UserInvitation }
+  | { type: 'UPDATE_USER_INVITATION'; payload: { id: string; updates: Partial<UserInvitation> } }
+  | { type: 'DELETE_USER_INVITATION'; payload: string }
+  | { type: 'RESEND_USER_INVITATION'; payload: { id: string; extendExpiration?: boolean; personalMessage?: string } }
+  
   // Invoice Actions
   | { type: 'ADD_INVOICE'; payload: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'> }
   | { type: 'UPDATE_INVOICE'; payload: { id: string; updates: Partial<Invoice> } }
@@ -619,6 +626,45 @@ function appReducer(state: AppState, action: AppAction): AppState {
         teams: Array.isArray(action.payload) ? action.payload : [],
       };
 
+    // User Invitation Actions
+    case 'SET_USER_INVITATIONS':
+      return {
+        ...state,
+        userInvitations: Array.isArray(action.payload) ? action.payload : [],
+      };
+
+    case 'ADD_USER_INVITATION':
+      return {
+        ...state,
+        userInvitations: [...state.userInvitations, action.payload],
+      };
+
+    case 'UPDATE_USER_INVITATION':
+      return {
+        ...state,
+        userInvitations: state.userInvitations.map(invitation =>
+          invitation.id === action.payload.id
+            ? { ...invitation, ...action.payload.updates }
+            : invitation
+        ),
+      };
+
+    case 'DELETE_USER_INVITATION':
+      return {
+        ...state,
+        userInvitations: state.userInvitations.filter(invitation => invitation.id !== action.payload),
+      };
+
+    case 'RESEND_USER_INVITATION':
+      return {
+        ...state,
+        userInvitations: state.userInvitations.map(invitation =>
+          invitation.id === action.payload.id
+            ? { ...invitation, ...action.payload }
+            : invitation
+        ),
+      };
+
     // Invoice Actions
     case 'ADD_INVOICE':
       return {
@@ -768,12 +814,24 @@ export interface UserInvitation {
   invitedBy: string; // User ID of inviter
   role: 'admin' | 'manager' | 'employee';
   teamId?: string;
+  department?: string;
+  jobTitle?: string;
+  hourlyRate?: number;
+  permissions: {
+    features: string[];
+    projects: string[];
+  };
   status: 'pending' | 'accepted' | 'expired' | 'cancelled';
-  invitationToken: string;
+  invitationToken?: string; // Only returned on creation
   expiresAt: string;
   acceptedAt?: string;
   onboardingCompleted: boolean;
+  personalMessage?: string;
   createdAt: string;
+  updatedAt: string;
+  emailSentAt: string;
+  resentCount: number;
+  lastResentAt?: string;
 }
 
 export interface UserActivity {

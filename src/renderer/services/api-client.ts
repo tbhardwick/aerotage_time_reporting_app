@@ -99,6 +99,100 @@ export interface Invoice {
   updatedAt: string;
 }
 
+export interface UserInvitation {
+  id: string;
+  email: string;
+  invitedBy: string;
+  role: 'admin' | 'manager' | 'employee';
+  teamId?: string;
+  department?: string;
+  jobTitle?: string;
+  hourlyRate?: number;
+  permissions: {
+    features: string[];
+    projects: string[];
+  };
+  status: 'pending' | 'accepted' | 'expired' | 'cancelled';
+  invitationToken?: string; // Only returned on creation
+  expiresAt: string;
+  acceptedAt?: string;
+  onboardingCompleted: boolean;
+  personalMessage?: string;
+  createdAt: string;
+  updatedAt: string;
+  emailSentAt: string;
+  resentCount: number;
+  lastResentAt?: string;
+}
+
+export interface CreateInvitationRequest {
+  email: string;
+  role: 'admin' | 'manager' | 'employee';
+  teamId?: string;
+  department?: string;
+  jobTitle?: string;
+  hourlyRate?: number;
+  permissions: {
+    features: string[];
+    projects: string[];
+  };
+  personalMessage?: string;
+}
+
+export interface InvitationFilters {
+  status?: 'pending' | 'accepted' | 'expired' | 'cancelled';
+  limit?: string;
+  offset?: string;
+  sortBy?: 'createdAt' | 'expiresAt' | 'email';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface ResendInvitationOptions {
+  extendExpiration?: boolean;
+  personalMessage?: string;
+}
+
+export interface InvitationValidation {
+  invitation: {
+    id: string;
+    email: string;
+    role: 'admin' | 'manager' | 'employee';
+    teamId?: string;
+    department?: string;
+    jobTitle?: string;
+    hourlyRate?: number;
+    permissions: {
+      features: string[];
+      projects: string[];
+    };
+    expiresAt: string;
+    isExpired: boolean;
+  };
+}
+
+export interface AcceptInvitationRequest {
+  token: string;
+  userData: {
+    name: string;
+    password: string;
+    contactInfo?: {
+      phone?: string;
+      address?: string;
+      emergencyContact?: string;
+    };
+    preferences: {
+      theme: 'light' | 'dark';
+      notifications: boolean;
+      timezone: string;
+    };
+  };
+}
+
+export interface AcceptInvitationResponse {
+  user: User;
+  invitation: UserInvitation;
+}
+
 class AerotageApiClient {
   private apiName = 'AerotageAPI';
 
@@ -143,6 +237,11 @@ class AerotageApiClient {
         'Content-Type': 'application/json',
         ...options.headers,
       };
+
+      // Debug: Log the request payload
+      if (options.body) {
+        console.log(`📤 Request payload for ${method} ${path}:`, JSON.stringify(options.body, null, 2));
+      }
 
       let restResponse;
       switch (method) {
@@ -209,9 +308,74 @@ class AerotageApiClient {
 
       console.log(`✅ Parsed API data for ${method} ${path}:`, responseData);
       return responseData as T;
-    } catch (error) {
-      console.error(`API Error (${method} ${path}):`, error);
-      throw error;
+    } catch (error: any) {
+      console.error(`❌ Raw API Error (${method} ${path}):`, error);
+      
+      // Extract detailed error information
+      let errorMessage = 'Unknown error';
+      let statusCode = 'unknown';
+      let errorDetails = null;
+
+      try {
+        // Check if this is an Amplify API error with response details
+        if (error?.response) {
+          const errorResponse = error.response;
+          console.log(`🔍 Error response object:`, errorResponse);
+          
+          statusCode = errorResponse.status || errorResponse.statusCode || 'unknown';
+          
+          // Try to extract error body
+          let errorBody = null;
+          if (errorResponse.body) {
+            if (typeof errorResponse.body === 'string') {
+              try {
+                errorBody = JSON.parse(errorResponse.body);
+              } catch {
+                errorBody = errorResponse.body;
+              }
+            } else {
+              errorBody = errorResponse.body;
+            }
+          }
+          
+          console.log(`🔍 Error body:`, errorBody);
+          
+          // Extract meaningful error message
+          if (errorBody) {
+            if (typeof errorBody === 'object') {
+              // Handle nested error structure: { success: false, error: { code: "...", message: "..." } }
+              if (errorBody.error && typeof errorBody.error === 'object') {
+                errorMessage = errorBody.error.message || errorBody.error.code || 'Server error';
+              } else {
+                errorMessage = errorBody.message || errorBody.error || errorBody.errorMessage || `HTTP ${statusCode} Error`;
+              }
+              errorDetails = errorBody;
+            } else {
+              errorMessage = errorBody;
+            }
+          } else {
+            errorMessage = `HTTP ${statusCode} Error`;
+          }
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+      } catch (parseError) {
+        console.warn('Failed to parse error response:', parseError);
+      }
+
+      // Create a more descriptive error
+      const apiError = new Error(`${errorMessage} (${statusCode})`);
+      (apiError as any).statusCode = statusCode;
+      (apiError as any).details = errorDetails;
+      (apiError as any).originalError = error;
+
+      console.error(`🚨 API Error (${method} ${path}): ${errorMessage}`, {
+        statusCode,
+        errorDetails,
+        originalError: error
+      });
+
+      throw apiError;
     }
   }
 
@@ -371,6 +535,170 @@ class AerotageApiClient {
       headers: { 'Accept': 'application/octet-stream' },
     });
     return response;
+  }
+
+  // User Invitations API
+  async createUserInvitation(invitation: CreateInvitationRequest): Promise<UserInvitation> {
+    console.log('📧 Creating user invitation:', invitation);
+    return this.request<UserInvitation>('POST', '/user-invitations', { body: invitation });
+  }
+
+  async getUserInvitations(filters?: InvitationFilters): Promise<UserInvitation[]> {
+    let params = '';
+    if (filters) {
+      const searchParams = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value);
+        }
+      });
+      params = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    }
+    console.log('📋 API Client - Fetching user invitations with params:', params);
+    console.log('🌐 API Client - Full URL will be: /user-invitations' + params);
+    
+    try {
+      const response = await this.request<any>('GET', `/user-invitations${params}`);
+      console.log('📋 API Client - getUserInvitations response received');
+      
+      // Handle different response formats:
+      // 1. Direct array: UserInvitation[]
+      // 2. Backend format: { success: boolean, data: { items: UserInvitation[], pagination: {...} } }
+      // 3. API spec format: { success: boolean, data: { invitations: UserInvitation[], pagination: {...} } }
+      let invitations: UserInvitation[];
+      
+      if (Array.isArray(response)) {
+        // Direct array response
+        invitations = response;
+        console.log('📋 API Client - Direct array format detected');
+      } else if (response && response.success && response.data) {
+        if (Array.isArray(response.data.items)) {
+          // Backend actual format: data.items
+          invitations = response.data.items;
+          console.log('📋 API Client - Backend format detected (data.items)');
+          console.log('📋 API Client - Pagination info:', response.data.pagination);
+        } else if (Array.isArray(response.data.invitations)) {
+          // API spec format: data.invitations
+          invitations = response.data.invitations;
+          console.log('📋 API Client - API spec format detected (data.invitations)');
+          console.log('📋 API Client - Pagination info:', response.data.pagination);
+        } else if (Array.isArray(response.data)) {
+          // Alternative format: data is direct array
+          invitations = response.data;
+          console.log('📋 API Client - Direct data array format detected');
+        } else {
+          console.error('📋 API Client - No invitations array found in response.data:', response.data);
+          throw new Error('No invitations array found in response data');
+        }
+      } else {
+        console.error('📋 API Client - Unexpected response format:', response);
+        console.error('📋 API Client - Full response structure:', JSON.stringify(response, null, 2));
+        throw new Error('Unexpected response format from getUserInvitations API');
+      }
+      
+      console.log('📋 API Client - Processed invitations:', invitations);
+      console.log('📋 API Client - Number of invitations:', invitations.length);
+      
+      return invitations;
+    } catch (error) {
+      console.error('📋 API Client - getUserInvitations FAILED:', error);
+      throw error;
+    }
+  }
+
+  async resendInvitation(invitationId: string, options?: ResendInvitationOptions): Promise<void> {
+    console.log('🔄 Resending invitation:', invitationId, options);
+    return this.request<void>('POST', `/user-invitations/${invitationId}/resend`, { body: options || {} });
+  }
+
+  async cancelInvitation(invitationId: string): Promise<void> {
+    console.log('❌ Cancelling invitation:', invitationId);
+    return this.request<void>('DELETE', `/user-invitations/${invitationId}`);
+  }
+
+  async validateInvitationToken(token: string): Promise<InvitationValidation> {
+    console.log('🔍 Validating invitation token:', token.substring(0, 10) + '...');
+    // Note: This is a public endpoint, so we override the request method to not include auth
+    return this.requestPublic<InvitationValidation>('GET', `/user-invitations/validate/${token}`);
+  }
+
+  async acceptInvitation(acceptanceData: AcceptInvitationRequest): Promise<AcceptInvitationResponse> {
+    console.log('✅ Accepting invitation for:', acceptanceData.userData.name);
+    // Note: This is a public endpoint, so we override the request method to not include auth
+    return this.requestPublic<AcceptInvitationResponse>('POST', '/user-invitations/accept', { body: acceptanceData });
+  }
+
+  // Public request method for invitation validation and acceptance (no auth required)
+  private async requestPublic<T>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
+    path: string, 
+    options: any = {},
+  ): Promise<T> {
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+
+      let restResponse;
+      switch (method) {
+        case 'GET':
+          restResponse = await get({ apiName: this.apiName, path, options: { headers, ...options } });
+          break;
+        case 'POST':
+          restResponse = await post({ apiName: this.apiName, path, options: { headers, body: options.body, ...options } });
+          break;
+        case 'PUT':
+          restResponse = await put({ apiName: this.apiName, path, options: { headers, body: options.body, ...options } });
+          break;
+        case 'DELETE':
+          restResponse = await del({ apiName: this.apiName, path, options: { headers, ...options } });
+          break;
+        default:
+          throw new Error(`Unsupported method: ${method}`);
+      }
+
+      console.log(`🔍 Raw public API response for ${method} ${path}:`, restResponse);
+
+      const response = await restResponse.response;
+      console.log(`🔍 Awaited public response for ${method} ${path}:`, response);
+
+      // Handle different response formats (same logic as private request)
+      let responseData;
+      
+      if (response && typeof response === 'object' && 'body' in response) {
+        const body = (response as any).body;
+        
+        if (body instanceof ReadableStream) {
+          const reader = body.getReader();
+          const decoder = new TextDecoder();
+          let result = '';
+          let done = false;
+          
+          while (!done) {
+            const { value, done: readerDone } = await reader.read();
+            done = readerDone;
+            if (value) {
+              result += decoder.decode(value, { stream: !done });
+            }
+          }
+          
+          responseData = result ? JSON.parse(result) : null;
+        } else if (typeof body === 'string') {
+          responseData = JSON.parse(body);
+        } else {
+          responseData = body;
+        }
+      } else {
+        responseData = response;
+      }
+
+      console.log(`✅ Parsed public API data for ${method} ${path}:`, responseData);
+      return responseData as T;
+    } catch (error) {
+      console.error(`Public API Error (${method} ${path}):`, error);
+      throw error;
+    }
   }
 }
 
