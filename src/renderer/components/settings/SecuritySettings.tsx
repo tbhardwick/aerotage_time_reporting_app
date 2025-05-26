@@ -7,6 +7,11 @@ import {
   ChangePasswordRequest, 
   UpdateUserSecuritySettingsRequest 
 } from '../../types/user-profile-api';
+import { 
+  validateSessionTermination, 
+  getTerminationConfirmationMessage,
+  SESSION_SECURITY_POLICY 
+} from '../../utils/sessionUtils';
 
 interface PasswordChangeData {
   currentPassword: string;
@@ -227,6 +232,27 @@ const SecuritySettings: React.FC = () => {
   const handleTerminateSession = async (sessionId: string) => {
     if (!user?.id) return;
     
+    // Validate session termination using utility function
+    const validation = validateSessionTermination(sessionId, sessions);
+    if (!validation.isValid) {
+      setMessage({ 
+        type: 'error', 
+        text: validation.error || 'Cannot terminate this session.' 
+      });
+      return;
+    }
+    
+    // Find the session for confirmation dialog
+    const sessionToTerminate = sessions.find(s => s.id === sessionId);
+    if (!sessionToTerminate) {
+      setMessage({ type: 'error', text: 'Session not found.' });
+      return;
+    }
+    
+    // Show confirmation dialog using utility function
+    const confirmed = window.confirm(getTerminationConfirmationMessage(sessionToTerminate));
+    if (!confirmed) return;
+    
     setIsTerminatingSessions(prev => [...prev, sessionId]);
     
     try {
@@ -235,7 +261,17 @@ const SecuritySettings: React.FC = () => {
       setMessage({ type: 'success', text: 'Session terminated successfully.' });
     } catch (error) {
       console.error('Error terminating session:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to terminate session. Please try again.';
+      let errorMessage = 'Failed to terminate session. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Cannot terminate your current session') || 
+            error.message.includes('CANNOT_TERMINATE_CURRENT_SESSION')) {
+          errorMessage = 'Cannot terminate your current session. Please use the Sign Out button to end your current session safely.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       setMessage({ type: 'error', text: errorMessage });
     } finally {
       setIsTerminatingSessions(prev => prev.filter(id => id !== sessionId));
@@ -483,6 +519,23 @@ const SecuritySettings: React.FC = () => {
           </button>
         </div>
         
+        {/* Session Management Info */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start space-x-2">
+            <svg className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <div className="text-sm text-blue-800">
+              <p className="font-medium mb-1">{SESSION_SECURITY_POLICY.title}</p>
+              <ul className="text-xs space-y-1">
+                {SESSION_SECURITY_POLICY.rules.map((rule, index) => (
+                  <li key={index}>• {rule}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+        
         {/* Session creation info */}
         {user && sessions.length === 0 && !isLoadingSessions && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -527,7 +580,21 @@ const SecuritySettings: React.FC = () => {
                   </div>
                 </div>
                 
-                {!session.isCurrent && (
+                {session.isCurrent ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded cursor-not-allowed">
+                      Cannot Terminate
+                    </div>
+                    <div className="group relative">
+                      <svg className="h-4 w-4 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="absolute bottom-full right-0 mb-2 w-64 p-2 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                        You cannot terminate your current session from this interface. Use the "Sign Out" button in the navigation to safely end your current session.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
                   <button
                     onClick={() => handleTerminateSession(session.id)}
                     disabled={isTerminatingSessions.includes(session.id)}

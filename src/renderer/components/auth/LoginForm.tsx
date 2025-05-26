@@ -131,38 +131,52 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const handleSuccessfulLogin = async () => {
     console.log('🚀 handleSuccessfulLogin called');
     try {
-      // Load user data and all application data
+      // Step 1: Get user information from Cognito
+      console.log('👤 Getting current user information...');
+      const user = await getCurrentUser();
+      const userId = user.userId || user.username;
+      console.log('✅ User ID obtained:', userId);
+      
+      // Step 2: Create backend session record (as per integration guide)
+      console.log('🆕 Creating backend session record...');
+      try {
+        const sessionData = await profileApi.createSession(userId, {
+          userAgent: navigator.userAgent,
+          loginTime: new Date().toISOString()
+        });
+        
+        console.log('✅ Session record created successfully:', sessionData.id);
+        
+        // Step 3: Store session info for current session tracking
+        localStorage.setItem('currentSessionId', sessionData.id);
+        localStorage.setItem('loginTime', sessionData.loginTime);
+        
+        // Clear any previous bootstrap errors since we now have a proper session
+        localStorage.removeItem('sessionBootstrapError');
+        
+      } catch (sessionError) {
+        console.error('❌ Failed to create session record:', sessionError);
+        
+        // Handle session migration if required
+        if (sessionError && typeof sessionError === 'object' && 'code' in sessionError) {
+          const apiError = sessionError as any;
+          if (apiError.code === 'SESSION_MIGRATION_REQUIRED') {
+            console.log('🔄 Session migration required, clearing storage and forcing re-login');
+            localStorage.clear();
+            window.location.href = '/login';
+            return;
+          }
+        }
+        
+        // Don't block login flow if session creation fails - continue with bootstrap fallback
+        console.log('⚠️ Session creation failed, falling back to bootstrap method');
+        setError('Warning: Session creation failed. Some features may be limited.');
+      }
+      
+      // Step 4: Load user data and all application data
       console.log('📊 Loading application data...');
       await loadAllData();
       console.log('✅ Application data loaded successfully');
-      
-      // Bootstrap session for enhanced session validation
-      console.log('🚀 Attempting session bootstrap...');
-      try {
-        const bootstrapResult = await sessionBootstrap.bootstrapSession();
-        
-        if (bootstrapResult.success) {
-          console.log('✅ Session bootstrap successful:', bootstrapResult.sessionId);
-          // Clear any previous bootstrap errors
-          localStorage.removeItem('sessionBootstrapError');
-        } else if (bootstrapResult.requiresManualResolution) {
-          console.log('⚠️ Session bootstrap requires manual resolution:', bootstrapResult.error);
-          // Store the bootstrap error to show the special error screen
-          localStorage.setItem('sessionBootstrapError', JSON.stringify(bootstrapResult));
-        } else {
-          console.log('❌ Session bootstrap failed but continuing:', bootstrapResult.error);
-          localStorage.removeItem('sessionBootstrapError');
-        }
-        
-      } catch (bootstrapError) {
-        console.error('❌ Session bootstrap error:', bootstrapError);
-        // Store error for later handling
-        localStorage.setItem('sessionBootstrapError', JSON.stringify({
-          success: false,
-          error: bootstrapError instanceof Error ? bootstrapError.message : 'Bootstrap failed',
-          requiresManualResolution: true
-        }));
-      }
       
       console.log('🎉 Login process completed, calling onLoginSuccess');
       onLoginSuccess?.();

@@ -63,14 +63,13 @@ class AuthErrorHandler {
       if (message.includes('No active sessions') || 
           message.includes('session has been terminated') ||
           message.includes('Authentication required') ||
-          message.includes('session is no longer valid')) {
+          message.includes('session is no longer valid') ||
+          message.includes('explicit deny')) {
         return true;
       }
       
       // Permission-related 403 errors that should NOT trigger logout
       if (message.includes('You can only access your own') ||
-          message.includes('You do not have permission') ||
-          message.includes('Access denied') ||
           message.includes('UNAUTHORIZED_PROFILE_ACCESS')) {
         console.log('🔍 AuthErrorHandler: 403 is a permission error, not triggering logout:', message);
         return false;
@@ -192,6 +191,22 @@ class AuthErrorHandler {
    */
   isCurrentlyLoggingOut(): boolean {
     return this.isLoggingOut;
+  }
+
+  /**
+   * Manually force logout - useful when session has been terminated externally
+   */
+  async forceLogout(reason: string = 'Manual logout requested'): Promise<void> {
+    console.log('🔐 AuthErrorHandler: Force logout requested:', reason);
+    
+    const logoutError = {
+      code: 'MANUAL_LOGOUT',
+      statusCode: 403,
+      shouldLogout: true,
+      message: reason
+    };
+    
+    await this.performLogout(logoutError);
   }
 }
 

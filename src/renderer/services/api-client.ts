@@ -378,6 +378,14 @@ class AerotageApiClient {
             } else {
               errorMessage = 'Access denied. You do not have permission to perform this action.';
             }
+          } else if (statusCodeNum === 401 && errorBody && 
+                     (errorBody.code === 'SESSION_MIGRATION_REQUIRED' || 
+                      errorBody.error?.code === 'SESSION_MIGRATION_REQUIRED')) {
+            // Handle session migration requirement
+            console.log('🔄 Session migration required, clearing storage and forcing re-login');
+            localStorage.clear();
+            window.location.href = '/login';
+            throw new Error('SESSION_MIGRATION_REQUIRED'); // Throw error to prevent further execution
           } else {
             // Extract meaningful error message for other status codes
             if (errorBody) {

@@ -173,6 +173,12 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
   // Show error state if initial load failed
   if (user && errors.initialLoad) {
     console.log('❌ Showing error screen:', errors.initialLoad);
+    
+    // Check if this looks like a session termination issue (all API calls failing with 403)
+    const isSessionTerminated = errors.initialLoad.includes('Access denied') || 
+                               errors.initialLoad.includes('403') ||
+                               errors.initialLoad.includes('explicit deny');
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full space-y-8 p-8">
@@ -183,21 +189,39 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
               </svg>
             </div>
             <h2 className="mt-6 text-lg font-medium text-gray-900">
-              Failed to load application data
+              {isSessionTerminated ? 'Session Terminated' : 'Failed to load application data'}
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              {errors.initialLoad}
+              {isSessionTerminated 
+                ? 'Your session has been terminated. This usually happens when sessions are terminated from another device or by an administrator.'
+                : errors.initialLoad
+              }
             </p>
-            <button
-              onClick={() => {
-                console.log('🔄 Retry button clicked');
-                hasLoadedRef.current = false; // Reset the flag
-                loadAllData();
-              }}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Retry
-            </button>
+            
+            {isSessionTerminated ? (
+              <div className="mt-4 space-y-3">
+                <button
+                  onClick={handleBootstrapLogout}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Sign Out and Return to Login
+                </button>
+                <p className="text-xs text-gray-500">
+                  Or open browser console and run: <code className="bg-gray-100 px-1 rounded">window.debugUtils.forceLogout()</code>
+                </p>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  console.log('🔄 Retry button clicked');
+                  hasLoadedRef.current = false; // Reset the flag
+                  loadAllData();
+                }}
+                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Retry
+              </button>
+            )}
           </div>
         </div>
       </div>
