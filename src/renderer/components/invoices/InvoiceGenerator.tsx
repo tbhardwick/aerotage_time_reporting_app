@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { PlusIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../../context/AppContext';
 import { format } from 'date-fns';
+import { apiClient } from '../../services/api-client';
 
 const InvoiceGenerator: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -112,7 +113,7 @@ const InvoiceGenerator: React.FC = () => {
     setSelectedTimeEntryIds(allIds);
   };
 
-  const handleGenerateInvoice = () => {
+  const handleGenerateInvoice = async () => {
     if (selectedTimeEntryIds.length === 0) {
       alert('Please select at least one time entry.');
       return;
@@ -123,29 +124,65 @@ const InvoiceGenerator: React.FC = () => {
       return;
     }
     
-    // Get unique project IDs from selected entries
-    const projectIds = [...new Set(
-      filteredTimeEntries
+    try {
+      // Get unique project IDs from selected entries
+      const projectIds = [...new Set(
+        filteredTimeEntries
+          .filter(entry => selectedTimeEntryIds.includes(entry.id))
+          .map(entry => entry.projectId)
+      )];
+      
+      // Create line items from selected time entries
+      const additionalLineItems = filteredTimeEntries
         .filter(entry => selectedTimeEntryIds.includes(entry.id))
-        .map(entry => entry.projectId)
-    )];
-    
-    dispatch({
-      type: 'GENERATE_INVOICE',
-      payload: {
+        .map(entry => {
+          const project = state.projects.find(p => p.id === entry.projectId);
+          const rate = project?.defaultHourlyRate || 100;
+          const hours = entry.duration / 60;
+          const amount = hours * rate;
+          
+          return {
+            type: 'time' as const,
+            description: `${project?.name || 'Project'}: ${entry.description}`,
+            quantity: hours,
+            rate,
+            amount,
+            taxable: true
+          };
+        });
+      
+      // Use the new API format for invoice creation
+      const invoiceData = {
         clientId: selectedClientId,
         timeEntryIds: selectedTimeEntryIds,
         projectIds,
         dueDate,
         notes: notes.trim() || undefined,
-      },
-    });
-    
-    // Reset form
-    setSelectedTimeEntryIds([]);
-    setSelectedClientId('');
-    setNotes('');
-    alert('Invoice generated successfully!');
+        paymentTerms: 'Net 30',
+        currency: 'USD',
+        taxRate: 0.1, // 10% tax
+        additionalLineItems
+      };
+      
+      // Call the API to create the invoice
+      const newInvoice = await apiClient.createInvoice(invoiceData);
+      
+      // Update the context with the new invoice
+      dispatch({
+        type: 'ADD_INVOICE',
+        payload: newInvoice,
+      });
+      
+      // Reset form
+      setSelectedTimeEntryIds([]);
+      setSelectedClientId('');
+      setNotes('');
+      alert(`Invoice ${newInvoice.invoiceNumber} generated successfully!`);
+      
+    } catch (error: any) {
+      console.error('Failed to generate invoice:', error);
+      alert(`Failed to generate invoice: ${error.message}`);
+    }
   };
 
   const getProjectName = (projectId: string) => {

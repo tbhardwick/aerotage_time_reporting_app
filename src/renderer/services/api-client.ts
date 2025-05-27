@@ -100,19 +100,47 @@ export interface Invoice {
   id: string;
   invoiceNumber: string;
   clientId: string;
+  clientName?: string;
   projectIds: string[];
   timeEntryIds: string[];
-  amount: number;
-  tax?: number;
-  totalAmount: number;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status: 'draft' | 'sent' | 'viewed' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
   issueDate: string;
   dueDate: string;
-  sentDate?: string;
   paidDate?: string;
+  sentDate?: string;
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  currency: string;
+  lineItems: Array<{
+    id?: string;
+    type: 'time' | 'expense' | 'fixed' | 'discount';
+    description: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+    taxable: boolean;
+  }>;
+  paymentTerms: string;
+  isRecurring: boolean;
+  recurringConfig?: {
+    frequency: 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+    interval: number;
+    startDate: string;
+    endDate?: string;
+    maxInvoices?: number;
+    autoSend?: boolean;
+    generateDaysBefore?: number;
+  };
+  remindersSent: number;
   notes?: string;
+  clientNotes?: string;
+  customFields?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
 }
 
 export interface UserInvitation {
@@ -814,25 +842,171 @@ class AerotageApiClient {
   }
 
   // Invoices API
-  async getInvoices(filters?: { clientId?: string; status?: string }): Promise<Invoice[]> {
-    const params = filters ? `?${new URLSearchParams(filters)}` : '';
-    return this.request<Invoice[]>('GET', `/invoices${params}`);
+  async getInvoices(filters?: { clientId?: string; status?: string; projectId?: string; dateFrom?: string; dateTo?: string; limit?: number; offset?: number; sortBy?: string; sortOrder?: string }): Promise<Invoice[]> {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+    }
+    
+    const queryString = params.toString();
+    const response = await this.request<any>('GET', `/invoices${queryString ? `?${queryString}` : ''}`);
+    
+    // Handle the real API response format: { success: true, data: { items: [...], pagination: {...} } }
+    if (response && response.success && response.data && Array.isArray(response.data.items)) {
+      console.log('✅ Real API invoices response:', response.data.items.length, 'invoices loaded');
+      return response.data.items;
+    }
+    
+    // Handle direct array response (fallback)
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    // Handle legacy format with invoices array
+    if (response && Array.isArray(response.invoices)) {
+      return response.invoices;
+    }
+    
+    console.warn('⚠️ Unexpected invoices API response format:', response);
+    return [];
   }
 
-  async createInvoice(invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'createdAt' | 'updatedAt'>): Promise<Invoice> {
-    return this.request<Invoice>('POST', '/invoices', { body: invoice });
+  async createInvoice(invoice: {
+    clientId: string;
+    projectIds?: string[];
+    timeEntryIds?: string[];
+    issueDate?: string;
+    dueDate?: string;
+    paymentTerms?: string;
+    currency?: string;
+    taxRate?: number;
+    discountRate?: number;
+    additionalLineItems?: Array<{
+      type: 'time' | 'expense' | 'fixed' | 'discount';
+      description: string;
+      quantity: number;
+      rate: number;
+      amount: number;
+      taxable: boolean;
+    }>;
+    notes?: string;
+    clientNotes?: string;
+    isRecurring?: boolean;
+    recurringConfig?: {
+      frequency: 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+      interval: number;
+      startDate: string;
+      endDate?: string;
+      maxInvoices?: number;
+      autoSend?: boolean;
+      generateDaysBefore?: number;
+    };
+  }): Promise<Invoice> {
+    const response = await this.request<any>('POST', '/invoices', { body: invoice });
+    
+    // Handle the real API response format: { success: true, data: {...} }
+    if (response && response.success && response.data) {
+      console.log('✅ Invoice created successfully:', response.data.invoiceNumber);
+      return response.data;
+    }
+    
+    // Handle direct invoice object response (fallback)
+    if (response && response.id) {
+      return response;
+    }
+    
+    console.warn('⚠️ Unexpected create invoice API response format:', response);
+    throw new Error('Invalid invoice data received from API');
   }
 
-  async updateInvoice(id: string, updates: Partial<Invoice>): Promise<Invoice> {
-    return this.request<Invoice>('PUT', `/invoices/${id}`, { body: updates });
+  async updateInvoice(id: string, updates: {
+    dueDate?: string;
+    paymentTerms?: string;
+    taxRate?: number;
+    discountRate?: number;
+    lineItems?: Array<{
+      id?: string;
+      type: 'time' | 'expense' | 'fixed' | 'discount';
+      description: string;
+      quantity: number;
+      rate: number;
+      amount: number;
+      taxable: boolean;
+    }>;
+    notes?: string;
+    clientNotes?: string;
+    customFields?: Record<string, any>;
+  }): Promise<Invoice> {
+    const response = await this.request<any>('PUT', `/invoices/${id}`, { body: updates });
+    
+    // Handle the real API response format: { success: true, data: {...} }
+    if (response && response.success && response.data) {
+      console.log('✅ Invoice updated successfully:', response.data.invoiceNumber);
+      return response.data;
+    }
+    
+    // Handle direct invoice object response (fallback)
+    if (response && response.id) {
+      return response;
+    }
+    
+    console.warn('⚠️ Unexpected update invoice API response format:', response);
+    throw new Error('Invalid invoice data received from API');
   }
 
-  async sendInvoice(id: string): Promise<void> {
-    return this.request<void>('POST', `/invoices/${id}/send`);
+  async sendInvoice(id: string, options?: {
+    recipientEmails?: string[];
+    subject?: string;
+    message?: string;
+    attachPdf?: boolean;
+    sendCopy?: boolean;
+    scheduleDate?: string;
+  }): Promise<void> {
+    const response = await this.request<any>('POST', `/invoices/${id}/send`, { body: options || {} });
+    
+    // Handle the real API response format
+    if (response && response.success) {
+      console.log('✅ Invoice sent successfully');
+      return;
+    }
+    
+    console.warn('⚠️ Unexpected send invoice API response format:', response);
+    throw new Error('Failed to send invoice');
   }
 
-  async updateInvoiceStatus(id: string, status: Invoice['status']): Promise<Invoice> {
-    return this.request<Invoice>('PUT', `/invoices/${id}/status`, { body: { status } });
+  async updateInvoiceStatus(id: string, status: 'draft' | 'sent' | 'viewed' | 'paid' | 'overdue' | 'cancelled' | 'refunded', paymentData?: {
+    amount: number;
+    paymentDate: string;
+    paymentMethod: string;
+    reference: string;
+    notes?: string;
+    externalPaymentId?: string;
+    processorFee?: number;
+  }): Promise<Invoice> {
+    const requestBody: any = { status };
+    if (paymentData) {
+      requestBody.paymentData = paymentData;
+    }
+    
+    const response = await this.request<any>('PUT', `/invoices/${id}/status`, { body: requestBody });
+    
+    // Handle the real API response format: { success: true, data: {...} }
+    if (response && response.success && response.data) {
+      console.log('✅ Invoice status updated successfully:', status);
+      return response.data;
+    }
+    
+    // Handle direct invoice object response (fallback)
+    if (response && response.id) {
+      return response;
+    }
+    
+    console.warn('⚠️ Unexpected update invoice status API response format:', response);
+    throw new Error('Invalid invoice data received from API');
   }
 
   // Reports API

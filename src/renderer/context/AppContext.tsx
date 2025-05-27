@@ -126,19 +126,47 @@ export interface Invoice {
   id: string;
   invoiceNumber: string;
   clientId: string;
+  clientName?: string;
   projectIds: string[];
   timeEntryIds: string[];
-  amount: number;
-  tax?: number;
-  totalAmount: number;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status: 'draft' | 'sent' | 'viewed' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
   issueDate: string;
   dueDate: string;
-  sentDate?: string;
   paidDate?: string;
+  sentDate?: string;
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  currency: string;
+  lineItems: Array<{
+    id?: string;
+    type: 'time' | 'expense' | 'fixed' | 'discount';
+    description: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+    taxable: boolean;
+  }>;
+  paymentTerms: string;
+  isRecurring: boolean;
+  recurringConfig?: {
+    frequency: 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+    interval: number;
+    startDate: string;
+    endDate?: string;
+    maxInvoices?: number;
+    autoSend?: boolean;
+    generateDaysBefore?: number;
+  };
+  remindersSent: number;
   notes?: string;
+  clientNotes?: string;
+  customFields?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
   // Populated fields
   client?: Client;
   projects?: Project[];
@@ -218,11 +246,11 @@ type AppAction =
   | { type: 'RESEND_USER_INVITATION'; payload: { id: string; extendExpiration?: boolean; personalMessage?: string } }
   
   // Invoice Actions
-  | { type: 'ADD_INVOICE'; payload: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'ADD_INVOICE'; payload: Invoice }
   | { type: 'UPDATE_INVOICE'; payload: { id: string; updates: Partial<Invoice> } }
   | { type: 'DELETE_INVOICE'; payload: string }
   | { type: 'SET_INVOICES'; payload: Invoice[] }
-  | { type: 'GENERATE_INVOICE'; payload: { clientId: string; timeEntryIds: string[]; projectIds: string[]; dueDate: string; notes?: string } }
+  | { type: 'GENERATE_INVOICE'; payload: { clientId: string; projectIds: string[]; timeEntryIds: string[]; dueDate: string; notes?: string } }
   
   // UI State Actions
   | { type: 'SET_LOADING'; payload: { key: string; loading: boolean } }
@@ -660,17 +688,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     // Invoice Actions
     case 'ADD_INVOICE':
+      // ✅ Use the invoice data as-is from API (includes proper ID, createdAt, updatedAt)
       return {
         ...state,
-        invoices: [
-          ...state.invoices,
-          {
-            ...action.payload,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
+        invoices: [...state.invoices, action.payload],
       };
 
     case 'UPDATE_INVOICE':
@@ -692,7 +713,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_INVOICES':
       return {
         ...state,
-        invoices: Array.isArray(action.payload) ? action.payload : [],
+        invoices: action.payload,
       };
 
     case 'GENERATE_INVOICE':
@@ -703,14 +724,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const totalHours = relatedTimeEntries.reduce((sum, entry) => sum + entry.duration, 0) / 60; // Convert minutes to hours
       const project = state.projects.find(p => action.payload.projectIds.includes(p.id));
       const hourlyRate = project?.defaultHourlyRate || 100;
-      const baseAmount = totalHours * hourlyRate;
-      const tax = baseAmount * 0.1; // 10% tax
-      const totalAmount = baseAmount + tax;
+      const subtotal = totalHours * hourlyRate;
+      const taxRate = 0.1; // 10% tax
+      const taxAmount = subtotal * taxRate;
+      const totalAmount = subtotal + taxAmount;
       
       // Generate invoice number
       const invoiceCount = state.invoices.length + 1;
       const year = new Date().getFullYear();
       const invoiceNumber = `INV-${year}-${String(invoiceCount).padStart(3, '0')}`;
+      
+      // Create line items from time entries
+      const lineItems = relatedTimeEntries.map(entry => {
+        const entryProject = state.projects.find(p => p.id === entry.projectId);
+        const rate = entryProject?.defaultHourlyRate || 100;
+        const hours = entry.duration / 60;
+        const amount = hours * rate;
+        
+        return {
+          type: 'time' as const,
+          description: `${entryProject?.name || 'Project'}: ${entry.description}`,
+          quantity: hours,
+          rate,
+          amount,
+          taxable: true
+        };
+      });
       
       const newInvoice: Invoice = {
         id: Date.now().toString(),
@@ -718,15 +757,23 @@ function appReducer(state: AppState, action: AppAction): AppState {
         clientId: action.payload.clientId,
         projectIds: action.payload.projectIds,
         timeEntryIds: action.payload.timeEntryIds,
-        amount: baseAmount,
-        tax,
+        subtotal,
+        taxRate,
+        taxAmount,
+        discountAmount: 0,
         totalAmount,
+        currency: 'USD',
+        lineItems,
+        paymentTerms: 'Net 30',
+        isRecurring: false,
+        remindersSent: 0,
         status: 'draft',
         issueDate: new Date().toISOString().split('T')[0],
         dueDate: action.payload.dueDate,
         notes: action.payload.notes,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        createdBy: state.user?.id || 'unknown',
       };
       
       return {

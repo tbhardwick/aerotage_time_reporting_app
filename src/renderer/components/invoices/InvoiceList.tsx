@@ -8,6 +8,7 @@ import {
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import { useAppContext, Invoice } from '../../context/AppContext';
+import { apiClient } from '../../services/api-client';
 
 const InvoiceList: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -29,7 +30,7 @@ const InvoiceList: React.FC = () => {
 
   // Filter invoices
   const filteredInvoices = state.invoices.filter(invoice => {
-    const clientName = getClientName(invoice.clientId);
+    const clientName = invoice.clientName || getClientName(invoice.clientId);
     const matchesSearch = 
       invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       clientName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -39,36 +40,71 @@ const InvoiceList: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDeleteInvoice = (invoiceId: string) => {
+  const handleDeleteInvoice = async (invoiceId: string) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
-      dispatch({ type: 'DELETE_INVOICE', payload: invoiceId });
+      try {
+        // Note: Delete endpoint not mentioned in API docs, using context for now
+        dispatch({ type: 'DELETE_INVOICE', payload: invoiceId });
+      } catch (error: any) {
+        console.error('Failed to delete invoice:', error);
+        alert(`Failed to delete invoice: ${error.message}`);
+      }
     }
   };
 
-  const handleSendInvoice = (invoiceId: string) => {
-    dispatch({
-      type: 'UPDATE_INVOICE',
-      payload: {
-        id: invoiceId,
-        updates: {
-          status: 'sent',
-          sentDate: new Date().toISOString(),
+  const handleSendInvoice = async (invoiceId: string) => {
+    try {
+      await apiClient.sendInvoice(invoiceId, {
+        attachPdf: true,
+        sendCopy: true
+      });
+      
+      // Update the invoice status in context
+      dispatch({
+        type: 'UPDATE_INVOICE',
+        payload: {
+          id: invoiceId,
+          updates: {
+            status: 'sent',
+            sentDate: new Date().toISOString(),
+          },
         },
-      },
-    });
+      });
+      
+      alert('Invoice sent successfully!');
+    } catch (error: any) {
+      console.error('Failed to send invoice:', error);
+      alert(`Failed to send invoice: ${error.message}`);
+    }
   };
 
-  const handleMarkPaid = (invoiceId: string) => {
-    dispatch({
-      type: 'UPDATE_INVOICE',
-      payload: {
-        id: invoiceId,
-        updates: {
-          status: 'paid',
-          paidDate: new Date().toISOString(),
+  const handleMarkPaid = async (invoiceId: string) => {
+    const invoice = state.invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+    
+    try {
+      const updatedInvoice = await apiClient.updateInvoiceStatus(invoiceId, 'paid', {
+        amount: invoice.totalAmount,
+        paymentDate: new Date().toISOString().split('T')[0],
+        paymentMethod: 'Manual Entry',
+        reference: `MANUAL-${Date.now()}`,
+        notes: 'Payment marked as received manually'
+      });
+      
+      // Update the invoice in context
+      dispatch({
+        type: 'UPDATE_INVOICE',
+        payload: {
+          id: invoiceId,
+          updates: updatedInvoice,
         },
-      },
-    });
+      });
+      
+      alert('Invoice marked as paid!');
+    } catch (error: any) {
+      console.error('Failed to mark invoice as paid:', error);
+      alert(`Failed to mark invoice as paid: ${error.message}`);
+    }
   };
 
   const getStatusBadge = (status: Invoice['status']) => {
@@ -79,21 +115,25 @@ const InvoiceList: React.FC = () => {
         return `${baseClasses} bg-gray-100 text-gray-800`;
       case 'sent':
         return `${baseClasses} bg-blue-100 text-blue-800`;
+      case 'viewed':
+        return `${baseClasses} bg-purple-100 text-purple-800`;
       case 'paid':
         return `${baseClasses} bg-green-100 text-green-800`;
       case 'overdue':
         return `${baseClasses} bg-red-100 text-red-800`;
       case 'cancelled':
         return `${baseClasses} bg-gray-100 text-gray-800`;
+      case 'refunded':
+        return `${baseClasses} bg-orange-100 text-orange-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currency,
     }).format(amount);
   };
 
@@ -161,7 +201,7 @@ const InvoiceList: React.FC = () => {
                     {invoice.invoiceNumber}
                   </h3>
                   <p className="text-sm text-neutral-500">
-                    {getClientName(invoice.clientId)}
+                    {invoice.clientName || getClientName(invoice.clientId)}
                   </p>
                 </div>
                 <span className={getStatusBadge(invoice.status)}>
@@ -172,10 +212,10 @@ const InvoiceList: React.FC = () => {
               {/* Amount */}
               <div className="mb-4">
                 <div className="text-2xl font-bold text-neutral-900">
-                  {formatCurrency(invoice.totalAmount)}
+                  {formatCurrency(invoice.totalAmount, invoice.currency)}
                 </div>
                 <div className="text-sm text-neutral-500">
-                  {formatCurrency(invoice.amount)} + {formatCurrency(invoice.tax || 0)} tax
+                  {formatCurrency(invoice.subtotal, invoice.currency)} + {formatCurrency(invoice.taxAmount, invoice.currency)} tax
                 </div>
               </div>
 

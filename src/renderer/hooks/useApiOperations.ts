@@ -343,40 +343,154 @@ export const useApiOperations = () => {
   }, [dispatch, setLoading, setError]);
 
   // Invoice Operations
-  const createInvoice = useCallback(async (invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'createdAt' | 'updatedAt'>) => {
+  const loadInvoices = async (filters?: { clientId?: string; status?: string; projectId?: string; dateFrom?: string; dateTo?: string; limit?: number; offset?: number; sortBy?: string; sortOrder?: string }) => {
+    try {
+      setLoading('loadInvoices', true);
+      setError('loadInvoices', null);
+      const invoices = await apiClient.getInvoices(filters);
+      dispatch({ type: 'SET_INVOICES', payload: invoices });
+      console.log('✅ Invoices loaded successfully:', invoices.length, 'invoices');
+    } catch (error: any) {
+      console.error('❌ Failed to load invoices:', error);
+      setError('loadInvoices', error.message || 'Failed to load invoices');
+    } finally {
+      setLoading('loadInvoices', false);
+    }
+  };
+
+  const createInvoice = async (invoiceData: {
+    clientId: string;
+    projectIds?: string[];
+    timeEntryIds?: string[];
+    issueDate?: string;
+    dueDate?: string;
+    paymentTerms?: string;
+    currency?: string;
+    taxRate?: number;
+    discountRate?: number;
+    additionalLineItems?: Array<{
+      type: 'time' | 'expense' | 'fixed' | 'discount';
+      description: string;
+      quantity: number;
+      rate: number;
+      amount: number;
+      taxable: boolean;
+    }>;
+    notes?: string;
+    clientNotes?: string;
+    isRecurring?: boolean;
+    recurringConfig?: any;
+  }) => {
     try {
       setLoading('createInvoice', true);
       setError('createInvoice', null);
-      const newInvoice = await apiClient.createInvoice(invoice);
-      dispatch({ type: 'ADD_INVOICE', payload: {
-        ...invoice,
-        invoiceNumber: newInvoice.invoiceNumber,
-      } });
+      const newInvoice = await apiClient.createInvoice(invoiceData);
+      dispatch({ type: 'ADD_INVOICE', payload: newInvoice });
+      console.log('✅ Invoice created successfully:', newInvoice.invoiceNumber);
       return newInvoice;
     } catch (error: any) {
-      console.error('Failed to create invoice:', error);
+      console.error('❌ Failed to create invoice:', error);
       setError('createInvoice', error.message || 'Failed to create invoice');
       throw error;
     } finally {
       setLoading('createInvoice', false);
     }
-  }, [dispatch, setLoading, setError]);
+  };
 
-  const updateInvoice = useCallback(async (id: string, updates: Partial<Invoice>) => {
+  const sendInvoice = async (invoiceId: string, options?: {
+    recipientEmails?: string[];
+    subject?: string;
+    message?: string;
+    attachPdf?: boolean;
+    sendCopy?: boolean;
+    scheduleDate?: string;
+  }) => {
     try {
-      setLoading('updateInvoice', true);
-      setError('updateInvoice', null);
-      const updatedInvoice = await apiClient.updateInvoice(id, updates);
-      dispatch({ type: 'UPDATE_INVOICE', payload: { id, updates } });
-      return updatedInvoice;
+      setLoading('sendInvoice', true);
+      setError('sendInvoice', null);
+      await apiClient.sendInvoice(invoiceId, options);
+      
+      // Update invoice status in context
+      dispatch({
+        type: 'UPDATE_INVOICE',
+        payload: {
+          id: invoiceId,
+          updates: {
+            status: 'sent',
+            sentDate: new Date().toISOString(),
+          },
+        },
+      });
+      
+      console.log('✅ Invoice sent successfully');
     } catch (error: any) {
-      console.error('Failed to update invoice:', error);
-      setError('updateInvoice', error.message || 'Failed to update invoice');
+      console.error('❌ Failed to send invoice:', error);
+      setError('sendInvoice', error.message || 'Failed to send invoice');
       throw error;
     } finally {
-      setLoading('updateInvoice', false);
+      setLoading('sendInvoice', false);
     }
-  }, [dispatch, setLoading, setError]);
+  };
+
+  const markInvoicePaid = async (invoiceId: string, paymentData: {
+    amount: number;
+    paymentDate: string;
+    paymentMethod: string;
+    reference: string;
+    notes?: string;
+    externalPaymentId?: string;
+    processorFee?: number;
+  }) => {
+    try {
+      setLoading('markInvoicePaid', true);
+      setError('markInvoicePaid', null);
+      const updatedInvoice = await apiClient.updateInvoiceStatus(invoiceId, 'paid', paymentData);
+      
+      // Update invoice in context
+      dispatch({
+        type: 'UPDATE_INVOICE',
+        payload: {
+          id: invoiceId,
+          updates: updatedInvoice,
+        },
+      });
+      
+      console.log('✅ Invoice marked as paid successfully');
+      return updatedInvoice;
+    } catch (error: any) {
+      console.error('❌ Failed to mark invoice as paid:', error);
+      setError('markInvoicePaid', error.message || 'Failed to mark invoice as paid');
+      throw error;
+    } finally {
+      setLoading('markInvoicePaid', false);
+    }
+  };
+
+  const updateInvoiceStatus = async (invoiceId: string, status: 'draft' | 'sent' | 'viewed' | 'paid' | 'overdue' | 'cancelled' | 'refunded', paymentData?: any) => {
+    try {
+      setLoading('updateInvoiceStatus', true);
+      setError('updateInvoiceStatus', null);
+      const updatedInvoice = await apiClient.updateInvoiceStatus(invoiceId, status, paymentData);
+      
+      // Update invoice in context
+      dispatch({
+        type: 'UPDATE_INVOICE',
+        payload: {
+          id: invoiceId,
+          updates: updatedInvoice,
+        },
+      });
+      
+      console.log('✅ Invoice status updated successfully:', status);
+      return updatedInvoice;
+    } catch (error: any) {
+      console.error('❌ Failed to update invoice status:', error);
+      setError('updateInvoiceStatus', error.message || 'Failed to update invoice status');
+      throw error;
+    } finally {
+      setLoading('updateInvoiceStatus', false);
+    }
+  };
 
   return {
     // Time Entry operations
@@ -403,7 +517,10 @@ export const useApiOperations = () => {
     deleteUser,
     
     // Invoice operations
+    loadInvoices,
     createInvoice,
-    updateInvoice,
+    sendInvoice,
+    markInvoicePaid,
+    updateInvoiceStatus,
   };
 }; 
