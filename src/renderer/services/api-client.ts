@@ -5,13 +5,17 @@ import { decodeJWTPayload } from '../utils/jwt';
 
 export interface TimeEntry {
   id: string;
+  userId?: string; // Added for API compatibility
   projectId: string;
   date: string;
+  startTime?: string; // Added for API compatibility
+  endTime?: string; // Added for API compatibility
   duration: number;
   description: string;
   isBillable: boolean;
   status: 'draft' | 'submitted' | 'approved' | 'rejected';
   createdAt: string;
+  updatedAt?: string; // Added for API compatibility
   submittedAt?: string;
   approvedAt?: string;
   rejectedAt?: string;

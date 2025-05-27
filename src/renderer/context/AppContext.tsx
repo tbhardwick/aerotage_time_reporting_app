@@ -414,35 +414,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'STOP_TIMER':
-      if (state.timer.isRunning && state.timer.currentProjectId) {
-        const newEntry: Omit<TimeEntry, 'id' | 'createdAt'> = {
-          projectId: state.timer.currentProjectId,
-          date: new Date().toISOString().split('T')[0],
-          duration: Math.floor(state.timer.elapsedTime / 60), // Convert to minutes
-          description: state.timer.currentDescription,
-          isBillable: true,
-          status: 'draft',
-        };
-
-        return {
-          ...state,
-          timeEntries: [
-            ...state.timeEntries,
-            {
-              ...newEntry,
-              id: Date.now().toString(),
-              createdAt: new Date().toISOString(),
-            },
-          ],
-          timer: {
-            isRunning: false,
-            startTime: null,
-            currentProjectId: null,
-            currentDescription: '',
-            elapsedTime: 0,
-          },
-        };
-      }
+      // Timer stop now only resets timer state
+      // Time entry creation is handled via API in the component
       return {
         ...state,
         timer: {

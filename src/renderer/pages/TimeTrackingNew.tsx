@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { useApiOperations } from '../hooks/useApiOperations';
 
 const TimeTrackingNew: React.FC = () => {
   const { state, dispatch } = useAppContext();
+  const { createTimeEntry, updateTimeEntry, deleteTimeEntry, submitTimeEntries } = useApiOperations();
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -54,25 +56,53 @@ const TimeTrackingNew: React.FC = () => {
     });
   };
 
-  const handleStopTimer = () => {
-    dispatch({ type: 'STOP_TIMER' });
-    setDescription('');
-  };
+  const handleStopTimer = async () => {
+    if (state.timer.isRunning && state.timer.currentProjectId) {
+      try {
+        // Create time entry via API
+        const timeEntryData = {
+          projectId: state.timer.currentProjectId,
+          date: new Date().toISOString().split('T')[0],
+          duration: Math.floor(state.timer.elapsedTime / 60), // Convert to minutes
+          description: state.timer.currentDescription,
+          isBillable: true,
+          status: 'draft' as const,
+        };
 
-  const handleDeleteEntry = (entryId: string) => {
-    if (window.confirm('Are you sure you want to delete this time entry?')) {
-      dispatch({ type: 'DELETE_TIME_ENTRY', payload: entryId });
+        await createTimeEntry(timeEntryData);
+        
+        // Stop the timer (this will reset timer state)
+        dispatch({ type: 'STOP_TIMER' });
+        setDescription('');
+      } catch (error) {
+        console.error('Failed to create time entry:', error);
+        alert('Failed to save time entry. Please try again.');
+      }
+    } else {
+      // Just stop the timer if no project selected
+      dispatch({ type: 'STOP_TIMER' });
+      setDescription('');
     }
   };
 
-  const handleSubmitEntry = (entryId: string) => {
-    dispatch({
-      type: 'UPDATE_TIME_ENTRY',
-      payload: {
-        id: entryId,
-        updates: { status: 'submitted' },
-      },
-    });
+  const handleDeleteEntry = async (entryId: string) => {
+    if (window.confirm('Are you sure you want to delete this time entry?')) {
+      try {
+        await deleteTimeEntry(entryId);
+      } catch (error) {
+        console.error('Failed to delete time entry:', error);
+        alert('Failed to delete time entry. Please try again.');
+      }
+    }
+  };
+
+  const handleSubmitEntry = async (entryId: string) => {
+    try {
+      await submitTimeEntries([entryId]);
+    } catch (error) {
+      console.error('Failed to submit time entry:', error);
+      alert('Failed to submit time entry. Please try again.');
+    }
   };
 
   // Get active projects only

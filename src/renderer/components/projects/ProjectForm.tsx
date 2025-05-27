@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppContext } from '../../context/AppContext';
+import { useApiOperations } from '../../hooks/useApiOperations';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 // Validation schema
@@ -25,7 +26,8 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess }) => {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
+  const { createProject, updateProject } = useApiOperations();
   const isEditing = !!projectId;
   const project = isEditing ? state.projects.find(p => p.id === projectId) : null;
 
@@ -85,24 +87,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
       };
 
       if (isEditing && projectId) {
-        dispatch({
-          type: 'UPDATE_PROJECT',
-          payload: {
-            id: projectId,
-            updates: projectData,
-          },
-        });
+        await updateProject(projectId, projectData);
       } else {
-        dispatch({
-          type: 'ADD_PROJECT',
-          payload: projectData,
-        });
+        await createProject(projectData);
       }
 
       onSuccess?.();
       onClose();
     } catch (error) {
       console.error('Error saving project:', error);
+      alert('Failed to save project. Please try again.');
     }
   };
 

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppContext } from '../../context/AppContext';
+import { useApiOperations } from '../../hooks/useApiOperations';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 // Validation schema
@@ -24,7 +25,8 @@ interface ClientFormProps {
 }
 
 const ClientForm: React.FC<ClientFormProps> = ({ clientId, onClose, onSuccess }) => {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
+  const { createClient, updateClient } = useApiOperations();
   const isEditing = !!clientId;
   const client = isEditing ? state.clients.find(c => c.id === clientId) : null;
 
@@ -73,24 +75,16 @@ const ClientForm: React.FC<ClientFormProps> = ({ clientId, onClose, onSuccess })
       };
 
       if (isEditing && clientId) {
-        dispatch({
-          type: 'UPDATE_CLIENT',
-          payload: {
-            id: clientId,
-            updates: clientData,
-          },
-        });
+        await updateClient(clientId, clientData);
       } else {
-        dispatch({
-          type: 'ADD_CLIENT',
-          payload: clientData,
-        });
+        await createClient(clientData);
       }
 
       onSuccess?.();
       onClose();
     } catch (error) {
       console.error('Error saving client:', error);
+      alert('Failed to save client. Please try again.');
     }
   };
 

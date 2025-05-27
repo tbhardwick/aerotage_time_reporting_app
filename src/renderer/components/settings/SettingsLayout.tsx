@@ -15,6 +15,7 @@ const settingsTabs: SettingsTab[] = [
   { id: 'preferences', label: 'Preferences', icon: '⚙️' },
   { id: 'security', label: 'Security', icon: '🔒' },
   { id: 'notifications', label: 'Notifications', icon: '🔔' },
+  { id: 'api-test', label: 'API Test', icon: '🧪' },
 ];
 
 interface SettingsLayoutContentProps {

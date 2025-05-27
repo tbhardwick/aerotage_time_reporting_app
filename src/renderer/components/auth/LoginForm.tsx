@@ -282,8 +282,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   if (requireNewPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+        <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Set New Password
@@ -357,8 +357,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   // Forgot Password Form
   if (showForgotPassword && !showResetCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+        <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Reset Your Password
@@ -427,8 +427,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   // Reset Password Confirmation Form
   if (showResetCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+        <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Enter Reset Code
@@ -564,8 +564,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+      <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to Aerotage Time
