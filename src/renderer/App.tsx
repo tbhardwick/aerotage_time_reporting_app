@@ -19,6 +19,7 @@ import { amplifyConfig } from './config/aws-config';
 import './utils/sessionTestUtils';
 import './utils/sessionDebugUtils';
 import './utils/debugUtils';
+import './utils/dataDebugUtils';
 
 // Configure AWS Amplify
 Amplify.configure(amplifyConfig);

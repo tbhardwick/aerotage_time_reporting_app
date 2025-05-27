@@ -42,12 +42,24 @@ export const useDataLoader = () => {
       console.log('🔄 Loading projects...', filters);
       setLoading('projects', true);
       setError('projects', null);
+      
       const projects = await apiClient.getProjects(filters);
-      console.log('✅ Projects loaded:', projects);
+      console.log('✅ Raw projects response:', projects);
+      console.log('✅ Projects type:', typeof projects, Array.isArray(projects));
+      console.log('✅ Projects length:', Array.isArray(projects) ? projects.length : 'N/A');
+      
       const validProjects = Array.isArray(projects) ? projects : [];
+      console.log('✅ Valid projects to dispatch:', validProjects);
+      
       dispatch({ type: 'SET_PROJECTS', payload: validProjects });
+      console.log('✅ Projects dispatched to context');
     } catch (error: any) {
       console.error('❌ Failed to load projects:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        statusCode: error.statusCode,
+        stack: error.stack
+      });
       setError('projects', error.message || 'Failed to load projects');
       dispatch({ type: 'SET_PROJECTS', payload: [] });
     } finally {
@@ -60,12 +72,24 @@ export const useDataLoader = () => {
       console.log('🔄 Loading clients...');
       setLoading('clients', true);
       setError('clients', null);
+      
       const clients = await apiClient.getClients();
-      console.log('✅ Clients loaded:', clients);
+      console.log('✅ Raw clients response:', clients);
+      console.log('✅ Clients type:', typeof clients, Array.isArray(clients));
+      console.log('✅ Clients length:', Array.isArray(clients) ? clients.length : 'N/A');
+      
       const validClients = Array.isArray(clients) ? clients : [];
+      console.log('✅ Valid clients to dispatch:', validClients);
+      
       dispatch({ type: 'SET_CLIENTS', payload: validClients });
+      console.log('✅ Clients dispatched to context');
     } catch (error: any) {
       console.error('❌ Failed to load clients:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        statusCode: error.statusCode,
+        stack: error.stack
+      });
       setError('clients', error.message || 'Failed to load clients');
       dispatch({ type: 'SET_CLIENTS', payload: [] });
     } finally {

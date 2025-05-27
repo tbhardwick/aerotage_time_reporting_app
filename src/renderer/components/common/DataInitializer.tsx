@@ -26,6 +26,16 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
       timeEntries: state.timeEntries.length,
       projects: state.projects.length,
       clients: state.clients.length,
+    },
+    loadingStates: {
+      clients: loading.clients,
+      projects: loading.projects,
+      timeEntries: loading.timeEntries,
+    },
+    errors: {
+      clients: errors.clients,
+      projects: errors.projects,
+      timeEntries: errors.timeEntries,
     }
   });
 

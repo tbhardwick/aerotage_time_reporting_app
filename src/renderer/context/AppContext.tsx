@@ -291,6 +291,34 @@ const initialState: AppState = {
   errors: {},
 };
 
+// Helper functions for development debugging
+const saveToLocalStorage = (key: string, data: any) => {
+  if (process.env.NODE_ENV === 'development') {
+    try {
+      localStorage.setItem(`aerotage_debug_${key}`, JSON.stringify(data));
+      console.log(`💾 Saved ${key} to localStorage for debugging:`, data.length || 'N/A', 'items');
+    } catch (error) {
+      console.warn(`Failed to save ${key} to localStorage:`, error);
+    }
+  }
+};
+
+const loadFromLocalStorage = (key: string) => {
+  if (process.env.NODE_ENV === 'development') {
+    try {
+      const stored = localStorage.getItem(`aerotage_debug_${key}`);
+      if (stored) {
+        const data = JSON.parse(stored);
+        console.log(`📂 Loaded ${key} from localStorage for debugging:`, data.length || 'N/A', 'items');
+        return data;
+      }
+    } catch (error) {
+      console.warn(`Failed to load ${key} from localStorage:`, error);
+    }
+  }
+  return [];
+};
+
 // Helper function to populate project with client data
 const populateProjectWithClient = (project: Project, clients: Client[]): Project => {
   const client = clients.find(c => c.id === project.clientId);
@@ -466,11 +494,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'SET_PROJECTS':
+      const projects = Array.isArray(action.payload) ? action.payload : [];
+      console.log('🔄 Context: Setting projects:', projects.length, 'items');
+      saveToLocalStorage('projects', projects); // Debug backup
       return {
         ...state,
-        projects: Array.isArray(action.payload) 
-          ? action.payload.map(project => populateProjectWithClient(project, state.clients))
-          : [],
+        projects: projects.map(project => populateProjectWithClient(project, state.clients)),
       };
 
     // Client Actions
@@ -508,6 +537,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'SET_CLIENTS':
       const clients = Array.isArray(action.payload) ? action.payload : [];
+      console.log('🔄 Context: Setting clients:', clients.length, 'items');
+      saveToLocalStorage('clients', clients); // Debug backup
       return {
         ...state,
         clients,
