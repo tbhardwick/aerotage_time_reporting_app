@@ -209,6 +209,116 @@ export interface AcceptInvitationResponse {
   invitation: UserInvitation;
 }
 
+// Daily/Weekly Time Tracking Interfaces
+export interface WorkDaySchedule {
+  start: string | null; // HH:MM format or null for non-working days
+  end: string | null; // HH:MM format or null for non-working days
+  targetHours: number;
+}
+
+export interface UserWorkSchedule {
+  userId: string;
+  schedule: {
+    monday: WorkDaySchedule;
+    tuesday: WorkDaySchedule;
+    wednesday: WorkDaySchedule;
+    thursday: WorkDaySchedule;
+    friday: WorkDaySchedule;
+    saturday: WorkDaySchedule;
+    sunday: WorkDaySchedule;
+  };
+  timezone: string;
+  weeklyTargetHours: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TimeGap {
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+  duration: number; // in hours
+  type: 'start_of_day' | 'between_entries' | 'end_of_day' | 'lunch_break';
+  suggestedDescription?: string;
+}
+
+export interface ProjectTimeBreakdown {
+  projectId: string;
+  projectName: string;
+  clientName: string;
+  hours: number;
+  billableHours: number;
+  percentage: number;
+}
+
+export interface DailySummary {
+  date: string; // YYYY-MM-DD format
+  dayOfWeek: string;
+  totalHours: number;
+  billableHours: number;
+  targetHours: number;
+  completionPercentage: number;
+  entriesCount: number;
+  projectBreakdown: ProjectTimeBreakdown[];
+  timeGaps: TimeGap[];
+  workingHours: {
+    firstEntry: string | null; // HH:MM format
+    lastEntry: string | null; // HH:MM format
+    totalSpan: string; // "Xh Ym" format
+  };
+}
+
+export interface WeeklyOverview {
+  weekInfo: {
+    weekStartDate: string; // YYYY-MM-DD format (Monday)
+    weekEndDate: string; // YYYY-MM-DD format (Friday)
+    weekNumber: number;
+    year: number;
+  };
+  dailySummaries: DailySummary[];
+  weeklyTotals: {
+    totalHours: number;
+    billableHours: number;
+    targetHours: number;
+    completionPercentage: number;
+  };
+  patterns: {
+    mostProductiveDay: string;
+    leastProductiveDay: string;
+    averageStartTime: string; // HH:MM format
+    averageEndTime: string; // HH:MM format
+  };
+  projectDistribution: ProjectTimeBreakdown[];
+  comparison?: {
+    previousWeek: {
+      totalHours: number;
+      change: string; // "+3.5" or "-1.2"
+      changePercentage: string; // "+10.0%" or "-5.5%"
+    };
+  };
+}
+
+export interface DailySummaryResponse {
+  summaries: DailySummary[];
+  periodSummary: {
+    totalDays: number;
+    workDays: number;
+    totalHours: number;
+    averageHoursPerDay: number;
+    targetHours: number;
+    completionPercentage: number;
+  };
+}
+
+export interface QuickTimeEntryRequest {
+  date: string; // YYYY-MM-DD format
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+  projectId: string;
+  description: string;
+  isBillable: boolean;
+  fillGap?: boolean; // Whether this entry is filling a detected gap
+}
+
 class AerotageApiClient {
   private apiName = 'AerotageAPI';
 
@@ -816,6 +926,56 @@ class AerotageApiClient {
       console.error(`Public API Error (${method} ${path}):`, error);
       throw error;
     }
+  }
+
+  // Daily/Weekly Time Tracking API
+  async getDailySummary(filters: {
+    startDate: string; // YYYY-MM-DD
+    endDate: string; // YYYY-MM-DD
+    userId?: string;
+    includeGaps?: boolean;
+    targetHours?: number;
+  }): Promise<DailySummaryResponse> {
+    const params = new URLSearchParams();
+    params.append('startDate', filters.startDate);
+    params.append('endDate', filters.endDate);
+    if (filters.userId) params.append('userId', filters.userId);
+    if (filters.includeGaps !== undefined) params.append('includeGaps', filters.includeGaps.toString());
+    if (filters.targetHours) params.append('targetHours', filters.targetHours.toString());
+
+    console.log('📅 API Client - Fetching daily summary:', filters);
+    return this.request<DailySummaryResponse>('GET', `/time-entries/daily-summary?${params.toString()}`);
+  }
+
+  async getWeeklyOverview(filters: {
+    weekStartDate: string; // YYYY-MM-DD (must be Monday)
+    userId?: string;
+    includeComparison?: boolean;
+  }): Promise<WeeklyOverview> {
+    const params = new URLSearchParams();
+    params.append('weekStartDate', filters.weekStartDate);
+    if (filters.userId) params.append('userId', filters.userId);
+    if (filters.includeComparison !== undefined) params.append('includeComparison', filters.includeComparison.toString());
+
+    console.log('📊 API Client - Fetching weekly overview:', filters);
+    return this.request<WeeklyOverview>('GET', `/time-entries/weekly-overview?${params.toString()}`);
+  }
+
+  async getUserWorkSchedule(userId?: string): Promise<UserWorkSchedule> {
+    const path = userId ? `/users/${userId}/work-schedule` : '/users/work-schedule';
+    console.log('⏰ API Client - Fetching work schedule for:', userId || 'current user');
+    return this.request<UserWorkSchedule>('GET', path);
+  }
+
+  async updateUserWorkSchedule(schedule: Partial<UserWorkSchedule>, userId?: string): Promise<UserWorkSchedule> {
+    const path = userId ? `/users/${userId}/work-schedule` : '/users/work-schedule';
+    console.log('⏰ API Client - Updating work schedule for:', userId || 'current user', schedule);
+    return this.request<UserWorkSchedule>('PUT', path, { body: schedule });
+  }
+
+  async createQuickTimeEntry(entry: QuickTimeEntryRequest): Promise<TimeEntry> {
+    console.log('⚡ API Client - Creating quick time entry:', entry);
+    return this.request<TimeEntry>('POST', '/time-entries/quick-add', { body: entry });
   }
 }
 

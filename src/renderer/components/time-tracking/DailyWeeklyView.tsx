@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { useDataLoader } from '../../hooks/useDataLoader';
+import { apiClient, DailySummaryResponse, WeeklyOverview, UserWorkSchedule } from '../../services/api-client';
 import QuickTimeEntryModal from './QuickTimeEntryModal';
 import { 
   format, 
@@ -26,39 +27,7 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 
-interface DailyTimeGap {
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  type: 'untracked' | 'break' | 'lunch';
-}
-
-interface DailySummary {
-  date: string;
-  dayOfWeek: string;
-  totalMinutes: number;
-  totalHours: number;
-  billableMinutes: number;
-  billableHours: number;
-  nonBillableMinutes: number;
-  nonBillableHours: number;
-  targetHours: number;
-  completionPercentage: number;
-  entriesCount: number;
-  gaps: DailyTimeGap[];
-  firstEntry?: string;
-  lastEntry?: string;
-}
-
-interface WeeklySummary {
-  weekStartDate: string;
-  weekEndDate: string;
-  totalHours: number;
-  billableHours: number;
-  targetHours: number;
-  completionPercentage: number;
-  dailySummaries: DailySummary[];
-}
+// Use API types directly - no need for local interfaces
 
 const DailyWeeklyView: React.FC = () => {
   const { state } = useAppContext();
@@ -66,6 +35,9 @@ const DailyWeeklyView: React.FC = () => {
   const [viewMode, setViewMode] = useState<'daily' | 'weekly'>('weekly');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
+  const [dailySummaryData, setDailySummaryData] = useState<DailySummaryResponse | null>(null);
+  const [weeklyOverviewData, setWeeklyOverviewData] = useState<WeeklyOverview | null>(null);
+  const [workSchedule, setWorkSchedule] = useState<UserWorkSchedule | null>(null);
   const [quickEntryModal, setQuickEntryModal] = useState<{
     isOpen: boolean;
     date: string;
@@ -76,14 +48,6 @@ const DailyWeeklyView: React.FC = () => {
     isOpen: false,
     date: '',
   });
-
-  // Default work schedule (8 hours, 9-5)
-  const defaultWorkSchedule = {
-    startTime: '09:00',
-    endTime: '17:00',
-    targetHours: 8,
-    lunchBreak: { start: '12:00', end: '13:00' }
-  };
 
   // Calculate current week range
   const weekRange = useMemo(() => {
@@ -106,130 +70,34 @@ const DailyWeeklyView: React.FC = () => {
     }
   }, [state.timeEntries, selectedDate, viewMode, weekRange]);
 
-  // Calculate time gaps for a specific day
-  const calculateTimeGaps = (entries: typeof state.timeEntries, date: Date): DailyTimeGap[] => {
-    const dayEntries = entries
-      .filter(entry => isSameDay(parseISO(entry.date), date))
-      .sort((a, b) => (a.startTime || '00:00').localeCompare(b.startTime || '00:00'));
-
-    if (dayEntries.length === 0) return [];
-
-    const gaps: DailyTimeGap[] = [];
-    const workStart = defaultWorkSchedule.startTime;
-    const workEnd = defaultWorkSchedule.endTime;
-
-    // Check gap before first entry
-    if (dayEntries[0].startTime && dayEntries[0].startTime > workStart) {
-      gaps.push({
-        startTime: workStart,
-        endTime: dayEntries[0].startTime,
-        durationMinutes: differenceInMinutes(
-          parseISO(`${format(date, 'yyyy-MM-dd')}T${dayEntries[0].startTime}`),
-          parseISO(`${format(date, 'yyyy-MM-dd')}T${workStart}`)
-        ),
-        type: 'untracked'
-      });
-    }
-
-    // Check gaps between entries
-    for (let i = 0; i < dayEntries.length - 1; i++) {
-      const currentEnd = dayEntries[i].endTime;
-      const nextStart = dayEntries[i + 1].startTime;
-      
-      if (currentEnd && nextStart && currentEnd < nextStart) {
-        const gapMinutes = differenceInMinutes(
-          parseISO(`${format(date, 'yyyy-MM-dd')}T${nextStart}`),
-          parseISO(`${format(date, 'yyyy-MM-dd')}T${currentEnd}`)
-        );
-        
-        if (gapMinutes >= 15) { // Only show gaps of 15+ minutes
-          gaps.push({
-            startTime: currentEnd,
-            endTime: nextStart,
-            durationMinutes: gapMinutes,
-            type: gapMinutes >= 60 ? 'lunch' : 'break'
-          });
-        }
+  // Load work schedule on component mount
+  useEffect(() => {
+    const loadWorkSchedule = async () => {
+      try {
+        const schedule = await apiClient.getUserWorkSchedule();
+        setWorkSchedule(schedule);
+      } catch (error) {
+        console.error('Failed to load work schedule:', error);
+        // Use default schedule if API fails
+        setWorkSchedule({
+          userId: 'current',
+          schedule: {
+            monday: { start: '09:00', end: '17:00', targetHours: 8 },
+            tuesday: { start: '09:00', end: '17:00', targetHours: 8 },
+            wednesday: { start: '09:00', end: '17:00', targetHours: 8 },
+            thursday: { start: '09:00', end: '17:00', targetHours: 8 },
+            friday: { start: '09:00', end: '17:00', targetHours: 8 },
+            saturday: { start: null, end: null, targetHours: 0 },
+            sunday: { start: null, end: null, targetHours: 0 }
+          },
+          timezone: 'America/New_York',
+          weeklyTargetHours: 40
+        });
       }
-    }
-
-    // Check gap after last entry
-    const lastEntry = dayEntries[dayEntries.length - 1];
-    if (lastEntry.endTime && lastEntry.endTime < workEnd) {
-      gaps.push({
-        startTime: lastEntry.endTime,
-        endTime: workEnd,
-        durationMinutes: differenceInMinutes(
-          parseISO(`${format(date, 'yyyy-MM-dd')}T${workEnd}`),
-          parseISO(`${format(date, 'yyyy-MM-dd')}T${lastEntry.endTime}`)
-        ),
-        type: 'untracked'
-      });
-    }
-
-    return gaps;
-  };
-
-  // Calculate daily summary
-  const calculateDailySummary = (date: Date): DailySummary => {
-    const dayEntries = state.timeEntries.filter(entry => 
-      isSameDay(parseISO(entry.date), date)
-    );
-
-    const totalMinutes = dayEntries.reduce((sum, entry) => sum + entry.duration, 0);
-    const billableMinutes = dayEntries
-      .filter(entry => entry.isBillable)
-      .reduce((sum, entry) => sum + entry.duration, 0);
-
-    const gaps = calculateTimeGaps(state.timeEntries, date);
-    const targetHours = defaultWorkSchedule.targetHours;
-
-    return {
-      date: format(date, 'yyyy-MM-dd'),
-      dayOfWeek: format(date, 'EEEE'),
-      totalMinutes,
-      totalHours: totalMinutes / 60,
-      billableMinutes,
-      billableHours: billableMinutes / 60,
-      nonBillableMinutes: totalMinutes - billableMinutes,
-      nonBillableHours: (totalMinutes - billableMinutes) / 60,
-      targetHours,
-      completionPercentage: (totalMinutes / (targetHours * 60)) * 100,
-      entriesCount: dayEntries.length,
-      gaps,
-      firstEntry: dayEntries[0]?.startTime,
-      lastEntry: dayEntries[dayEntries.length - 1]?.endTime
     };
-  };
 
-  // Calculate weekly summary
-  const weeklySummary: WeeklySummary = useMemo(() => {
-    const dailySummaries: DailySummary[] = [];
-    let totalHours = 0;
-    let billableHours = 0;
-    let targetHours = 0;
-
-    // Generate summaries for each day of the week
-    for (let i = 0; i < 7; i++) {
-      const date = addDays(weekRange.start, i);
-      const summary = calculateDailySummary(date);
-      dailySummaries.push(summary);
-      
-      totalHours += summary.totalHours;
-      billableHours += summary.billableHours;
-      targetHours += summary.targetHours;
-    }
-
-    return {
-      weekStartDate: format(weekRange.start, 'yyyy-MM-dd'),
-      weekEndDate: format(weekRange.end, 'yyyy-MM-dd'),
-      totalHours,
-      billableHours,
-      targetHours,
-      completionPercentage: (totalHours / targetHours) * 100,
-      dailySummaries
-    };
-  }, [weekRange, state.timeEntries]);
+    loadWorkSchedule();
+  }, []);
 
   // Navigation handlers
   const navigatePrevious = () => {
@@ -269,24 +137,45 @@ const DailyWeeklyView: React.FC = () => {
     });
   };
 
-  // Load time entries when date range changes
+  // Load data when date range changes
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       try {
         if (viewMode === 'daily') {
-          await loadTimeEntries({
+          const dailyData = await apiClient.getDailySummary({
             startDate: format(selectedDate, 'yyyy-MM-dd'),
-            endDate: format(selectedDate, 'yyyy-MM-dd')
+            endDate: format(selectedDate, 'yyyy-MM-dd'),
+            includeGaps: true
           });
+          setDailySummaryData(dailyData);
+          setWeeklyOverviewData(null);
         } else {
-          await loadTimeEntries({
-            startDate: format(weekRange.start, 'yyyy-MM-dd'),
-            endDate: format(weekRange.end, 'yyyy-MM-dd')
+          const weeklyData = await apiClient.getWeeklyOverview({
+            weekStartDate: format(weekRange.start, 'yyyy-MM-dd'),
+            includeComparison: true
           });
+          setWeeklyOverviewData(weeklyData);
+          setDailySummaryData(null);
         }
       } catch (error) {
-        console.error('Failed to load time entries:', error);
+        console.error('Failed to load time tracking data:', error);
+        // Fallback to loading time entries for basic functionality
+        try {
+          if (viewMode === 'daily') {
+            await loadTimeEntries({
+              startDate: format(selectedDate, 'yyyy-MM-dd'),
+              endDate: format(selectedDate, 'yyyy-MM-dd')
+            });
+          } else {
+            await loadTimeEntries({
+              startDate: format(weekRange.start, 'yyyy-MM-dd'),
+              endDate: format(weekRange.end, 'yyyy-MM-dd')
+            });
+          }
+        } catch (fallbackError) {
+          console.error('Failed to load fallback time entries:', fallbackError);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -386,9 +275,21 @@ const DailyWeeklyView: React.FC = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : viewMode === 'weekly' ? (
-        <WeeklyViewContent summary={weeklySummary} onOpenQuickEntry={openQuickEntry} />
+        weeklyOverviewData ? (
+          <WeeklyViewContent summary={weeklyOverviewData} onOpenQuickEntry={openQuickEntry} />
+        ) : (
+          <div className="text-center py-12 text-neutral-500">
+            No weekly data available. Please try again.
+          </div>
+        )
       ) : (
-        <DailyViewContent summary={calculateDailySummary(selectedDate)} onOpenQuickEntry={openQuickEntry} />
+        dailySummaryData && dailySummaryData.summaries.length > 0 ? (
+          <DailyViewContent summary={dailySummaryData.summaries[0]} onOpenQuickEntry={openQuickEntry} />
+        ) : (
+          <div className="text-center py-12 text-neutral-500">
+            No daily data available. Please try again.
+          </div>
+        )
       )}
 
       {/* Quick Time Entry Modal */}
@@ -406,7 +307,7 @@ const DailyWeeklyView: React.FC = () => {
 
 // Weekly View Component
 const WeeklyViewContent: React.FC<{ 
-  summary: WeeklySummary; 
+  summary: WeeklyOverview; 
   onOpenQuickEntry: (date: string, startTime?: string, endTime?: string, suggestedDuration?: number) => void;
 }> = ({ summary, onOpenQuickEntry }) => {
   return (
@@ -419,7 +320,7 @@ const WeeklyViewContent: React.FC<{
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Total Hours</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.totalHours.toFixed(1)}
+                {summary.weeklyTotals.totalHours.toFixed(1)}
               </p>
             </div>
           </div>
@@ -431,7 +332,7 @@ const WeeklyViewContent: React.FC<{
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Billable Hours</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.billableHours.toFixed(1)}
+                {summary.weeklyTotals.billableHours.toFixed(1)}
               </p>
             </div>
           </div>
@@ -443,7 +344,7 @@ const WeeklyViewContent: React.FC<{
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Target Hours</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.targetHours.toFixed(1)}
+                {summary.weeklyTotals.targetHours.toFixed(1)}
               </p>
             </div>
           </div>
@@ -452,20 +353,20 @@ const WeeklyViewContent: React.FC<{
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center">
             <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              summary.completionPercentage >= 100 
+              summary.weeklyTotals.completionPercentage >= 100 
                 ? 'bg-green-100 text-green-600' 
-                : summary.completionPercentage >= 80
+                : summary.weeklyTotals.completionPercentage >= 80
                 ? 'bg-yellow-100 text-yellow-600'
                 : 'bg-red-100 text-red-600'
             }`}>
               <span className="text-sm font-bold">
-                {Math.round(summary.completionPercentage)}%
+                {Math.round(summary.weeklyTotals.completionPercentage)}%
               </span>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Completion</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.completionPercentage.toFixed(1)}%
+                {summary.weeklyTotals.completionPercentage.toFixed(1)}%
               </p>
             </div>
           </div>
@@ -475,11 +376,11 @@ const WeeklyViewContent: React.FC<{
       {/* Daily Breakdown */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold text-neutral-900 mb-4">Daily Breakdown</h3>
-                 <div className="grid grid-cols-7 gap-4">
-           {summary.dailySummaries.map((day) => (
-             <DayCard key={day.date} summary={day} onOpenQuickEntry={onOpenQuickEntry} />
-           ))}
-         </div>
+                         <div className="grid grid-cols-7 gap-4">
+          {summary.dailySummaries.map((day) => (
+            <DayCard key={day.date} summary={day} onOpenQuickEntry={onOpenQuickEntry} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -487,7 +388,7 @@ const WeeklyViewContent: React.FC<{
 
 // Daily View Component
 const DailyViewContent: React.FC<{ 
-  summary: DailySummary; 
+  summary: import('../../services/api-client').DailySummary; 
   onOpenQuickEntry: (date: string, startTime?: string, endTime?: string, suggestedDuration?: number) => void;
 }> = ({ summary, onOpenQuickEntry }) => {
   return (
@@ -498,10 +399,10 @@ const DailyViewContent: React.FC<{
           <div className="flex items-center">
             <ClockIcon className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Total Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">
-                {summary.totalHours.toFixed(1)}
-              </p>
+                        <p className="text-sm font-medium text-neutral-600">Total Hours</p>
+          <p className="text-2xl font-bold text-neutral-900">
+            {summary.totalHours.toFixed(1)}
+          </p>
             </div>
           </div>
         </div>
@@ -554,21 +455,21 @@ const DailyViewContent: React.FC<{
       </div>
 
       {/* Time Gaps Analysis */}
-      {summary.gaps.length > 0 && (
+      {summary.timeGaps && summary.timeGaps.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center mb-4">
             <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600 mr-2" />
             <h3 className="text-lg font-semibold text-neutral-900">Time Gaps Detected</h3>
           </div>
           <div className="space-y-3">
-            {summary.gaps.map((gap, index) => (
+            {summary.timeGaps.map((gap, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <div>
                   <p className="text-sm font-medium text-neutral-900">
                     {gap.startTime} - {gap.endTime}
                   </p>
                   <p className="text-xs text-neutral-600">
-                    {Math.floor(gap.durationMinutes / 60)}h {gap.durationMinutes % 60}m untracked
+                    {gap.duration.toFixed(1)}h untracked
                   </p>
                 </div>
                 <button 
@@ -576,7 +477,7 @@ const DailyViewContent: React.FC<{
                     summary.date, 
                     gap.startTime, 
                     gap.endTime, 
-                    gap.durationMinutes
+                    gap.duration * 60 // Convert hours to minutes
                   )}
                   className="flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
                 >
@@ -594,11 +495,11 @@ const DailyViewContent: React.FC<{
 
 // Day Card Component for Weekly View
 const DayCard: React.FC<{ 
-  summary: DailySummary; 
+  summary: import('../../services/api-client').DailySummary; 
   onOpenQuickEntry: (date: string, startTime?: string, endTime?: string, suggestedDuration?: number) => void;
 }> = ({ summary, onOpenQuickEntry }) => {
   const isToday = isSameDay(parseISO(summary.date), new Date());
-  const hasGaps = summary.gaps.length > 0;
+  const hasGaps = summary.timeGaps && summary.timeGaps.length > 0;
   
   return (
     <div className={`p-4 rounded-lg border-2 transition-colors ${
@@ -646,7 +547,7 @@ const DayCard: React.FC<{
               >
                 <ExclamationTriangleIcon className="w-3 h-3" />
                 <span className="ml-1">
-                  {summary.gaps.length} gap{summary.gaps.length !== 1 ? 's' : ''}
+                  {summary.timeGaps?.length || 0} gap{(summary.timeGaps?.length || 0) !== 1 ? 's' : ''}
                 </span>
               </button>
             </div>
