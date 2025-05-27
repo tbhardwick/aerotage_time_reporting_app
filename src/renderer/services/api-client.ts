@@ -690,33 +690,23 @@ class AerotageApiClient {
       
       // Handle different response formats:
       // 1. Direct array: UserInvitation[]
-      // 2. Backend format: { success: boolean, data: { items: UserInvitation[], pagination: {...} } }
-      // 3. API spec format: { success: boolean, data: { invitations: UserInvitation[], pagination: {...} } }
+      // 2. Paginated format: { items: UserInvitation[], pagination: {...} }
       let invitations: UserInvitation[];
       
       if (Array.isArray(response)) {
         // Direct array response
         invitations = response;
         console.log('📋 API Client - Direct array format detected');
-      } else if (response && response.success && response.data) {
-        if (Array.isArray(response.data.items)) {
-          // Backend actual format: data.items
-          invitations = response.data.items;
-          console.log('📋 API Client - Backend format detected (data.items)');
-          console.log('📋 API Client - Pagination info:', response.data.pagination);
-        } else if (Array.isArray(response.data.invitations)) {
-          // API spec format: data.invitations
-          invitations = response.data.invitations;
-          console.log('📋 API Client - API spec format detected (data.invitations)');
-          console.log('📋 API Client - Pagination info:', response.data.pagination);
-        } else if (Array.isArray(response.data)) {
-          // Alternative format: data is direct array
-          invitations = response.data;
-          console.log('📋 API Client - Direct data array format detected');
-        } else {
-          console.error('📋 API Client - No invitations array found in response.data:', response.data);
-          throw new Error('No invitations array found in response data');
-        }
+      } else if (response && Array.isArray(response.items)) {
+        // Paginated format: { items: UserInvitation[], pagination: {...} }
+        invitations = response.items;
+        console.log('📋 API Client - Paginated format detected (items array)');
+        console.log('📋 API Client - Pagination info:', response.pagination);
+      } else if (response && Array.isArray(response.invitations)) {
+        // Alternative format: { invitations: UserInvitation[], pagination: {...} }
+        invitations = response.invitations;
+        console.log('📋 API Client - Alternative format detected (invitations array)');
+        console.log('📋 API Client - Pagination info:', response.pagination);
       } else {
         console.error('📋 API Client - Unexpected response format:', response);
         console.error('📋 API Client - Full response structure:', JSON.stringify(response, null, 2));
