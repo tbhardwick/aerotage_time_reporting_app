@@ -43,8 +43,8 @@ export const UserList: React.FC<UserListProps> = ({
   const filteredUsers = useMemo(() => {
     return state.users.filter(user => {
       const matchesSearch = 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.jobTitle && user.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.department && user.department.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -311,13 +311,13 @@ export const UserList: React.FC<UserListProps> = ({
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                           <span className="text-sm font-medium text-gray-700">
-                            {user.name.split(' ').map(n => n[0]).join('')}
+                            {user.name ? user.name.split(' ').map(n => n[0]).join('') : user.email ? user.email[0].toUpperCase() : '?'}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm font-medium text-gray-900">{user.name || 'No Name'}</div>
+                        <div className="text-sm text-gray-500">{user.email || 'No Email'}</div>
                         {user.jobTitle && (
                           <div className="text-xs text-gray-400">{user.jobTitle}</div>
                         )}
