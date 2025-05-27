@@ -324,17 +324,18 @@ class AerotageApiClient {
 
   private async getAuthToken(): Promise<string> {
     try {
-      // Try to get the session with forceRefresh to bypass caching issues
+      // Get the session with forceRefresh to bypass caching issues
       const session = await fetchAuthSession({ forceRefresh: false });
       
-      // Check if we have a valid ID token
-      if (session.tokens?.idToken) {
-        return session.tokens.idToken.toString();
-      }
-      
-      // If we don't have an ID token but have access token, try that
+      // Use AccessToken as specified in the API documentation (NOT IdToken)
       if (session.tokens?.accessToken) {
         return session.tokens.accessToken.toString();
+      }
+      
+      // Fallback to ID token if access token is not available
+      if (session.tokens?.idToken) {
+        console.warn('⚠️ Using IdToken as fallback - AccessToken preferred for API calls');
+        return session.tokens.idToken.toString();
       }
       
       throw new Error('No valid authentication token found');
@@ -607,7 +608,15 @@ class AerotageApiClient {
   async getCurrentUser(): Promise<User> {
     // Get user ID from JWT token (consistent with backend expectations)
     const session = await fetchAuthSession({ forceRefresh: false });
-    const token = session.tokens?.idToken?.toString();
+    
+    // Use AccessToken as specified in the API documentation
+    let token = session.tokens?.accessToken?.toString();
+    
+    // Fallback to IdToken if AccessToken is not available
+    if (!token && session.tokens?.idToken) {
+      console.warn('⚠️ Using IdToken as fallback for user ID extraction');
+      token = session.tokens.idToken.toString();
+    }
     
     if (!token) {
       throw new Error('No authentication token available');
@@ -619,7 +628,78 @@ class AerotageApiClient {
     }
     
     const userId = tokenPayload.sub;
-    return this.request<User>('GET', `/users/${userId}`);
+    console.log('🔍 getCurrentUser - Fetching user data for ID:', userId);
+    
+    const response = await this.request<any>('GET', `/users/${userId}`);
+    console.log('🔍 getCurrentUser - Raw API response:', response);
+    console.log('🔍 getCurrentUser - Response type:', typeof response);
+    console.log('🔍 getCurrentUser - Response keys:', response ? Object.keys(response) : 'null');
+    
+    // Handle the response format after automatic unwrapping
+    // The API returns: { success: true, data: { user: {...} } }
+    // After automatic unwrapping, we receive: { user: {...} }
+    let userData = null;
+    
+    // Most likely case: Auto-unwrapped response gives us { user: {...} }
+    if (response && response.user && typeof response.user === 'object') {
+      console.log('✅ getCurrentUser - Auto-unwrapped format: { user: {...} }');
+      userData = response.user;
+    }
+    // Fallback: Direct user object (if unwrapping extracted user directly)
+    else if (response && response.id && response.email) {
+      console.log('✅ getCurrentUser - Direct user object');
+      userData = response;
+    }
+    // Fallback: Full response structure (if unwrapping didn't happen)
+    else if (response && response.success && response.data && response.data.user) {
+      console.log('✅ getCurrentUser - Full response structure');
+      userData = response.data.user;
+    }
+    // Fallback: Response data contains user directly
+    else if (response && response.success && response.data && response.data.id) {
+      console.log('✅ getCurrentUser - Response data is user object');
+      userData = response.data;
+    }
+    
+    if (!userData) {
+      console.error('❌ getCurrentUser - No valid user data found in response:', response);
+      console.error('❌ getCurrentUser - Response structure analysis:');
+      if (response) {
+        console.error('  - Response type:', typeof response);
+        console.error('  - Response keys:', Object.keys(response));
+        console.error('  - Has user property:', 'user' in response);
+        console.error('  - Has id property:', 'id' in response);
+        console.error('  - Has email property:', 'email' in response);
+        console.error('  - Has success property:', 'success' in response);
+        console.error('  - Has data property:', 'data' in response);
+        
+        if (response.user) {
+          console.error('  - user type:', typeof response.user);
+          console.error('  - user keys:', Object.keys(response.user));
+        }
+      }
+      throw new Error('Invalid user data received from API');
+    }
+    
+    // Validate that we have minimum required user properties
+    if (!userData.id) {
+      console.error('❌ getCurrentUser - User data missing ID:', userData);
+      throw new Error('User data missing required ID field');
+    }
+    
+    if (!userData.email) {
+      console.error('❌ getCurrentUser - User data missing email:', userData);
+      throw new Error('User data missing required email field');
+    }
+    
+    console.log('✅ getCurrentUser - Successfully parsed user data:', {
+      id: userData.id,
+      email: userData.email,
+      name: userData.name,
+      role: userData.role
+    });
+    
+    return userData;
   }
 
   // Time Entries API
@@ -699,7 +779,26 @@ class AerotageApiClient {
 
   // Users API
   async getUsers(): Promise<User[]> {
-    return this.request<User[]>('GET', '/users');
+    const response = await this.request<any>('GET', '/users');
+    
+    // Handle the real API response format: { success: true, data: { users: [...], total: number } }
+    if (response && response.success && response.data && Array.isArray(response.data.users)) {
+      console.log('✅ Real API users response:', response.data.users.length, 'users loaded');
+      return response.data.users;
+    }
+    
+    // Handle direct array response (fallback)
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    // Handle legacy format with users array
+    if (response && Array.isArray(response.users)) {
+      return response.users;
+    }
+    
+    console.warn('⚠️ Unexpected users API response format:', response);
+    return [];
   }
 
   async createUser(user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {

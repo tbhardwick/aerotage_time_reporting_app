@@ -67,14 +67,129 @@ export const useApiOperations = () => {
     try {
       setLoading('submitTimeEntries', true);
       setError('submitTimeEntries', null);
+      
+      // Submit to backend API
       await apiClient.submitTimeEntries(timeEntryIds);
+      
+      // Update local state immediately for UI responsiveness
       dispatch({ type: 'SUBMIT_TIME_ENTRIES', payload: timeEntryIds });
+      
+      // Refresh time entries from backend to ensure synchronization
+      try {
+        const refreshedTimeEntries = await apiClient.getTimeEntries();
+        
+        // Handle paginated response format: {items: [...], pagination: {...}}
+        let validTimeEntries = [];
+        if (Array.isArray(refreshedTimeEntries)) {
+          validTimeEntries = refreshedTimeEntries;
+        } else if (refreshedTimeEntries && typeof refreshedTimeEntries === 'object' && Array.isArray((refreshedTimeEntries as any).items)) {
+          validTimeEntries = (refreshedTimeEntries as any).items;
+        }
+        
+        // Update state with fresh data from backend
+        dispatch({ type: 'SET_TIME_ENTRIES', payload: validTimeEntries });
+        console.log('✅ Time entries refreshed after submission:', validTimeEntries.length, 'entries');
+      } catch (refreshError) {
+        console.warn('⚠️ Failed to refresh time entries after submission:', refreshError);
+        // Don't throw here - submission was successful, refresh just failed
+      }
+      
     } catch (error: any) {
       console.error('Failed to submit time entries:', error);
       setError('submitTimeEntries', error.message || 'Failed to submit time entries');
       throw error;
     } finally {
       setLoading('submitTimeEntries', false);
+    }
+  }, [dispatch, setLoading, setError]);
+
+  const approveTimeEntries = useCallback(async (timeEntryIds: string[], comments?: string) => {
+    try {
+      setLoading('approveTimeEntries', true);
+      setError('approveTimeEntries', null);
+      
+      // Approve via backend API
+      await apiClient.approveTimeEntries(timeEntryIds, comments);
+      
+      // Update local state immediately for UI responsiveness
+      dispatch({ 
+        type: 'APPROVE_TIME_ENTRIES', 
+        payload: { 
+          ids: timeEntryIds, 
+          approverId: '', // Will be set by backend
+          comment: comments 
+        } 
+      });
+      
+      // Refresh time entries from backend to ensure synchronization
+      try {
+        const refreshedTimeEntries = await apiClient.getTimeEntries();
+        
+        // Handle paginated response format
+        let validTimeEntries = [];
+        if (Array.isArray(refreshedTimeEntries)) {
+          validTimeEntries = refreshedTimeEntries;
+        } else if (refreshedTimeEntries && typeof refreshedTimeEntries === 'object' && Array.isArray((refreshedTimeEntries as any).items)) {
+          validTimeEntries = (refreshedTimeEntries as any).items;
+        }
+        
+        dispatch({ type: 'SET_TIME_ENTRIES', payload: validTimeEntries });
+        console.log('✅ Time entries refreshed after approval:', validTimeEntries.length, 'entries');
+      } catch (refreshError) {
+        console.warn('⚠️ Failed to refresh time entries after approval:', refreshError);
+      }
+      
+    } catch (error: any) {
+      console.error('Failed to approve time entries:', error);
+      setError('approveTimeEntries', error.message || 'Failed to approve time entries');
+      throw error;
+    } finally {
+      setLoading('approveTimeEntries', false);
+    }
+  }, [dispatch, setLoading, setError]);
+
+  const rejectTimeEntries = useCallback(async (timeEntryIds: string[], comments: string) => {
+    try {
+      setLoading('rejectTimeEntries', true);
+      setError('rejectTimeEntries', null);
+      
+      // Reject via backend API
+      await apiClient.rejectTimeEntries(timeEntryIds, comments);
+      
+      // Update local state immediately for UI responsiveness
+      dispatch({ 
+        type: 'REJECT_TIME_ENTRIES', 
+        payload: { 
+          ids: timeEntryIds, 
+          approverId: '', // Will be set by backend
+          comment: comments 
+        } 
+      });
+      
+      // Refresh time entries from backend to ensure synchronization
+      try {
+        const refreshedTimeEntries = await apiClient.getTimeEntries();
+        
+        // Handle paginated response format
+        let validTimeEntries = [];
+        if (Array.isArray(refreshedTimeEntries)) {
+          validTimeEntries = refreshedTimeEntries;
+        } else if (refreshedTimeEntries && typeof refreshedTimeEntries === 'object' && Array.isArray((refreshedTimeEntries as any).items)) {
+          validTimeEntries = (refreshedTimeEntries as any).items;
+        }
+        
+        dispatch({ type: 'SET_TIME_ENTRIES', payload: validTimeEntries });
+        console.log('✅ Time entries refreshed after rejection:', validTimeEntries.length, 'entries');
+      } catch (refreshError) {
+        console.warn('⚠️ Failed to refresh time entries after rejection:', refreshError);
+      }
+      
+    } catch (error: any) {
+      console.error('Failed to reject time entries:', error);
+      setError('rejectTimeEntries', error.message || 'Failed to reject time entries');
+      throw error;
+    } finally {
+      setLoading('rejectTimeEntries', false);
     }
   }, [dispatch, setLoading, setError]);
 
@@ -269,6 +384,8 @@ export const useApiOperations = () => {
     updateTimeEntry,
     deleteTimeEntry,
     submitTimeEntries,
+    approveTimeEntries,
+    rejectTimeEntries,
     
     // Project operations
     createProject,

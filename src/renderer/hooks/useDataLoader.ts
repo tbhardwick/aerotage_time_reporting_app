@@ -240,6 +240,11 @@ export const useDataLoader = () => {
       } else {
         console.log('🎉 All data loaded successfully!');
       }
+
+      // Note: Users list is managed separately from current user authentication
+      // Admin accounts should see all users from the backend API
+      console.log('✅ Data loading completed - users list managed via backend API');
+
     } catch (error: any) {
       console.error('💥 Failed to load application data:', error);
       setError('initialLoad', error.message || 'Failed to load application data');
@@ -247,7 +252,7 @@ export const useDataLoader = () => {
       console.log('🏁 Data loading completed');
       setLoading('initialLoad', false);
     }
-  }, [loadCurrentUser, loadClients, loadProjects, loadTimeEntries, loadUsers, loadInvoices, setLoading, setError]);
+  }, [loadCurrentUser, loadClients, loadProjects, loadTimeEntries, loadUsers, loadInvoices, setLoading, setError, dispatch]);
 
   return {
     loadTimeEntries,

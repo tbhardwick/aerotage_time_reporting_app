@@ -68,7 +68,7 @@ const InvoiceGenerator: React.FC = () => {
     
     selectedEntries.forEach(entry => {
       const project = state.projects.find(p => p.id === entry.projectId);
-      const rate = project?.hourlyRate || 100;
+      const rate = project?.defaultHourlyRate || 100;
       const hours = entry.duration / 60;
       const amount = hours * rate;
       
@@ -187,6 +187,18 @@ const InvoiceGenerator: React.FC = () => {
           <p className="mt-1 text-sm text-neutral-500">
             You need approved billable time entries to generate invoices.
           </p>
+          <div className="mt-4 text-xs text-neutral-400 max-w-md mx-auto">
+            <p className="mb-2">To create invoices, follow these steps:</p>
+            <ol className="text-left space-y-1">
+              <li>1. Create time entries (Time Tracking page)</li>
+              <li>2. Submit entries for approval (Approvals page)</li>
+              <li>3. Approve submitted entries (manager/admin)</li>
+              <li>4. Return here to generate invoices</li>
+            </ol>
+            <p className="mt-2 text-blue-600">
+              💡 Use Settings → Workflow Test to test the complete flow
+            </p>
+          </div>
         </div>
       ) : (
         <div className="grid lg:grid-cols-2 gap-6">
@@ -232,7 +244,7 @@ const InvoiceGenerator: React.FC = () => {
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {filteredTimeEntries.map(entry => {
                     const project = state.projects.find(p => p.id === entry.projectId);
-                    const rate = project?.hourlyRate || 100;
+                    const rate = project?.defaultHourlyRate || 100;
                     const amount = (entry.duration / 60) * rate;
                     
                     return (

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { PaperAirplaneIcon, ClockIcon, CalendarIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../../context/AppContext';
+import { useApiOperations } from '../../hooks/useApiOperations';
 import { TimeEntry } from '../../context/AppContext';
 
 interface BulkSubmissionProps {
@@ -8,9 +9,11 @@ interface BulkSubmissionProps {
 }
 
 export function BulkSubmission({ userId }: BulkSubmissionProps) {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
+  const { submitTimeEntries } = useApiOperations();
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get current user
   const currentUser = userId ? state.users.find(u => u.id === userId) : state.user;
@@ -52,16 +55,20 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
   };
 
   // Handle submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedEntries.length === 0) return;
     
-    dispatch({
-      type: 'SUBMIT_TIME_ENTRIES',
-      payload: selectedEntries
-    });
+    setIsSubmitting(true);
     
-    setSelectedEntries([]);
-    setShowConfirmModal(false);
+    try {
+      await submitTimeEntries(selectedEntries);
+      setSelectedEntries([]);
+      setShowConfirmModal(false);
+    } catch (error) {
+      console.error('Error submitting time entries:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Format duration
@@ -311,9 +318,10 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit for Approval
+                  {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
                 </button>
               </div>
             </div>

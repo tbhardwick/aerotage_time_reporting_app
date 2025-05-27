@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { CheckIcon, XMarkIcon, UserIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, XMarkIcon, UserIcon, ClockIcon, CalendarIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../../context/AppContext';
+import { useApiOperations } from '../../hooks/useApiOperations';
 import { TimeEntry, User, Project } from '../../context/AppContext';
 
 interface ApprovalQueueProps {
@@ -8,11 +9,13 @@ interface ApprovalQueueProps {
 }
 
 export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
+  const { approveTimeEntries, rejectTimeEntries } = useApiOperations();
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
   const [filter, setFilter] = useState<'all' | 'submitted'>('submitted');
   const [comment, setComment] = useState('');
   const [showCommentModal, setShowCommentModal] = useState<'approve' | 'reject' | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Get pending entries for approval
   const pendingEntries = useMemo(() => {
@@ -62,45 +65,46 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
   };
 
   // Handle approval
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (selectedEntries.length === 0) return;
     
     if (comment.trim()) {
-      dispatch({
-        type: 'APPROVE_TIME_ENTRIES',
-        payload: {
-          ids: selectedEntries,
-          approverId: state.user?.id || '',
-          comment: comment.trim()
-        }
-      });
-      setComment('');
-      setShowCommentModal(null);
+      setIsProcessing(true);
+      try {
+        await approveTimeEntries(selectedEntries, comment.trim());
+        setComment('');
+        setShowCommentModal(null);
+      } catch (error) {
+        console.error('Error approving entries:', error);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
-      dispatch({
-        type: 'APPROVE_TIME_ENTRIES',
-        payload: {
-          ids: selectedEntries,
-          approverId: state.user?.id || ''
-        }
-      });
+      setIsProcessing(true);
+      try {
+        await approveTimeEntries(selectedEntries);
+      } catch (error) {
+        console.error('Error approving entries:', error);
+      } finally {
+        setIsProcessing(false);
+      }
     }
     
     setSelectedEntries([]);
   };
 
   // Handle rejection
-  const handleReject = () => {
+  const handleReject = async () => {
     if (selectedEntries.length === 0 || !comment.trim()) return;
     
-    dispatch({
-      type: 'REJECT_TIME_ENTRIES',
-      payload: {
-        ids: selectedEntries,
-        approverId: state.user?.id || '',
-        comment: comment.trim()
-      }
-    });
+    setIsProcessing(true);
+    try {
+      await rejectTimeEntries(selectedEntries, comment.trim());
+    } catch (error) {
+      console.error('Error rejecting entries:', error);
+    } finally {
+      setIsProcessing(false);
+    }
     
     setComment('');
     setShowCommentModal(null);
@@ -160,14 +164,16 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
             <div className="flex space-x-2">
               <button
                 onClick={() => setShowCommentModal('approve')}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                disabled={isProcessing}
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckIcon className="h-4 w-4 mr-1" />
                 Approve
               </button>
               <button
                 onClick={() => setShowCommentModal('reject')}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                disabled={isProcessing}
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <XMarkIcon className="h-4 w-4 mr-1" />
                 Reject
@@ -333,14 +339,17 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                 </button>
                 <button
                   onClick={showCommentModal === 'approve' ? handleApprove : handleReject}
-                  disabled={showCommentModal === 'reject' && !comment.trim()}
+                  disabled={isProcessing || (showCommentModal === 'reject' && !comment.trim())}
                   className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                     showCommentModal === 'approve'
                       ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
                       : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
                   }`}
                 >
-                  {showCommentModal === 'approve' ? 'Approve' : 'Reject'}
+                  {isProcessing 
+                    ? (showCommentModal === 'approve' ? 'Approving...' : 'Rejecting...')
+                    : (showCommentModal === 'approve' ? 'Approve' : 'Reject')
+                  }
                 </button>
               </div>
             </div>
