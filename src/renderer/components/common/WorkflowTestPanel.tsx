@@ -79,8 +79,22 @@ const WorkflowTestPanel: React.FC = () => {
         return;
       }
 
+      // Filter out entries submitted by the current user (can't approve own entries)
+      const otherUsersEntries = submittedEntries.filter(entry => 
+        entry.submittedBy && entry.submittedBy !== currentUser?.id
+      );
+
+      if (otherUsersEntries.length === 0) {
+        addResult('⚠️ No entries from other users found to approve.');
+        addResult('💡 Note: Users cannot approve their own time entries (business rule).');
+        addResult('📋 To test approval workflow:');
+        addResult('   1. Have another user submit time entries, OR');
+        addResult('   2. Use a different admin/manager account to approve entries');
+        return;
+      }
+
       // Only approve entries that were recently submitted (within last 5 minutes)
-      const recentlySubmitted = submittedEntries.filter(entry => {
+      const recentlySubmitted = otherUsersEntries.filter(entry => {
         if (!entry.submittedAt) return false;
         const submittedTime = new Date(entry.submittedAt).getTime();
         const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
@@ -88,21 +102,26 @@ const WorkflowTestPanel: React.FC = () => {
       });
 
       if (recentlySubmitted.length === 0) {
-        addResult('❌ No recently submitted entries found to approve. Try submitting some entries first.');
+        addResult('❌ No recently submitted entries from other users found to approve.');
+        addResult('💡 Try having another user submit entries, then approve them here.');
         return;
       }
 
       const entryIds = recentlySubmitted.slice(0, 3).map(entry => entry.id); // Approve up to 3 entries
-      addResult(`🔄 Attempting to approve ${entryIds.length} recently submitted entries...`);
+      addResult(`🔄 Attempting to approve ${entryIds.length} entries from other users...`);
       
       await approveTimeEntries(entryIds, 'Test approval via workflow panel');
-      addResult(`✅ Approved ${entryIds.length} time entries`);
+      addResult(`✅ Approved ${entryIds.length} time entries from other users`);
     } catch (error: any) {
       addResult(`❌ Failed to approve time entries: ${error.message}`);
       
       // Provide more specific guidance based on the error
-      if (error.message?.includes('INSUFFICIENT_APPROVAL_PERMISSIONS')) {
-        addResult('💡 Tip: Make sure your user has manager or admin role to approve entries.');
+      if (error.message?.includes('INSUFFICIENT_APPROVAL_PERMISSIONS') || 
+          error.message?.includes('Cannot approve your own time entry')) {
+        addResult('💡 Business Rule: Users cannot approve their own time entries.');
+        addResult('📋 To test approval workflow:');
+        addResult('   1. Create entries with a different user account, OR');
+        addResult('   2. Have another user submit entries for you to approve');
       } else if (error.message?.includes('400')) {
         addResult('💡 Tip: Some entries may already be approved or have permission restrictions.');
       }
@@ -161,8 +180,8 @@ const WorkflowTestPanel: React.FC = () => {
       return;
     }
 
-    // Step 3: Approve entry
-    addResult('✅ Step 3: Approving submitted test entry...');
+    // Step 3: Approve entry (with business rule handling)
+    addResult('✅ Step 3: Attempting to approve submitted test entry...');
     await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
     
     try {
@@ -170,10 +189,14 @@ const WorkflowTestPanel: React.FC = () => {
       addResult('✅ Test entry approved successfully');
     } catch (error: any) {
       addResult(`❌ Failed to approve test entry: ${error.message}`);
-      if (error.message?.includes('INSUFFICIENT_APPROVAL_PERMISSIONS')) {
-        addResult('💡 Note: Your user may not have approval permissions. This is expected for employee roles.');
+      if (error.message?.includes('INSUFFICIENT_APPROVAL_PERMISSIONS') || 
+          error.message?.includes('Cannot approve your own time entry')) {
+        addResult('💡 Business Rule: Users cannot approve their own time entries.');
+        addResult('📋 This is expected behavior for security reasons.');
+        addResult('🔄 Continuing with workflow test...');
+      } else {
+        addResult('💡 Note: Approval failed, but continuing with workflow test.');
       }
-      // Continue with refresh even if approval fails
     }
 
     // Step 4: Refresh data
@@ -183,6 +206,15 @@ const WorkflowTestPanel: React.FC = () => {
 
     addResult('🎉 Full workflow test completed!');
     addResult('📊 Check the status counters above to see the results.');
+    
+    // Additional guidance for approval testing
+    if (currentUser?.role === 'admin' || currentUser?.role === 'manager') {
+      addResult('');
+      addResult('📋 To test the approval workflow completely:');
+      addResult('   1. Have another user create and submit time entries');
+      addResult('   2. Then use the "Approve Submitted" button to approve them');
+      addResult('   3. Or create a second admin/manager account for testing');
+    }
   };
 
   const clearResults = () => {
@@ -227,6 +259,11 @@ const WorkflowTestPanel: React.FC = () => {
         {!canApprove && (
           <div className="mt-2 text-xs text-orange-700 bg-orange-100 p-2 rounded">
             💡 Note: Only managers and admins can approve time entries. Approval tests may fail for employee users.
+          </div>
+        )}
+        {canApprove && (
+          <div className="mt-2 text-xs text-blue-700 bg-blue-100 p-2 rounded">
+            💡 Business Rule: Users cannot approve their own time entries. To test approval, you need entries from other users.
           </div>
         )}
       </div>
