@@ -545,6 +545,47 @@ class ProfileApiService {
       throw new Error('Failed to create session. Please try again.');
     }
   }
+
+  async logout(): Promise<{ message: string; sessionId?: string }> {
+    try {
+      console.log('🚪 Calling backend logout endpoint...');
+      const headers = await this.getAuthHeaders();
+      const url = `${API_BASE_URL}/logout`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({}),
+      });
+
+      const result = await this.handleApiResponse<{ message: string; sessionId?: string }>(response);
+      console.log('✅ Backend logout successful:', result.message);
+      if (result.sessionId) {
+        console.log('🗑️ Session deleted:', result.sessionId);
+      }
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to logout from backend:', error);
+      
+      // Handle specific error cases
+      if (error && typeof error === 'object' && 'code' in error) {
+        const apiError = error as ApiError;
+        switch (apiError.code) {
+          case 'SESSION_NOT_FOUND':
+            // This is not necessarily an error - session might already be cleaned up
+            console.log('ℹ️ No active session found to logout from');
+            return { message: 'No active session found' };
+          default:
+            throw new Error(apiError.message || 'Failed to logout.');
+        }
+      }
+      
+      if (error instanceof Error && error.message.includes('Authentication')) {
+        throw error;
+      }
+      throw new Error('Failed to logout. Please try again.');
+    }
+  }
 }
 
 export const profileApi = new ProfileApiService(); 

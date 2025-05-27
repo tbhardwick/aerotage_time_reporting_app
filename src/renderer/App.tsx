@@ -95,11 +95,38 @@ const Navigation: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      // Use the new backend logout endpoint for proper cleanup
+      try {
+        const { fetchAuthSession } = await import('aws-amplify/auth');
+        const { profileApi } = await import('./services/profileApi');
+        
+        // Get current session for API call
+        const session = await fetchAuthSession({ forceRefresh: false });
+        const token = session.tokens?.accessToken?.toString();
+        
+        if (token) {
+          console.log('🚪 Calling backend logout endpoint...');
+          await profileApi.logout();
+          console.log('✅ Backend logout successful - session cleaned up');
+        }
+      } catch (logoutError) {
+        // Don't block logout if backend logout fails
+        console.warn('⚠️ Backend logout failed, continuing with Cognito logout:', logoutError);
+      }
+      
+      // Clear local session data
+      localStorage.removeItem('currentSessionId');
+      localStorage.removeItem('loginTime');
+      
+      // Sign out from Cognito
       await signOut();
+      
       // Reload the page to reset the app state
       window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);
+      // Force reload even if logout fails
+      window.location.reload();
     }
   };
 
@@ -112,7 +139,7 @@ const Navigation: React.FC = () => {
 
     return (
     <>
-      <nav className="bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation" style={{ WebkitAppRegion: 'drag' } as any}>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation" style={{ WebkitAppRegion: 'drag' } as any}>
         <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
           <div className="flex items-center justify-between h-16">
                         {/* Desktop Navigation */}
@@ -158,7 +185,7 @@ const Navigation: React.FC = () => {
     </nav>
 
     {/* Mobile Navigation Menu - Outside nav to avoid width constraints */}
-    <div className={`lg:hidden transition-all duration-300 ease-in-out relative z-50 ${
+    <div className={`lg:hidden transition-all duration-300 ease-in-out fixed top-16 left-0 right-0 z-40 ${
       isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
     }`} style={{ overflow: isMobileMenuOpen ? 'visible' : 'hidden' }}>
       {/* Subtle backdrop when menu is open - starts below nav */}
@@ -219,7 +246,7 @@ const App: React.FC = () => {
             <Router>
               <div className="min-h-screen bg-gray-50 font-sans">
                 <Navigation />
-                <main className="flex-1" role="main">
+                <main className="flex-1 pt-16" role="main">
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <Routes>
                       <Route path="/" element={<Dashboard />} />

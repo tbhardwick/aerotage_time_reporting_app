@@ -289,6 +289,161 @@ export const testSessionTimeout = async () => {
   }
 };
 
+/**
+ * Test session deletion to verify backend behavior
+ */
+export const testSessionDeletion = async () => {
+  console.group('🧪 Testing Session Deletion Backend Behavior');
+  
+  try {
+    const userId = await getUserIdFromToken();
+    console.log('👤 Testing with user ID:', userId);
+    
+    // Get initial sessions
+    console.log('📋 Step 1: Getting initial sessions...');
+    const initialSessions = await profileApi.getUserSessions(userId);
+    console.log(`📊 Found ${initialSessions.length} initial sessions`);
+    
+    initialSessions.forEach((session, index) => {
+      console.log(`   Session ${index + 1}: ${session.id.substring(0, 8)}... (${session.isCurrent ? 'CURRENT' : 'other'})`);
+    });
+    
+    // Find a non-current session to test with
+    const nonCurrentSessions = initialSessions.filter(s => !s.isCurrent);
+    
+    if (nonCurrentSessions.length === 0) {
+      console.log('⚠️ No non-current sessions found to test deletion with');
+      console.log('💡 To test this:');
+      console.log('   1. Login from another browser/device');
+      console.log('   2. Run this test again');
+      return;
+    }
+    
+    const testSession = nonCurrentSessions[0];
+    console.log(`🎯 Step 2: Will test deletion of session: ${testSession.id.substring(0, 8)}...`);
+    console.log(`   User Agent: ${testSession.userAgent.substring(0, 50)}...`);
+    console.log(`   IP: ${testSession.ipAddress}`);
+    
+    // Attempt to delete the session
+    console.log('🗑️ Step 3: Attempting to delete session...');
+    try {
+      const deleteResult = await profileApi.terminateSession(userId, testSession.id);
+      console.log('✅ Delete API returned:', deleteResult);
+    } catch (deleteError) {
+      console.error('❌ Delete API failed:', deleteError);
+      return;
+    }
+    
+    // Wait a moment for backend processing
+    console.log('⏳ Step 4: Waiting 2 seconds for backend processing...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Check if session was actually deleted
+    console.log('🔍 Step 5: Checking if session was actually deleted...');
+    const finalSessions = await profileApi.getUserSessions(userId);
+    console.log(`📊 Found ${finalSessions.length} final sessions`);
+    
+    const deletedSessionStillExists = finalSessions.find(s => s.id === testSession.id);
+    
+    if (deletedSessionStillExists) {
+      console.log('❌ BACKEND ISSUE: Session still exists after deletion!');
+      console.log('🔧 This confirms the backend is not actually deleting sessions from the database');
+      console.log('📋 Session details:', {
+        id: deletedSessionStillExists.id.substring(0, 8) + '...',
+        userAgent: deletedSessionStillExists.userAgent.substring(0, 50) + '...',
+        isCurrent: deletedSessionStillExists.isCurrent,
+        lastActivity: deletedSessionStillExists.lastActivity
+      });
+    } else {
+      console.log('✅ SUCCESS: Session was properly deleted from backend');
+    }
+    
+    // Summary
+    console.log('\n📊 Test Summary:');
+    console.log(`   Initial sessions: ${initialSessions.length}`);
+    console.log(`   Final sessions: ${finalSessions.length}`);
+    console.log(`   Expected change: -1 session`);
+    console.log(`   Actual change: ${finalSessions.length - initialSessions.length} sessions`);
+    
+    if (finalSessions.length === initialSessions.length - 1) {
+      console.log('🎉 Backend deletion is working correctly!');
+    } else {
+      console.log('🚨 Backend deletion is NOT working - sessions are not being removed from database');
+    }
+    
+  } catch (error) {
+    console.error('❌ Test failed:', error);
+  } finally {
+    console.groupEnd();
+  }
+};
+
+/**
+ * Simple session existence test - call this from the Electron app console
+ */
+export const testSessionExistence = async () => {
+  console.group('🔍 Session Existence Test');
+  
+  try {
+    const userId = await getUserIdFromToken();
+    console.log('👤 User ID:', userId);
+    
+    // Get current sessions from API
+    const sessions = await profileApi.getUserSessions(userId);
+    console.log(`📊 Total sessions found: ${sessions.length}`);
+    
+    sessions.forEach((session, index) => {
+      const loginTime = new Date(session.loginTime);
+      const lastActivity = new Date(session.lastActivity);
+      const timeSinceLogin = Math.round((Date.now() - loginTime.getTime()) / (1000 * 60)); // minutes
+      const timeSinceActivity = Math.round((Date.now() - lastActivity.getTime()) / (1000 * 60)); // minutes
+      
+      console.log(`📱 Session ${index + 1}:`, {
+        id: session.id.substring(0, 8) + '...',
+        isCurrent: session.isCurrent,
+        userAgent: session.userAgent.substring(0, 60) + '...',
+        ipAddress: session.ipAddress,
+        loginTime: loginTime.toLocaleString(),
+        lastActivity: lastActivity.toLocaleString(),
+        minutesSinceLogin: timeSinceLogin,
+        minutesSinceActivity: timeSinceActivity,
+        location: session.location ? `${session.location.city}, ${session.location.country}` : 'Unknown'
+      });
+    });
+    
+    // Analysis
+    const currentSessions = sessions.filter(s => s.isCurrent);
+    const otherSessions = sessions.filter(s => !s.isCurrent);
+    
+    console.log('\n📈 Analysis:');
+    console.log(`   Current sessions: ${currentSessions.length}`);
+    console.log(`   Other sessions: ${otherSessions.length}`);
+    
+    if (otherSessions.length > 0) {
+      console.log('\n🔍 Other sessions details:');
+      otherSessions.forEach((session, index) => {
+        const lastActivity = new Date(session.lastActivity);
+        const minutesAgo = Math.round((Date.now() - lastActivity.getTime()) / (1000 * 60));
+        
+        console.log(`   ${index + 1}. Last active ${minutesAgo} minutes ago`);
+        console.log(`      User Agent: ${session.userAgent.substring(0, 80)}...`);
+        console.log(`      IP: ${session.ipAddress}`);
+        
+        if (minutesAgo > 30) {
+          console.log(`      ⚠️  This session has been inactive for ${minutesAgo} minutes - might be logged out`);
+        } else {
+          console.log(`      ✅ This session was recently active - likely still logged in`);
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Error testing session existence:', error);
+  }
+  
+  console.groupEnd();
+};
+
 // Make functions available globally for debugging
 declare global {
   interface Window {
@@ -298,6 +453,8 @@ declare global {
       testTokenRefresh: typeof testTokenRefresh;
       runBackendValidationTest: typeof runBackendValidationTest;
       testSessionTimeout: typeof testSessionTimeout;
+      testSessionDeletion: typeof testSessionDeletion;
+      testSessionExistence: typeof testSessionExistence;
     };
   }
 }
@@ -309,6 +466,8 @@ if (process.env.NODE_ENV === 'development') {
     testTerminatedSession,
     testTokenRefresh,
     runBackendValidationTest,
-    testSessionTimeout
+    testSessionTimeout,
+    testSessionDeletion,
+    testSessionExistence
   };
 } 

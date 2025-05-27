@@ -73,6 +73,7 @@ npm run check-deps        # Check for unstable dependencies
 - **Time Tracking**: Timer functionality with manual entry support
 - **Project Management**: Create and manage projects and clients
 - **User Authentication**: AWS Cognito integration with password reset
+- **Session Management**: Multi-device session tracking with auto-cleanup and termination
 - **Password Reset**: Complete email-based password reset flow with security best practices
 - **Real-time Timer**: Persistent timer across app restarts
 - **Data Export**: CSV and PDF export capabilities
@@ -87,6 +88,9 @@ npm run check-deps        # Check for unstable dependencies
 - **Invoice Generation**: Automated invoice creation
 
 ### 🔐 Security Features
+- **Session Management**: Multi-device session tracking with automatic cleanup
+- **Session Termination**: Secure logout with backend session cleanup
+- **Auto-refresh**: Real-time session monitoring and terminated session detection
 - **Password Reset**: Secure email-based reset with 6-digit codes
 - **Password Policy**: Enforced complexity requirements (8+ chars, uppercase, lowercase, numbers)
 - **Code Expiration**: 15-minute expiration for reset codes
@@ -111,7 +115,8 @@ Comprehensive documentation is available in the [`docs/`](./docs/) directory:
 - **[React Context Setup](./docs/REACT_CONTEXT_SETUP.md)** - State management architecture
 - **[Dependency Analysis](./docs/DEPENDENCY_ANALYSIS.md)** - Dependency management and security
 
-### Password Reset Documentation
+### Security & Authentication Documentation
+- **[Session Management](./docs/SESSION_MANAGEMENT.md)** - Multi-device session tracking and management
 - **[Frontend Implementation](./docs/FRONTEND_PASSWORD_RESET_IMPLEMENTATION.md)** - Complete implementation guide
 - **[Backend Requirements](./docs/PASSWORD_RESET_BACKEND_REQUIREMENTS.md)** - Backend team requirements
 - **[Integration Guide](./FRONTEND_PASSWORD_RESET_INTEGRATION_GUIDE.md)** - End-to-end integration instructions

@@ -39,6 +39,9 @@ const SecuritySettings: React.FC = () => {
   const [isLoadingSettings, setIsLoadingSettings] = useState(true);
   const [isLoadingSessions, setIsLoadingSessions] = useState(true);
   const [isTerminatingSessions, setIsTerminatingSessions] = useState<string[]>([]);
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+  const [autoRefreshPaused, setAutoRefreshPaused] = useState(false);
+  const [previousSessionIds, setPreviousSessionIds] = useState<string[]>([]);
   
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -49,6 +52,27 @@ const SecuritySettings: React.FC = () => {
       loadUserSessions();
     }
   }, [user?.id]);
+
+  // Auto-refresh sessions every 30 seconds to detect terminated sessions
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const refreshInterval = setInterval(() => {
+      // Don't auto-refresh if paused or if user is actively terminating sessions
+      if (autoRefreshPaused || isTerminatingSessions.length > 0) {
+        console.log('⏸️ Auto-refresh paused (user activity detected)');
+        return;
+      }
+      
+      console.log('🔄 Auto-refreshing session list...');
+      loadUserSessions();
+    }, 30000); // Refresh every 30 seconds
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [user?.id, autoRefreshPaused, isTerminatingSessions.length]);
 
   const loadSecuritySettings = async () => {
     if (!user?.id) return;
@@ -79,9 +103,46 @@ const SecuritySettings: React.FC = () => {
       console.log('📱 Sessions response:', userSessions);
       console.log('📊 Number of sessions found:', userSessions.length);
       
+      // Enhanced logging for debugging terminated sessions
+      userSessions.forEach((session, index) => {
+        console.log(`📋 Session ${index + 1}:`, {
+          id: session.id.substring(0, 8) + '...',
+          userAgent: session.userAgent.substring(0, 50) + '...',
+          isCurrent: session.isCurrent,
+          loginTime: session.loginTime,
+          lastActivity: session.lastActivity,
+          ipAddress: session.ipAddress
+        });
+      });
+      
       // Get the current session ID from localStorage
       const currentSessionId = localStorage.getItem('currentSessionId');
       console.log('💾 Current session ID from localStorage:', currentSessionId);
+      
+      // Check if any sessions should have been deleted
+      const currentSessionIds = userSessions.map(s => s.id);
+      console.log('🔍 Session comparison:', {
+        previousCount: previousSessionIds.length,
+        currentCount: currentSessionIds.length,
+        previousIds: previousSessionIds.map(id => id.substring(0, 8) + '...'),
+        currentIds: currentSessionIds.map(id => id.substring(0, 8) + '...')
+      });
+      
+      const removedSessions = previousSessionIds.filter(id => !currentSessionIds.includes(id));
+      const addedSessions = currentSessionIds.filter(id => !previousSessionIds.includes(id));
+      
+      if (removedSessions.length > 0) {
+        console.log('🗑️ Sessions removed since last refresh:', removedSessions.map(id => id.substring(0, 8) + '...'));
+      }
+      if (addedSessions.length > 0) {
+        console.log('➕ New sessions since last refresh:', addedSessions.map(id => id.substring(0, 8) + '...'));
+      }
+      if (removedSessions.length === 0 && addedSessions.length === 0 && previousSessionIds.length > 0) {
+        console.log('🔄 No session changes detected - this might indicate backend deletion issue');
+      }
+      
+      // Update previous session IDs for next comparison
+      setPreviousSessionIds(currentSessionIds);
       
       // Manually mark the current session if backend isn't doing it
       const enhancedSessions = userSessions.map(session => {
@@ -99,6 +160,7 @@ const SecuritySettings: React.FC = () => {
       
       console.log('✅ Enhanced sessions with current detection:', enhancedSessions);
       setSessions(enhancedSessions);
+      setLastRefreshTime(new Date());
       
       if (enhancedSessions.length === 0) {
         console.log('ℹ️ No active sessions found for user. This could mean:');
@@ -271,6 +333,13 @@ const SecuritySettings: React.FC = () => {
       return;
     }
     
+    console.log('🚫 About to terminate session:', {
+      sessionId: sessionId.substring(0, 8) + '...',
+      userAgent: sessionToTerminate.userAgent.substring(0, 50) + '...',
+      ipAddress: sessionToTerminate.ipAddress,
+      isCurrent: sessionToTerminate.isCurrent
+    });
+    
     // Show confirmation dialog using utility function
     const confirmed = window.confirm(getTerminationConfirmationMessage(sessionToTerminate));
     if (!confirmed) return;
@@ -278,11 +347,27 @@ const SecuritySettings: React.FC = () => {
     setIsTerminatingSessions(prev => [...prev, sessionId]);
     
     try {
-      await profileApi.terminateSession(user.id, sessionId);
-      setSessions(prev => prev.filter(session => session.id !== sessionId));
+      console.log('📡 Calling terminateSession API...');
+      const result = await profileApi.terminateSession(user.id, sessionId);
+      console.log('✅ Session termination API response:', result);
+      
+      // Remove from local state immediately
+      setSessions(prev => {
+        const newSessions = prev.filter(session => session.id !== sessionId);
+        console.log('🔄 Updated local sessions state:', newSessions.length, 'sessions remaining');
+        return newSessions;
+      });
+      
       setMessage({ type: 'success', text: 'Session terminated successfully.' });
+      
+      // Refresh the session list after termination to ensure consistency
+      console.log('⏰ Scheduling session refresh in 1 second to verify backend deletion...');
+      setTimeout(() => {
+        console.log('🔍 Refreshing sessions to verify backend deletion...');
+        loadUserSessions();
+      }, 1000);
     } catch (error) {
-      console.error('Error terminating session:', error);
+      console.error('❌ Failed to terminate session:', error);
       let errorMessage = 'Failed to terminate session. Please try again.';
       
       if (error instanceof Error) {
@@ -531,14 +616,38 @@ const SecuritySettings: React.FC = () => {
       {/* Active Sessions */}
       <div className="bg-white rounded-lg border border-neutral-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-md font-medium text-neutral-900">Active Sessions</h3>
+          <div>
+            <h3 className="text-md font-medium text-neutral-900">Active Sessions</h3>
+            <p className="text-xs text-neutral-500 mt-1">
+              {autoRefreshPaused ? (
+                <span className="text-amber-600 font-medium">Auto-refresh paused</span>
+              ) : (
+                'Auto-refreshes every 30 seconds to detect terminated sessions'
+              )}
+              {lastRefreshTime && (
+                <span className="ml-2">
+                  • Last updated: {lastRefreshTime.toLocaleTimeString()}
+                </span>
+              )}
+            </p>
+          </div>
           <div className="flex space-x-2">
+            <button
+              onClick={() => setAutoRefreshPaused(!autoRefreshPaused)}
+              className={`px-3 py-1 text-sm rounded transition-colors duration-200 ${
+                autoRefreshPaused 
+                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                  : 'bg-gray-600 text-white hover:bg-gray-700'
+              }`}
+            >
+              {autoRefreshPaused ? 'Resume Auto-Refresh' : 'Pause Auto-Refresh'}
+            </button>
             <button
               onClick={loadUserSessions}
               disabled={isLoadingSessions}
               className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
             >
-              {isLoadingSessions ? 'Refreshing...' : 'Refresh Sessions'}
+              {isLoadingSessions ? 'Refreshing...' : 'Refresh Now'}
             </button>
           </div>
         </div>
