@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppContext } from '../../context/AppContext';
+import { useApiOperations } from '../../hooks/useApiOperations';
 import {
   XMarkIcon,
   UserIcon,
@@ -79,7 +80,9 @@ const TIMEZONES = [
 
 export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) => {
   const { state, dispatch } = useAppContext();
+  const { createUser, updateUser } = useApiOperations();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditMode = !!userId;
 
   // Get user data for edit mode
@@ -172,33 +175,23 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
 
   const onSubmit = async (data: UserFormData) => {
     setIsSubmitting(true);
+    setSubmitError(null); // Clear any previous errors
     try {
       if (isEditMode && existingUser) {
         // Update existing user
-        dispatch({
-          type: 'UPDATE_USER',
-          payload: {
-            id: userId!,
-            updates: {
-              ...data,
-              updatedAt: new Date().toISOString(),
-            },
-          },
-        });
+        await updateUser(userId!, data);
       } else {
         // Create new user
-        dispatch({
-          type: 'ADD_USER',
-          payload: {
-            ...data,
-            createdBy: state.user?.id || 'unknown',
-          },
+        await createUser({
+          ...data,
+          createdBy: state.user?.id || 'unknown',
         });
       }
       onSave();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving user:', error);
+      setSubmitError(error.message || 'An error occurred while saving the user. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -229,6 +222,19 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
               <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
+
+          {/* Error Display */}
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="flex">
+                <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Error</h3>
+                  <p className="text-sm text-red-700 mt-1">{submitError}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Basic Information */}
