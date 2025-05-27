@@ -13,6 +13,9 @@ import {
   SESSION_SECURITY_POLICY 
 } from '../../utils/sessionUtils';
 
+// Debug utilities (available in development)
+import { debugSessionUI, fixSessionState } from '../../utils/sessionDebugger';
+
 interface PasswordChangeData {
   currentPassword: string;
   newPassword: string;
@@ -510,13 +513,43 @@ const SecuritySettings: React.FC = () => {
       <div className="bg-white rounded-lg border border-neutral-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-md font-medium text-neutral-900">Active Sessions</h3>
-          <button
-            onClick={loadUserSessions}
-            disabled={isLoadingSessions}
-            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
-          >
-            {isLoadingSessions ? 'Refreshing...' : 'Refresh Sessions'}
-          </button>
+          <div className="flex space-x-2">
+            {process.env.NODE_ENV === 'development' && (
+              <>
+                <button
+                  onClick={async () => {
+                    console.log('🐛 Running session debug analysis...');
+                    await debugSessionUI();
+                  }}
+                  className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors duration-200"
+                  title="Debug session state (development only)"
+                >
+                  Debug
+                </button>
+                <button
+                  onClick={async () => {
+                    console.log('🔧 Fixing session state...');
+                    const success = await fixSessionState();
+                    if (success) {
+                      // Reload sessions after fix
+                      setTimeout(() => loadUserSessions(), 1000);
+                    }
+                  }}
+                  className="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-700 transition-colors duration-200"
+                  title="Fix session state (development only)"
+                >
+                  Fix
+                </button>
+              </>
+            )}
+            <button
+              onClick={loadUserSessions}
+              disabled={isLoadingSessions}
+              className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+            >
+              {isLoadingSessions ? 'Refreshing...' : 'Refresh Sessions'}
+            </button>
+          </div>
         </div>
         
         {/* Session Management Info */}

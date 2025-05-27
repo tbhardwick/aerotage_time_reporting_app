@@ -170,9 +170,12 @@ class SessionBootstrapService {
    */
   private async attemptNormalSessionCreation(userId: string) {
     try {
+      // Only send fields that match the CreateSessionRequest interface
       const sessionData = {
         userAgent: navigator.userAgent,
         loginTime: new Date().toISOString()
+        // Note: ipAddress is auto-detected by backend
+        // Note: isCurrent is set by backend for new sessions
       };
       
       const session = await profileApi.createSession(userId, sessionData);

@@ -180,6 +180,33 @@ src/
 7. **Context Integration**: Update context state after successful API calls
 8. **Backend Dependency**: Frontend requires backend infrastructure to be deployed first
 
+### API Documentation & Reference 📚
+**Official API Documentation**: [https://djfreip4iwrq0.cloudfront.net/](mdc:https:/djfreip4iwrq0.cloudfront.net)
+
+#### API Documentation Usage Rules
+1. **Primary Reference**: Always consult the official API docs before implementing new API integrations
+2. **Endpoint Discovery**: Use the documentation to identify available endpoints and their specifications
+3. **Request/Response Formats**: Follow the exact request/response schemas documented in the API docs
+4. **Authentication Requirements**: Verify JWT token requirements and header formats from the documentation
+5. **Error Handling**: Implement error handling based on documented error response formats
+6. **Development Environment**: Current API base URL is `https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev/`
+7. **Production Environment**: Production API base URL will be `https://api.aerotage.com/`
+
+#### API Integration Workflow
+1. **Documentation First**: Review API documentation before writing any API integration code
+2. **Type Definitions**: Create TypeScript interfaces that match the documented API schemas
+3. **Service Layer**: Implement API calls in `src/renderer/services/` following documented patterns
+4. **Error Mapping**: Map API error responses to user-friendly messages
+5. **Testing**: Test against documented endpoints and expected responses
+6. **Context Updates**: Update React Context state based on successful API responses
+
+#### API Documentation Integration with Development
+- **Cursor Docs**: API documentation is indexed in Cursor for AI-assisted development
+- **Reference During Coding**: Use the documentation to ensure accurate API implementation
+- **Schema Validation**: Validate frontend data structures against API documentation schemas
+- **Endpoint Coverage**: Ensure all documented endpoints have corresponding frontend implementations
+- **Version Compatibility**: Monitor API documentation for version updates and breaking changes
+
 ## Feature-Specific Rules
 
 ### Authentication
@@ -450,6 +477,8 @@ type AppAction =
 - **Document any unavoidable unstable dependencies** ✅
 - **Coordinate with backend repository for infrastructure changes** ✅
 - **Update AWS configuration when backend endpoints change** ✅
+- **Consult API documentation before implementing new integrations** ✅
+- **Follow documented API schemas and response formats exactly** ✅
 
 ## Phase-Specific Focus
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { signIn, confirmSignIn, getCurrentUser, resetPassword, confirmResetPassword, resendSignUpCode, AuthError } from 'aws-amplify/auth';
+import { signIn, confirmSignIn, getCurrentUser, resetPassword, confirmResetPassword, resendSignUpCode, AuthError, fetchAuthSession } from 'aws-amplify/auth';
 import { useAppContext } from '../../context/AppContext';
 import { apiClient } from '../../services/api-client';
 import { profileApi } from '../../services/profileApi';
 import { sessionBootstrap } from '../../services/sessionBootstrap';
 import { handlePasswordResetErrors, validatePasswordPolicy, formatPasswordErrors } from '../../utils/passwordResetErrors';
 import { useDataLoader } from '../../hooks/useDataLoader';
+import { decodeJWTPayload } from '../../utils/jwt';
 
 interface LoginFormProps {
   onLoginSuccess?: () => void;
@@ -131,11 +132,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const handleSuccessfulLogin = async () => {
     console.log('🚀 handleSuccessfulLogin called');
     try {
-      // Step 1: Get user information from Cognito
+      // Step 1: Get user information from Cognito and JWT token
       console.log('👤 Getting current user information...');
       const user = await getCurrentUser();
-      const userId = user.userId || user.username;
-      console.log('✅ User ID obtained:', userId);
+      
+      // Get user ID from JWT token (consistent with backend expectations)
+      const session = await fetchAuthSession({ forceRefresh: false });
+      const token = session.tokens?.idToken?.toString();
+      
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+      
+      const tokenPayload = decodeJWTPayload(token);
+      if (!tokenPayload || !tokenPayload.sub) {
+        throw new Error('Invalid token payload');
+      }
+      
+      const userId = tokenPayload.sub;
+      console.log('✅ User ID obtained from JWT token:', userId);
       
       // Step 2: Create backend session record (as per integration guide)
       console.log('🆕 Creating backend session record...');
