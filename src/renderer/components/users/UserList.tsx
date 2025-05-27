@@ -42,7 +42,11 @@ export const UserList: React.FC<UserListProps> = ({
   // Filter and search users
   const filteredUsers = useMemo(() => {
     return state.users.filter(user => {
-      const matchesSearch = 
+      // Safety check: ensure user object is valid
+      if (!user || typeof user !== 'object') return false;
+      
+      // If no search term, match all users
+      const matchesSearch = !searchTerm || 
         (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.jobTitle && user.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
