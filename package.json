@@ -6,7 +6,8 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "npm run dev:clean && NODE_ENV=development concurrently \"npm run dev:renderer\" \"wait-on http://localhost:3000 && electronmon .\"",
+    "dev": "npm run dev:clean && NODE_ENV=development concurrently \"npm run dev:renderer\" \"wait-on http://localhost:3000 && sleep 2 && electronmon .\"",
+    "dev:manual": "npm run dev:clean && NODE_ENV=development concurrently \"npm run dev:renderer\" \"wait-on http://localhost:3000 && electron .\"",
     "dev:clean": "lsof -ti:3000 | xargs kill -9 || true",
     "dev:renderer": "webpack serve --mode development",
     "build": "webpack --mode production && electron-builder",
