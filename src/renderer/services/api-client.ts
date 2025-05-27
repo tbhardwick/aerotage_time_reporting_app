@@ -26,18 +26,28 @@ export interface TimeEntry {
 
 export interface Project {
   id: string;
-  clientId: string;
   name: string;
+  clientId: string;
+  clientName: string;
   description?: string;
+  status: 'active' | 'paused' | 'completed' | 'cancelled';
+  defaultBillable: boolean;
+  defaultHourlyRate?: number;
   budget?: {
-    hours?: number;
-    amount?: number;
+    type: 'hours' | 'amount';
+    value: number;
+    spent: number;
   };
-  hourlyRate: number;
-  status: 'active' | 'inactive' | 'completed';
-  isActive: boolean;
+  deadline?: string; // ISO date format (YYYY-MM-DD)
+  teamMembers: Array<{
+    userId: string;
+    name?: string;
+    role: string;
+  }>;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
+  createdBy?: string;
 }
 
 export interface Client {

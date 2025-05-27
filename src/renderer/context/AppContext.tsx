@@ -37,18 +37,28 @@ export interface Client {
 
 export interface Project {
   id: string;
-  clientId: string;
   name: string;
+  clientId: string;
+  clientName: string;
   description?: string;
+  status: 'active' | 'paused' | 'completed' | 'cancelled';
+  defaultBillable: boolean;
+  defaultHourlyRate?: number;
   budget?: {
-    hours?: number;
-    amount?: number;
+    type: 'hours' | 'amount';
+    value: number;
+    spent: number;
   };
-  hourlyRate: number;
-  status: 'active' | 'inactive' | 'completed';
-  isActive: boolean; // For backward compatibility
+  deadline?: string; // ISO date format (YYYY-MM-DD)
+  teamMembers: Array<{
+    userId: string;
+    name?: string;
+    role: string;
+  }>;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
+  createdBy?: string;
   // Populated fields
   client?: Client;
 }
@@ -682,7 +692,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       );
       const totalHours = relatedTimeEntries.reduce((sum, entry) => sum + entry.duration, 0) / 60; // Convert minutes to hours
       const project = state.projects.find(p => action.payload.projectIds.includes(p.id));
-      const hourlyRate = project?.hourlyRate || 100;
+      const hourlyRate = project?.defaultHourlyRate || 100;
       const baseAmount = totalHours * hourlyRate;
       const tax = baseAmount * 0.1; // 10% tax
       const totalAmount = baseAmount + tax;

@@ -9,12 +9,17 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 // Validation schema
 const projectSchema = z.object({
   clientId: z.string().min(1, 'Please select a client'),
-  name: z.string().min(1, 'Project name is required').max(100, 'Name must be less than 100 characters'),
+  name: z.string().min(2, 'Project name must be at least 2 characters').max(100, 'Name must be less than 100 characters'),
   description: z.string().optional(),
-  hourlyRate: z.number().min(0, 'Hourly rate must be positive').max(10000, 'Hourly rate seems too high'),
-  budgetHours: z.number().min(0, 'Budget hours must be positive').optional().or(z.literal(0)),
-  budgetAmount: z.number().min(0, 'Budget amount must be positive').optional().or(z.literal(0)),
-  status: z.enum(['active', 'inactive', 'completed']),
+  defaultHourlyRate: z.number().min(0, 'Hourly rate must be positive').max(1000, 'Hourly rate must be 1000 or less').optional(),
+  budgetType: z.enum(['hours', 'amount']).optional(),
+  budgetValue: z.number().min(0, 'Budget value must be positive').optional(),
+  budgetSpent: z.number().min(0, 'Budget spent must be positive').optional(),
+  deadline: z.string().optional(),
+  status: z.enum(['active', 'paused', 'completed', 'cancelled']),
+  defaultBillable: z.boolean(),
+  teamMembersText: z.string().optional(),
+  tagsText: z.string().optional(),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -43,47 +48,69 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
       clientId: '',
       name: '',
       description: '',
-      hourlyRate: 100,
-      budgetHours: 0,
-      budgetAmount: 0,
+      defaultHourlyRate: 100,
+      budgetType: 'hours',
+      budgetValue: 0,
+      budgetSpent: 0,
+      deadline: '',
       status: 'active',
+      defaultBillable: false,
+      teamMembersText: '',
+      tagsText: '',
     },
   });
 
-  const watchedBudgetHours = watch('budgetHours');
-  const watchedHourlyRate = watch('hourlyRate');
+  // Watch form values for calculations
+  const watchedBudgetValue = watch('budgetValue');
+  const watchedDefaultHourlyRate = watch('defaultHourlyRate');
 
-  // Calculate estimated budget amount based on hours and rate
-  const estimatedBudgetAmount = (watchedBudgetHours || 0) * (watchedHourlyRate || 0);
+  // Calculate budget estimate
+  const budgetEstimate = watchedBudgetValue && watchedDefaultHourlyRate 
+    ? watchedBudgetValue * watchedDefaultHourlyRate 
+    : 0;
 
-  // Populate form when editing
+  // Set form values when editing
   useEffect(() => {
     if (project) {
       reset({
         clientId: project.clientId,
         name: project.name,
         description: project.description || '',
-        hourlyRate: project.hourlyRate,
-        budgetHours: project.budget?.hours || 0,
-        budgetAmount: project.budget?.amount || 0,
+        defaultHourlyRate: project.defaultHourlyRate,
+        budgetType: project.budget?.type || 'hours',
+        budgetValue: project.budget?.value || 0,
+        budgetSpent: project.budget?.spent || 0,
+        deadline: project.deadline || '',
         status: project.status,
+        defaultBillable: project.defaultBillable,
+        teamMembersText: project.teamMembers?.map(tm => tm.userId).join(', ') || '',
+        tagsText: project.tags?.join(', ') || '',
       });
     }
   }, [project, reset]);
 
-  const onSubmit = async (data: ProjectFormData) => {
+  const onSubmit = async (data: any) => {
     try {
       const projectData = {
         clientId: data.clientId,
+        clientName: state.clients.find(c => c.id === data.clientId)?.name || '',
         name: data.name,
         description: data.description || undefined,
-        hourlyRate: data.hourlyRate,
-        budget: {
-          hours: data.budgetHours || undefined,
-          amount: data.budgetAmount || undefined,
-        },
+        defaultHourlyRate: data.defaultHourlyRate,
+        budget: data.budgetValue ? {
+          type: data.budgetType as 'hours' | 'amount',
+          value: data.budgetValue,
+          spent: data.budgetSpent || 0,
+        } : undefined,
+        deadline: data.deadline || undefined,
         status: data.status,
-        isActive: data.status === 'active',
+        defaultBillable: data.defaultBillable,
+        teamMembers: data.teamMembersText ? 
+          data.teamMembersText.split(',').map((userId: string) => ({
+            userId: userId.trim(),
+            role: 'member'
+          })).filter((tm: any) => tm.userId) : [],
+        tags: data.tagsText ? data.tagsText.split(',').map((t: string) => t.trim()).filter((t: string) => t) : [],
       };
 
       if (isEditing && projectId) {
@@ -184,7 +211,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
           {/* Hourly Rate */}
           <div>
-            <label htmlFor="hourlyRate" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="defaultHourlyRate" className="block text-sm font-medium text-neutral-700 mb-2">
               Hourly Rate *
             </label>
             <div className="relative">
@@ -193,18 +220,18 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               </div>
               <input
                 type="number"
-                id="hourlyRate"
-                {...register('hourlyRate', { valueAsNumber: true })}
+                id="defaultHourlyRate"
+                {...register('defaultHourlyRate', { valueAsNumber: true })}
                 className={`block w-full pl-7 pr-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.hourlyRate ? 'border-red-300' : 'border-neutral-300'
+                  errors.defaultHourlyRate ? 'border-red-300' : 'border-neutral-300'
                 }`}
                 placeholder="100"
                 min="0"
                 step="0.01"
               />
             </div>
-            {errors.hourlyRate && (
-              <p className="mt-1 text-sm text-red-600">{errors.hourlyRate.message}</p>
+            {errors.defaultHourlyRate && (
+              <p className="mt-1 text-sm text-red-600">{errors.defaultHourlyRate.message}</p>
             )}
           </div>
 
@@ -215,27 +242,23 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Budget Hours */}
               <div>
-                <label htmlFor="budgetHours" className="block text-sm font-medium text-neutral-700 mb-2">
-                  Budget Hours
+                <label htmlFor="budgetType" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Budget Type
                 </label>
-                <input
-                  type="number"
-                  id="budgetHours"
-                  {...register('budgetHours', { valueAsNumber: true })}
-                  className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="0"
-                  min="0"
-                  step="0.5"
-                />
-                {errors.budgetHours && (
-                  <p className="mt-1 text-sm text-red-600">{errors.budgetHours.message}</p>
-                )}
+                <select
+                  id="budgetType"
+                  {...register('budgetType')}
+                  className="block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="hours">Hours</option>
+                  <option value="amount">Amount</option>
+                </select>
               </div>
 
-              {/* Budget Amount */}
+              {/* Budget Value */}
               <div>
-                <label htmlFor="budgetAmount" className="block text-sm font-medium text-neutral-700 mb-2">
-                  Budget Amount
+                <label htmlFor="budgetValue" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Budget Value
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -243,28 +266,68 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
                   </div>
                   <input
                     type="number"
-                    id="budgetAmount"
-                    {...register('budgetAmount', { valueAsNumber: true })}
+                    id="budgetValue"
+                    {...register('budgetValue', { valueAsNumber: true })}
+                    className="block w-full pl-7 pr-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                {errors.budgetValue && (
+                  <p className="mt-1 text-sm text-red-600">{errors.budgetValue.message}</p>
+                )}
+              </div>
+
+              {/* Budget Spent */}
+              <div>
+                <label htmlFor="budgetSpent" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Budget Spent
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-neutral-500 sm:text-sm">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    id="budgetSpent"
+                    {...register('budgetSpent', { valueAsNumber: true })}
                     className="block w-full pl-7 pr-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="0"
                     min="0"
                     step="0.01"
                   />
                 </div>
-                {errors.budgetAmount && (
-                  <p className="mt-1 text-sm text-red-600">{errors.budgetAmount.message}</p>
+                {errors.budgetSpent && (
+                  <p className="mt-1 text-sm text-red-600">{errors.budgetSpent.message}</p>
                 )}
               </div>
             </div>
 
             {/* Budget Estimate */}
-            {watchedBudgetHours && watchedBudgetHours > 0 && watchedHourlyRate && (
+            {watchedBudgetValue && watchedDefaultHourlyRate && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-sm text-blue-800">
-                  <strong>Estimated Budget:</strong> {watchedBudgetHours} hours × ${watchedHourlyRate}/hr = ${estimatedBudgetAmount.toLocaleString()}
+                  <strong>Estimated Budget:</strong> {watchedBudgetValue} hours × ${watchedDefaultHourlyRate}/hr = ${budgetEstimate.toLocaleString()}
                 </p>
               </div>
             )}
+
+            {/* Deadline */}
+            <div>
+              <label htmlFor="deadline" className="block text-sm font-medium text-neutral-700 mb-2">
+                Deadline
+              </label>
+              <input
+                type="date"
+                id="deadline"
+                {...register('deadline')}
+                className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              {errors.deadline && (
+                <p className="mt-1 text-sm text-red-600">{errors.deadline.message}</p>
+              )}
+            </div>
           </div>
 
           {/* Project Status */}
@@ -278,12 +341,54 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="paused">Paused</option>
               <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
             <p className="mt-1 text-sm text-neutral-500">
               Only active projects will appear in time tracking dropdowns
             </p>
+          </div>
+
+          {/* Default Billable */}
+          <div>
+            <label htmlFor="defaultBillable" className="block text-sm font-medium text-neutral-700 mb-2">
+              Default Billable
+            </label>
+            <input
+              type="checkbox"
+              id="defaultBillable"
+              {...register('defaultBillable')}
+              className="mt-1"
+            />
+          </div>
+
+          {/* Team Members */}
+          <div>
+            <label htmlFor="teamMembersText" className="block text-sm font-medium text-neutral-700 mb-2">
+              Team Members
+            </label>
+            <textarea
+              id="teamMembersText"
+              {...register('teamMembersText')}
+              rows={3}
+              className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter team members separated by commas"
+            />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label htmlFor="tagsText" className="block text-sm font-medium text-neutral-700 mb-2">
+              Tags
+            </label>
+            <textarea
+              id="tagsText"
+              {...register('tagsText')}
+              rows={3}
+              className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter tags separated by commas"
+            />
           </div>
 
           {/* Form Actions */}

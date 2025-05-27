@@ -28,7 +28,7 @@ const ApiIntegrationTest: React.FC = () => {
       
       // Test 2: Create Client
       addResult('👤 Testing client creation...');
-      const testClient = await createClient({
+      const clientResponse = await createClient({
         name: `Test Client ${Date.now()}`,
         contactInfo: {
           email: 'test@example.com',
@@ -36,24 +36,51 @@ const ApiIntegrationTest: React.FC = () => {
         },
         isActive: true
       });
+      
+      // Extract the actual client data from the API response
+      // The API returns either the client directly or wrapped in a response object
+      const testClient = (clientResponse as any).data || clientResponse;
       addResult(`✅ Client created: ${testClient.name}`);
       
       // Test 3: Create Project
       addResult('📁 Testing project creation...');
-      const testProject = await createProject({
-        clientId: testClient.id,
+      
+      // Debug: Log the testClient object
+      console.log('🔍 Test Client object:', testClient);
+      addResult(`🔍 Client ID: ${testClient.id}, Client Name: ${testClient.name}`);
+      
+      const projectPayload = {
         name: `Test Project ${Date.now()}`,
+        clientId: testClient.id,
+        clientName: testClient.name,
         description: 'API Integration Test Project',
-        hourlyRate: 100,
-        status: 'active',
-        isActive: true
-      });
-      addResult(`✅ Project created: ${testProject.name}`);
+        status: 'active' as const,
+        defaultBillable: true,
+        defaultHourlyRate: 100,
+        budget: {
+          type: 'hours' as const,
+          value: 100,
+          spent: 0
+        },
+        deadline: '2024-12-31',
+        teamMembers: [],
+        tags: []
+      };
+      
+      // Debug: Log the project payload
+      console.log('🔍 Project payload being sent:', projectPayload);
+      addResult(`🔍 Project payload: ${JSON.stringify(projectPayload, null, 2)}`);
+      
+      const testProject = await createProject(projectPayload);
+      
+      // Extract the actual project data from the API response
+      const actualProject = (testProject as any).data || testProject;
+      addResult(`✅ Project created: ${actualProject.name}`);
       
       // Test 4: Create Time Entry
       addResult('⏱️ Testing time entry creation...');
       const testTimeEntry = await createTimeEntry({
-        projectId: testProject.id,
+        projectId: actualProject.id,
         date: new Date().toISOString().split('T')[0],
         duration: 60, // 1 hour
         description: 'API Integration Test Entry',
