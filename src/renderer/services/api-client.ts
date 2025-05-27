@@ -323,6 +323,13 @@ class AerotageApiClient {
       }
 
       console.log(`✅ Parsed API data for ${method} ${path}:`, responseData);
+      
+      // ✅ AUTOMATIC UNWRAPPING: Extract data if response is wrapped
+      if (responseData && typeof responseData === 'object' && 'success' in responseData && 'data' in responseData) {
+        console.log(`🔄 Unwrapping response data for ${method} ${path}:`, responseData.data);
+        return responseData.data as T; // Return unwrapped data
+      }
+
       return responseData as T;
     } catch (error: any) {
       console.error(`❌ Raw API Error (${method} ${path}):`, error);

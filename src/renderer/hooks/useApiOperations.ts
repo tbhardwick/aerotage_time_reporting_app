@@ -20,7 +20,8 @@ export const useApiOperations = () => {
       setLoading('createTimeEntry', true);
       setError('createTimeEntry', null);
       const newEntry = await apiClient.createTimeEntry(entry);
-      dispatch({ type: 'ADD_TIME_ENTRY', payload: entry });
+      // ✅ AFTER: Clean code - returns TimeEntry object directly
+      dispatch({ type: 'ADD_TIME_ENTRY', payload: newEntry });
       return newEntry;
     } catch (error: any) {
       console.error('Failed to create time entry:', error);
@@ -83,7 +84,8 @@ export const useApiOperations = () => {
       setLoading('createProject', true);
       setError('createProject', null);
       const newProject = await apiClient.createProject(project);
-      dispatch({ type: 'ADD_PROJECT', payload: project });
+      // ✅ AFTER: Clean code - returns Project object directly
+      dispatch({ type: 'ADD_PROJECT', payload: newProject });
       return newProject;
     } catch (error: any) {
       console.error('Failed to create project:', error);
@@ -131,7 +133,8 @@ export const useApiOperations = () => {
       setLoading('createClient', true);
       setError('createClient', null);
       const newClient = await apiClient.createClient(client);
-      dispatch({ type: 'ADD_CLIENT', payload: client });
+      // ✅ AFTER: Clean code - returns Client object directly
+      dispatch({ type: 'ADD_CLIENT', payload: newClient });
       return newClient;
     } catch (error: any) {
       console.error('Failed to create client:', error);
@@ -147,6 +150,8 @@ export const useApiOperations = () => {
       setLoading('updateClient', true);
       setError('updateClient', null);
       const updatedClient = await apiClient.updateClient(id, updates);
+      // ✅ AFTER: Clean code - returns Client object directly
+      // Use the original updates for the context, as the reducer expects Partial<Client>
       dispatch({ type: 'UPDATE_CLIENT', payload: { id, updates } });
       return updatedClient;
     } catch (error: any) {
@@ -179,7 +184,8 @@ export const useApiOperations = () => {
       setLoading('createUser', true);
       setError('createUser', null);
       const newUser = await apiClient.createUser(user);
-      dispatch({ type: 'ADD_USER', payload: user });
+      // ✅ AFTER: Clean code - returns User object directly
+      dispatch({ type: 'ADD_USER', payload: newUser });
       return newUser;
     } catch (error: any) {
       console.error('Failed to create user:', error);

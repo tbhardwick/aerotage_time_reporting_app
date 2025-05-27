@@ -169,7 +169,7 @@ export interface AppState {
 // Actions
 type AppAction =
   // Time Entry Actions
-  | { type: 'ADD_TIME_ENTRY'; payload: Omit<TimeEntry, 'id' | 'createdAt'> }
+  | { type: 'ADD_TIME_ENTRY'; payload: TimeEntry }
   | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
   | { type: 'DELETE_TIME_ENTRY'; payload: string }
   | { type: 'SET_TIME_ENTRIES'; payload: TimeEntry[] }
@@ -186,20 +186,20 @@ type AppAction =
   | { type: 'UPDATE_TIMER_TIME'; payload: number }
   
   // Project Actions
-  | { type: 'ADD_PROJECT'; payload: Omit<Project, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'ADD_PROJECT'; payload: Project }
   | { type: 'UPDATE_PROJECT'; payload: { id: string; updates: Partial<Project> } }
   | { type: 'DELETE_PROJECT'; payload: string }
   | { type: 'SET_PROJECTS'; payload: Project[] }
   
   // Client Actions
-  | { type: 'ADD_CLIENT'; payload: Omit<Client, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'ADD_CLIENT'; payload: Client }
   | { type: 'UPDATE_CLIENT'; payload: { id: string; updates: Partial<Client> } }
   | { type: 'DELETE_CLIENT'; payload: string }
   | { type: 'SET_CLIENTS'; payload: Client[] }
   
   // User Actions
   | { type: 'SET_USER'; payload: AppState['user'] }
-  | { type: 'ADD_USER'; payload: Omit<User, 'id' | 'createdAt' | 'updatedAt'> }
+  | { type: 'ADD_USER'; payload: User }
   | { type: 'UPDATE_USER'; payload: { id: string; updates: Partial<User> } }
   | { type: 'DELETE_USER'; payload: string }
   | { type: 'SET_USERS'; payload: User[] }
@@ -302,16 +302,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     // Time Entry Actions
     case 'ADD_TIME_ENTRY':
+      // ✅ Use the time entry data as-is from API (includes proper ID, createdAt)
       return {
         ...state,
-        timeEntries: [
-          ...state.timeEntries,
-          {
-            ...action.payload,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-          },
-        ],
+        timeEntries: [...state.timeEntries, action.payload],
       };
 
     case 'UPDATE_TIME_ENTRY':
@@ -448,12 +442,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     // Project Actions
     case 'ADD_PROJECT':
-      const newProject = {
-        ...action.payload,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      // ✅ Use the project data as-is from API (includes proper ID, createdAt, updatedAt)
+      const newProject = action.payload;
       return {
         ...state,
         projects: [...state.projects, populateProjectWithClient(newProject, state.clients)],
@@ -485,12 +475,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     // Client Actions
     case 'ADD_CLIENT':
-      const newClient = {
-        ...action.payload,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      // ✅ Use the client data as-is from API (includes proper ID, createdAt, updatedAt)
+      const newClient = action.payload;
       return {
         ...state,
         clients: [...state.clients, newClient],
@@ -537,17 +523,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'ADD_USER':
+      // ✅ Use the user data as-is from API (includes proper ID, createdAt, updatedAt)
       return {
         ...state,
-        users: [
-          ...state.users,
-          {
-            ...action.payload,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
+        users: [...state.users, action.payload],
       };
 
     case 'UPDATE_USER':
