@@ -4,7 +4,7 @@ import { Amplify } from 'aws-amplify';
 import { signOut } from 'aws-amplify/auth';
 import { AppProvider } from './context/AppContext';
 import { DataInitializer } from './components/common/DataInitializer';
-import TimeTrackingNew from './pages/TimeTrackingNew';
+import TimeTrackingEnhanced from './pages/TimeTrackingEnhanced';
 import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
 import Reports from './pages/Reports';
@@ -251,7 +251,7 @@ const App: React.FC = () => {
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
-                      <Route path="/time-tracking" element={<TimeTrackingNew />} />
+                      <Route path="/time-tracking" element={<TimeTrackingEnhanced />} />
                       <Route path="/projects" element={<Projects />} />
                       <Route path="/approvals" element={<Approvals />} />
                       <Route path="/reports" element={<Reports />} />
