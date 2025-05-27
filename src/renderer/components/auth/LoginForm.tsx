@@ -150,64 +150,70 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       }
       
       const userId = tokenPayload.sub;
-      console.log('✅ User ID obtained from JWT token:', userId);
-      
-      // Step 2: Create backend session record (as per integration guide)
-      console.log('🆕 Creating backend session record...');
+      console.log('✅ User ID obtained:', userId);
+
+      // Step 2: Create session record for Electron app
+      console.log('🆕 Creating session record for Electron app...');
       try {
         const sessionData = await profileApi.createSession(userId, {
-          userAgent: navigator.userAgent,
+          userAgent: navigator.userAgent, // This will show as Electron app
           loginTime: new Date().toISOString()
         });
         
-        console.log('✅ Session record created successfully:', sessionData.id);
+        console.log('✅ Electron session created successfully:', sessionData.id);
         
-        // Step 3: Store session info for current session tracking
+        // Store session ID for current session tracking
         localStorage.setItem('currentSessionId', sessionData.id);
         localStorage.setItem('loginTime', sessionData.loginTime);
         
-        // Clear any previous bootstrap errors since we now have a proper session
-        localStorage.removeItem('sessionBootstrapError');
-        
       } catch (sessionError) {
-        console.error('❌ Failed to create session record:', sessionError);
+        console.log('⚠️ Session creation failed, but continuing with login:', sessionError);
         
-        // Handle session migration if required
-        if (sessionError && typeof sessionError === 'object' && 'code' in sessionError) {
-          const apiError = sessionError as any;
-          if (apiError.code === 'SESSION_MIGRATION_REQUIRED') {
-            console.log('🔄 Session migration required, clearing storage and forcing re-login');
-            localStorage.clear();
-            window.location.href = '/login';
-            return;
+        // Don't block login if session creation fails
+        // This allows login to work even if backend doesn't support multiple sessions yet
+        if (sessionError instanceof Error) {
+          if (sessionError.message.includes('403') || sessionError.message.includes('Forbidden')) {
+            console.log('💡 Backend may not support multiple sessions yet');
+            console.log('💡 User can still use the app, session management will be limited');
           }
         }
-        
-        // Don't block login flow if session creation fails - continue with bootstrap fallback
-        console.log('⚠️ Session creation failed, falling back to bootstrap method');
-        setError('Warning: Session creation failed. Some features may be limited.');
       }
-      
-      // Step 4: Load user data and all application data
+
+      // Step 3: Load application data
       console.log('📊 Loading application data...');
+      
+      // Step 4: Update app context with user information
+      console.log('🔄 Updating app context...');
+      // Note: User object will be created when profile data is loaded
+      
+      // Step 5: Load initial data using the data loader
+      console.log('📥 Loading initial application data...');
       await loadAllData();
-      console.log('✅ Application data loaded successfully');
+
+      console.log('🎉 Login completed successfully!');
       
-      console.log('🎉 Login process completed, calling onLoginSuccess');
-      onLoginSuccess?.();
-    } catch (err: any) {
-      console.error('❌ Failed in handleSuccessfulLogin:', err);
-      
-      // If it's an identity pool error, show a specific message but continue
-      if (err.message?.includes('AWS Identity Pool configuration error')) {
-        setError('Warning: Some features may be limited due to configuration issues. Contact your administrator.');
-      } else {
-        setError('Failed to load application data. Please try refreshing the page.');
+      // Navigate to dashboard
+      if (onLoginSuccess) {
+        onLoginSuccess();
       }
       
-      // Continue with login even if data loading fails partially
-      console.log('🔄 Continuing with login despite errors');
-      onLoginSuccess?.();
+    } catch (error) {
+      console.error('❌ Login process failed:', error);
+      
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Authentication')) {
+          errorMessage = 'Authentication failed. Please check your credentials and try again.';
+        } else if (error.message.includes('Network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
+      setLoading(false);
     }
   };
 

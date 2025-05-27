@@ -13,8 +13,7 @@ import {
   SESSION_SECURITY_POLICY 
 } from '../../utils/sessionUtils';
 
-// Debug utilities (available in development)
-import { debugSessionUI, fixSessionState } from '../../utils/sessionDebugger';
+// Session utilities are available in sessionDebugger.ts for development if needed
 
 interface PasswordChangeData {
   currentPassword: string;
@@ -79,9 +78,29 @@ const SecuritySettings: React.FC = () => {
       const userSessions = await profileApi.getUserSessions(user.id);
       console.log('📱 Sessions response:', userSessions);
       console.log('📊 Number of sessions found:', userSessions.length);
-      setSessions(userSessions);
       
-      if (userSessions.length === 0) {
+      // Get the current session ID from localStorage
+      const currentSessionId = localStorage.getItem('currentSessionId');
+      console.log('💾 Current session ID from localStorage:', currentSessionId);
+      
+      // Manually mark the current session if backend isn't doing it
+      const enhancedSessions = userSessions.map(session => {
+        const isCurrentSession = session.id === currentSessionId || session.isCurrent;
+        
+        if (session.id === currentSessionId && !session.isCurrent) {
+          console.log('🔧 Manually marking session as current:', session.id);
+        }
+        
+        return {
+          ...session,
+          isCurrent: isCurrentSession
+        };
+      });
+      
+      console.log('✅ Enhanced sessions with current detection:', enhancedSessions);
+      setSessions(enhancedSessions);
+      
+      if (enhancedSessions.length === 0) {
         console.log('ℹ️ No active sessions found for user. This could mean:');
         console.log('   1. Sessions have expired');
         console.log('   2. User recently changed session settings');
@@ -514,34 +533,6 @@ const SecuritySettings: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-md font-medium text-neutral-900">Active Sessions</h3>
           <div className="flex space-x-2">
-            {process.env.NODE_ENV === 'development' && (
-              <>
-                <button
-                  onClick={async () => {
-                    console.log('🐛 Running session debug analysis...');
-                    await debugSessionUI();
-                  }}
-                  className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors duration-200"
-                  title="Debug session state (development only)"
-                >
-                  Debug
-                </button>
-                <button
-                  onClick={async () => {
-                    console.log('🔧 Fixing session state...');
-                    const success = await fixSessionState();
-                    if (success) {
-                      // Reload sessions after fix
-                      setTimeout(() => loadUserSessions(), 1000);
-                    }
-                  }}
-                  className="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-700 transition-colors duration-200"
-                  title="Fix session state (development only)"
-                >
-                  Fix
-                </button>
-              </>
-            )}
             <button
               onClick={loadUserSessions}
               disabled={isLoadingSessions}
