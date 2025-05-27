@@ -23,7 +23,7 @@ export interface AuthState {
 export interface Client {
   id: string;
   name: string;
-  contactInfo: {
+  contactInfo?: {
     email?: string;
     phone?: string;
     address?: string;

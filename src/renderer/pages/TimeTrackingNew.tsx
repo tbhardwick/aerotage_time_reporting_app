@@ -86,12 +86,28 @@ const TimeTrackingNew: React.FC = () => {
   };
 
   const handleDeleteEntry = async (entryId: string) => {
+    const entry = state.timeEntries.find(e => e.id === entryId);
+    
+    // Check if entry can be deleted
+    if (entry && (entry.status === 'submitted' || entry.status === 'approved')) {
+      alert('Cannot delete time entries that have been submitted or approved.');
+      return;
+    }
+    
     if (window.confirm('Are you sure you want to delete this time entry?')) {
       try {
         await deleteTimeEntry(entryId);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete time entry:', error);
-        alert('Failed to delete time entry. Please try again.');
+        
+        // Show more specific error messages
+        if (error.message?.includes('submitted or approved')) {
+          alert('Cannot delete time entries that have been submitted or approved.');
+        } else if (error.message?.includes('400')) {
+          alert('This time entry cannot be deleted. It may have been submitted or approved.');
+        } else {
+          alert('Failed to delete time entry. Please try again.');
+        }
       }
     }
   };
@@ -238,12 +254,12 @@ const TimeTrackingNew: React.FC = () => {
                 return project ? (
                   <>
                     <div><strong>Client:</strong> {project.client?.name}</div>
-                    <div><strong>Rate:</strong> ${project.hourlyRate}/hr</div>
+                    <div><strong>Rate:</strong> ${project.defaultHourlyRate || 'Not set'}/hr</div>
                     {project.description && (
                       <div><strong>Description:</strong> {project.description}</div>
                     )}
-                    {project.budget?.hours && (
-                      <div><strong>Budget:</strong> {project.budget.hours} hours</div>
+                    {project.budget?.type === 'hours' && (
+                      <div><strong>Budget:</strong> {project.budget.value} hours</div>
                     )}
                   </>
                 ) : null;
@@ -303,7 +319,9 @@ const TimeTrackingNew: React.FC = () => {
               No time entries yet. Start the timer to create your first entry!
             </div>
           ) : (
-            state.timeEntries.map(entry => {
+            state.timeEntries
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .map(entry => {
               const project = state.projects.find(p => p.id === entry.projectId);
               return (
                 <div key={entry.id} style={{ 
@@ -316,12 +334,21 @@ const TimeTrackingNew: React.FC = () => {
                     <div>
                       <div style={{ marginBottom: '0.5rem' }}>
                         <span style={{ 
-                          backgroundColor: entry.status === 'draft' ? '#f3f4f6' : '#dcfce7', 
-                          color: entry.status === 'draft' ? '#374151' : '#166534', 
+                          backgroundColor: 
+                            entry.status === 'draft' ? '#f3f4f6' : 
+                            entry.status === 'submitted' ? '#fef3c7' :
+                            entry.status === 'approved' ? '#dcfce7' : 
+                            entry.status === 'rejected' ? '#fee2e2' : '#f3f4f6', 
+                          color: 
+                            entry.status === 'draft' ? '#374151' : 
+                            entry.status === 'submitted' ? '#92400e' :
+                            entry.status === 'approved' ? '#166534' : 
+                            entry.status === 'rejected' ? '#dc2626' : '#374151', 
                           padding: '0.25rem 0.5rem', 
                           borderRadius: '9999px', 
                           fontSize: '0.75rem',
-                          marginRight: '0.5rem'
+                          marginRight: '0.5rem',
+                          textTransform: 'capitalize'
                         }}>
                           {entry.status}
                         </span>
@@ -345,36 +372,65 @@ const TimeTrackingNew: React.FC = () => {
                       <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>{formatDuration(entry.duration)}</p>
                       <div style={{ marginTop: '0.5rem' }}>
                         {entry.status === 'draft' && (
-                          <button 
-                            onClick={() => handleSubmitEntry(entry.id)}
-                            style={{
-                              backgroundColor: '#2563eb',
-                              color: 'white',
-                              padding: '0.25rem 0.75rem',
-                              borderRadius: '0.25rem',
-                              border: 'none',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              marginRight: '0.5rem'
-                            }}
-                          >
-                            Submit
-                          </button>
+                          <>
+                            <button 
+                              onClick={() => handleSubmitEntry(entry.id)}
+                              style={{
+                                backgroundColor: '#2563eb',
+                                color: 'white',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '0.25rem',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '0.875rem',
+                                marginRight: '0.5rem'
+                              }}
+                            >
+                              Submit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteEntry(entry.id)}
+                              style={{
+                                backgroundColor: '#dc2626',
+                                color: 'white',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '0.25rem',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '0.875rem'
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
-                        <button 
-                          onClick={() => handleDeleteEntry(entry.id)}
-                          style={{
-                            backgroundColor: '#dc2626',
-                            color: 'white',
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '0.25rem',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '0.875rem'
-                          }}
-                        >
-                          Delete
-                        </button>
+                        {entry.status === 'submitted' && (
+                          <span style={{
+                            color: '#6b7280',
+                            fontSize: '0.875rem',
+                            fontStyle: 'italic'
+                          }}>
+                            Awaiting approval
+                          </span>
+                        )}
+                        {entry.status === 'approved' && (
+                          <span style={{
+                            color: '#16a34a',
+                            fontSize: '0.875rem',
+                            fontWeight: '500'
+                          }}>
+                            ✓ Approved
+                          </span>
+                        )}
+                        {entry.status === 'rejected' && (
+                          <span style={{
+                            color: '#dc2626',
+                            fontSize: '0.875rem',
+                            fontWeight: '500'
+                          }}>
+                            ✗ Rejected
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

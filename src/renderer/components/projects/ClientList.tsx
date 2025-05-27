@@ -13,7 +13,7 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
 
   const filteredClients = state.clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.contactInfo.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    client.contactInfo?.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDeleteClient = (clientId: string) => {
@@ -143,22 +143,27 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
 
                 {/* Contact Information */}
                 <div className="space-y-2">
-                  {client.contactInfo.email && (
+                  {client.contactInfo?.email && (
                     <div className="flex items-center text-sm">
                       <span className="text-neutral-500 w-12">Email:</span>
                       <span className="text-neutral-900">{client.contactInfo.email}</span>
                     </div>
                   )}
-                  {client.contactInfo.phone && (
+                  {client.contactInfo?.phone && (
                     <div className="flex items-center text-sm">
                       <span className="text-neutral-500 w-12">Phone:</span>
                       <span className="text-neutral-900">{client.contactInfo.phone}</span>
                     </div>
                   )}
-                  {client.contactInfo.address && (
+                  {client.contactInfo?.address && (
                     <div className="flex items-start text-sm">
                       <span className="text-neutral-500 w-12 mt-0.5">Address:</span>
                       <span className="text-neutral-900 flex-1">{client.contactInfo.address}</span>
+                    </div>
+                  )}
+                  {!client.contactInfo && (
+                    <div className="text-sm text-neutral-500 italic">
+                      No contact information available
                     </div>
                   )}
                 </div>
