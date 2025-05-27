@@ -391,6 +391,9 @@ const DailyViewContent: React.FC<{
   summary: import('../../services/api-client').DailySummary; 
   onOpenQuickEntry: (date: string, startTime?: string, endTime?: string, suggestedDuration?: number) => void;
 }> = ({ summary, onOpenQuickEntry }) => {
+  // Debug: Log the summary structure to understand the API response
+  console.log('📊 Daily Summary Data:', summary);
+  
   return (
     <div className="space-y-6">
       {/* Daily Summary Cards */}
@@ -399,10 +402,10 @@ const DailyViewContent: React.FC<{
           <div className="flex items-center">
             <ClockIcon className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-                        <p className="text-sm font-medium text-neutral-600">Total Hours</p>
-          <p className="text-2xl font-bold text-neutral-900">
-            {summary.totalHours.toFixed(1)}
-          </p>
+              <p className="text-sm font-medium text-neutral-600">Total Hours</p>
+              <p className="text-2xl font-bold text-neutral-900">
+                {(summary.totalHours || 0).toFixed(1)}
+              </p>
             </div>
           </div>
         </div>
@@ -413,7 +416,7 @@ const DailyViewContent: React.FC<{
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Billable Hours</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.billableHours.toFixed(1)}
+                {(summary.billableHours || 0).toFixed(1)}
               </p>
             </div>
           </div>
@@ -425,7 +428,7 @@ const DailyViewContent: React.FC<{
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Entries</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.entriesCount}
+                {summary.entriesCount || 0}
               </p>
             </div>
           </div>
@@ -434,20 +437,20 @@ const DailyViewContent: React.FC<{
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center">
             <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              summary.completionPercentage >= 100 
+              (summary.completionPercentage || 0) >= 100 
                 ? 'bg-green-100 text-green-600' 
-                : summary.completionPercentage >= 80
+                : (summary.completionPercentage || 0) >= 80
                 ? 'bg-yellow-100 text-yellow-600'
                 : 'bg-red-100 text-red-600'
             }`}>
               <span className="text-sm font-bold">
-                {Math.round(summary.completionPercentage)}%
+                {Math.round(summary.completionPercentage || 0)}%
               </span>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Target Progress</p>
               <p className="text-2xl font-bold text-neutral-900">
-                {summary.completionPercentage.toFixed(1)}%
+                {(summary.completionPercentage || 0).toFixed(1)}%
               </p>
             </div>
           </div>
@@ -469,7 +472,7 @@ const DailyViewContent: React.FC<{
                     {gap.startTime} - {gap.endTime}
                   </p>
                   <p className="text-xs text-neutral-600">
-                    {gap.duration.toFixed(1)}h untracked
+                    {(gap.duration || 0).toFixed(1)}h untracked
                   </p>
                 </div>
                 <button 
@@ -477,7 +480,7 @@ const DailyViewContent: React.FC<{
                     summary.date, 
                     gap.startTime, 
                     gap.endTime, 
-                    gap.duration * 60 // Convert hours to minutes
+                    (gap.duration || 0) * 60 // Convert hours to minutes
                   )}
                   className="flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
                 >
@@ -518,10 +521,10 @@ const DayCard: React.FC<{
         <div className="mt-3 space-y-2">
           <div className="text-sm">
             <p className="font-medium text-neutral-900">
-              {summary.totalHours.toFixed(1)}h
+              {(summary.totalHours || 0).toFixed(1)}h
             </p>
             <p className="text-xs text-neutral-600">
-              of {summary.targetHours}h target
+              of {summary.targetHours || 0}h target
             </p>
           </div>
           
@@ -529,13 +532,13 @@ const DayCard: React.FC<{
           <div className="w-full bg-neutral-200 rounded-full h-2">
             <div 
               className={`h-2 rounded-full transition-all ${
-                summary.completionPercentage >= 100 
+                (summary.completionPercentage || 0) >= 100 
                   ? 'bg-green-500' 
-                  : summary.completionPercentage >= 80
+                  : (summary.completionPercentage || 0) >= 80
                   ? 'bg-yellow-500'
                   : 'bg-red-500'
               }`}
-              style={{ width: `${Math.min(summary.completionPercentage, 100)}%` }}
+              style={{ width: `${Math.min(summary.completionPercentage || 0, 100)}%` }}
             />
           </div>
           
@@ -554,7 +557,7 @@ const DayCard: React.FC<{
           )}
           
           {/* Quick add button for days with low completion */}
-          {!hasGaps && summary.completionPercentage < 80 && (
+          {!hasGaps && (summary.completionPercentage || 0) < 80 && (
             <button
               onClick={() => onOpenQuickEntry(summary.date)}
               className="flex items-center justify-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
