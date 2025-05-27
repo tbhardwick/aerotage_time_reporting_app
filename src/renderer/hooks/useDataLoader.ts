@@ -25,8 +25,18 @@ export const useDataLoader = () => {
       setLoading('timeEntries', true);
       setError('timeEntries', null);
       const timeEntries = await apiClient.getTimeEntries(filters);
-      console.log('✅ Time entries loaded:', timeEntries);
-      const validTimeEntries = Array.isArray(timeEntries) ? timeEntries : [];
+      console.log('✅ Raw time entries response:', timeEntries);
+      
+      // Handle paginated response format: {items: [...], pagination: {...}}
+      let validTimeEntries = [];
+      if (Array.isArray(timeEntries)) {
+        validTimeEntries = timeEntries;
+      } else if (timeEntries && typeof timeEntries === 'object' && Array.isArray((timeEntries as any).items)) {
+        validTimeEntries = (timeEntries as any).items;
+        console.log('✅ Extracted time entries from paginated response:', validTimeEntries.length, 'items');
+      }
+      
+      console.log('✅ Valid time entries to dispatch:', validTimeEntries.length, 'items');
       dispatch({ type: 'SET_TIME_ENTRIES', payload: validTimeEntries });
     } catch (error: any) {
       console.error('❌ Failed to load time entries:', error);
@@ -46,10 +56,17 @@ export const useDataLoader = () => {
       const projects = await apiClient.getProjects(filters);
       console.log('✅ Raw projects response:', projects);
       console.log('✅ Projects type:', typeof projects, Array.isArray(projects));
-      console.log('✅ Projects length:', Array.isArray(projects) ? projects.length : 'N/A');
       
-      const validProjects = Array.isArray(projects) ? projects : [];
-      console.log('✅ Valid projects to dispatch:', validProjects);
+      // Handle paginated response format: {items: [...], pagination: {...}}
+      let validProjects = [];
+      if (Array.isArray(projects)) {
+        validProjects = projects;
+      } else if (projects && typeof projects === 'object' && Array.isArray((projects as any).items)) {
+        validProjects = (projects as any).items;
+        console.log('✅ Extracted projects from paginated response:', validProjects.length, 'items');
+      }
+      
+      console.log('✅ Valid projects to dispatch:', validProjects.length, 'items');
       
       dispatch({ type: 'SET_PROJECTS', payload: validProjects });
       console.log('✅ Projects dispatched to context');
@@ -76,10 +93,17 @@ export const useDataLoader = () => {
       const clients = await apiClient.getClients();
       console.log('✅ Raw clients response:', clients);
       console.log('✅ Clients type:', typeof clients, Array.isArray(clients));
-      console.log('✅ Clients length:', Array.isArray(clients) ? clients.length : 'N/A');
       
-      const validClients = Array.isArray(clients) ? clients : [];
-      console.log('✅ Valid clients to dispatch:', validClients);
+      // Handle paginated response format: {items: [...], pagination: {...}}
+      let validClients = [];
+      if (Array.isArray(clients)) {
+        validClients = clients;
+      } else if (clients && typeof clients === 'object' && Array.isArray((clients as any).items)) {
+        validClients = (clients as any).items;
+        console.log('✅ Extracted clients from paginated response:', validClients.length, 'items');
+      }
+      
+      console.log('✅ Valid clients to dispatch:', validClients.length, 'items');
       
       dispatch({ type: 'SET_CLIENTS', payload: validClients });
       console.log('✅ Clients dispatched to context');
@@ -103,8 +127,18 @@ export const useDataLoader = () => {
       setLoading('users', true);
       setError('users', null);
       const users = await apiClient.getUsers();
-      console.log('✅ Users loaded:', users);
-      const validUsers = Array.isArray(users) ? users : [];
+      console.log('✅ Raw users response:', users);
+      
+      // Handle paginated response format: {items: [...], pagination: {...}}
+      let validUsers = [];
+      if (Array.isArray(users)) {
+        validUsers = users;
+      } else if (users && typeof users === 'object' && Array.isArray((users as any).items)) {
+        validUsers = (users as any).items;
+        console.log('✅ Extracted users from paginated response:', validUsers.length, 'items');
+      }
+      
+      console.log('✅ Valid users to dispatch:', validUsers.length, 'items');
       dispatch({ type: 'SET_USERS', payload: validUsers });
     } catch (error: any) {
       console.error('❌ Failed to load users:', error);
@@ -121,8 +155,18 @@ export const useDataLoader = () => {
       setLoading('invoices', true);
       setError('invoices', null);
       const invoices = await apiClient.getInvoices(filters);
-      console.log('✅ Invoices loaded:', invoices);
-      const validInvoices = Array.isArray(invoices) ? invoices : [];
+      console.log('✅ Raw invoices response:', invoices);
+      
+      // Handle paginated response format: {items: [...], pagination: {...}}
+      let validInvoices = [];
+      if (Array.isArray(invoices)) {
+        validInvoices = invoices;
+      } else if (invoices && typeof invoices === 'object' && Array.isArray((invoices as any).items)) {
+        validInvoices = (invoices as any).items;
+        console.log('✅ Extracted invoices from paginated response:', validInvoices.length, 'items');
+      }
+      
+      console.log('✅ Valid invoices to dispatch:', validInvoices.length, 'items');
       dispatch({ type: 'SET_INVOICES', payload: validInvoices });
     } catch (error: any) {
       console.error('❌ Failed to load invoices:', error);

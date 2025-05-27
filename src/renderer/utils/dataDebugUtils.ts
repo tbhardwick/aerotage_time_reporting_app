@@ -9,7 +9,15 @@ export const dataDebugUtils = {
       const clients = await apiClient.getClients();
       console.log('✅ Clients API response:', clients);
       console.log('✅ Type:', typeof clients, 'Array:', Array.isArray(clients));
-      console.log('✅ Length:', Array.isArray(clients) ? clients.length : 'N/A');
+      
+      if (Array.isArray(clients)) {
+        console.log('✅ Direct array length:', clients.length);
+      } else if (clients && typeof clients === 'object' && Array.isArray((clients as any).items)) {
+        console.log('✅ Paginated response - items length:', (clients as any).items.length);
+        console.log('✅ Pagination info:', (clients as any).pagination);
+      } else {
+        console.log('✅ Length: N/A');
+      }
       return clients;
     } catch (error) {
       console.error('❌ Clients API failed:', error);
@@ -23,7 +31,15 @@ export const dataDebugUtils = {
       const projects = await apiClient.getProjects();
       console.log('✅ Projects API response:', projects);
       console.log('✅ Type:', typeof projects, 'Array:', Array.isArray(projects));
-      console.log('✅ Length:', Array.isArray(projects) ? projects.length : 'N/A');
+      
+      if (Array.isArray(projects)) {
+        console.log('✅ Direct array length:', projects.length);
+      } else if (projects && typeof projects === 'object' && Array.isArray((projects as any).items)) {
+        console.log('✅ Paginated response - items length:', (projects as any).items.length);
+        console.log('✅ Pagination info:', (projects as any).pagination);
+      } else {
+        console.log('✅ Length: N/A');
+      }
       return projects;
     } catch (error) {
       console.error('❌ Projects API failed:', error);
@@ -37,7 +53,15 @@ export const dataDebugUtils = {
       const timeEntries = await apiClient.getTimeEntries();
       console.log('✅ Time entries API response:', timeEntries);
       console.log('✅ Type:', typeof timeEntries, 'Array:', Array.isArray(timeEntries));
-      console.log('✅ Length:', Array.isArray(timeEntries) ? timeEntries.length : 'N/A');
+      
+      if (Array.isArray(timeEntries)) {
+        console.log('✅ Direct array length:', timeEntries.length);
+      } else if (timeEntries && typeof timeEntries === 'object' && Array.isArray((timeEntries as any).items)) {
+        console.log('✅ Paginated response - items length:', (timeEntries as any).items.length);
+        console.log('✅ Pagination info:', (timeEntries as any).pagination);
+      } else {
+        console.log('✅ Length: N/A');
+      }
       return timeEntries;
     } catch (error) {
       console.error('❌ Time entries API failed:', error);
@@ -148,8 +172,16 @@ export const dataDebugUtils = {
       // If no clientId provided, try to get one from existing clients
       if (!clientId) {
         const clients = await this.testClients();
-        if (Array.isArray(clients) && clients.length > 0) {
-          clientId = clients[0].id;
+        let clientsArray = [];
+        
+        if (Array.isArray(clients)) {
+          clientsArray = clients;
+        } else if (clients && typeof clients === 'object' && Array.isArray((clients as any).items)) {
+          clientsArray = (clients as any).items;
+        }
+        
+        if (clientsArray.length > 0) {
+          clientId = clientsArray[0].id;
         } else {
           console.log('No clients found, creating one first...');
           const newClient = await this.createTestClient();
