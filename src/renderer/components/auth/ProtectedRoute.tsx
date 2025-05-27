@@ -5,6 +5,7 @@ import { LoginForm } from './LoginForm';
 import { useAppContext } from '../../context/AppContext';
 import { decodeJWTPayload } from '../../utils/jwt';
 import { clearBootstrapErrorIfLoggedIn } from '../../utils/bootstrapUtils';
+import { useDataLoader } from '../../hooks/useDataLoader';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const { state, dispatch } = useAppContext();
+  const { loadCurrentUser } = useDataLoader();
 
   useEffect(() => {
     checkAuthStatus();
@@ -45,44 +47,54 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       console.log('🔍 User ID from token:', userId);
       console.log('🔍 Email from token:', email);
       
-      // Create user object for context
-      const user = {
-        id: userId,
-        email: email,
-        name: name,
-        role: 'employee' as const, // Default role, will be updated from API
-        hourlyRate: 50,
-        teamId: undefined,
-        department: undefined,
-        isActive: true,
-        contactInfo: {},
-        profilePicture: undefined,
-        jobTitle: undefined,
-        startDate: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        permissions: {
-          features: ['timeTracking', 'approvals', 'reporting'],
-          projects: [],
-        },
-        preferences: {
-          theme: 'light' as const,
-          notifications: true,
-          timezone: 'UTC',
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: 'system',
-      };
-      
-      console.log('✅ Setting user in context:', user);
-      
-      // Set user in context
-      dispatch({ type: 'SET_USER', payload: user });
+      // Try to load real user data from API
+      try {
+        console.log('🔄 Loading real user data from API...');
+        const realUserData = await loadCurrentUser();
+        console.log('✅ Real user data loaded:', realUserData);
+        setIsAuthenticated(true);
+      } catch (apiError: any) {
+        console.warn('⚠️ Failed to load user data from API, using fallback:', apiError.message);
+        
+        // Create fallback user object for context if API fails
+        const fallbackUser = {
+          id: userId,
+          email: email,
+          name: name,
+          role: 'employee' as const, // Default role when API is unavailable
+          hourlyRate: 50,
+          teamId: undefined,
+          department: undefined,
+          isActive: true,
+          contactInfo: {},
+          profilePicture: undefined,
+          jobTitle: undefined,
+          startDate: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+          permissions: {
+            features: ['timeTracking', 'approvals', 'reporting'],
+            projects: [],
+          },
+          preferences: {
+            theme: 'light' as const,
+            notifications: true,
+            timezone: 'UTC',
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          createdBy: 'system',
+        };
+        
+        console.log('⚠️ Setting fallback user in context:', fallbackUser);
+        
+        // Set fallback user in context
+        dispatch({ type: 'SET_USER', payload: fallbackUser });
+        setIsAuthenticated(true);
+      }
       
       // Clear any old bootstrap errors since user is successfully authenticated
       clearBootstrapErrorIfLoggedIn();
       
-      setIsAuthenticated(true);
     } catch (error) {
       console.error('❌ Authentication failed:', error);
       setIsAuthenticated(false);

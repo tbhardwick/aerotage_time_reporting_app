@@ -6,11 +6,12 @@ import { useDataLoader } from '../../hooks/useDataLoader';
 const WorkflowTestPanel: React.FC = () => {
   const { state } = useAppContext();
   const { createTimeEntry, submitTimeEntries, approveTimeEntries } = useApiOperations();
-  const { loadTimeEntries } = useDataLoader();
+  const { loadTimeEntries, loadCurrentUser } = useDataLoader();
   const [isCreating, setIsCreating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isRefreshingUser, setIsRefreshingUser] = useState(false);
   const [testResults, setTestResults] = useState<string[]>([]);
 
   const addResult = (message: string) => {
@@ -113,12 +114,27 @@ const WorkflowTestPanel: React.FC = () => {
   const refreshData = async () => {
     setIsRefreshing(true);
     try {
+      addResult('🔄 Refreshing time entries from backend...');
       await loadTimeEntries();
-      addResult('✅ Refreshed time entries data from backend');
+      addResult('✅ Time entries refreshed successfully');
     } catch (error: any) {
       addResult(`❌ Failed to refresh data: ${error.message}`);
     } finally {
       setIsRefreshing(false);
+    }
+  };
+
+  const refreshCurrentUser = async () => {
+    setIsRefreshingUser(true);
+    try {
+      addResult('🔄 Refreshing current user data from API...');
+      const userData = await loadCurrentUser();
+      addResult(`✅ Current user refreshed: ${userData.name} (${userData.role})`);
+      addResult(`📊 User permissions: ${userData.permissions.features.join(', ')}`);
+    } catch (error: any) {
+      addResult(`❌ Failed to refresh user data: ${error.message}`);
+    } finally {
+      setIsRefreshingUser(false);
     }
   };
 
@@ -273,6 +289,14 @@ const WorkflowTestPanel: React.FC = () => {
             className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+          </button>
+
+          <button
+            onClick={refreshCurrentUser}
+            disabled={isRefreshingUser}
+            className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isRefreshingUser ? 'Refreshing...' : 'Refresh User Role'}
           </button>
         </div>
         
