@@ -1,12 +1,18 @@
 export const awsConfig = {
-  // API Gateway
-  apiGatewayUrl: 'https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev',
+  // API Gateway - Updated with custom domain
+  apiGatewayUrl: 'https://time-api-dev.aerotage.com',
   
-  // Cognito Authentication
+  // Backup API URL (fallback)
+  backupApiUrl: 'https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev',
+  
+  // Cognito Authentication - Updated with provided configuration
   region: 'us-east-1',
   userPoolId: 'us-east-1_EsdlgX9Qg',
   userPoolClientId: '148r35u6uultp1rmfdu22i8amb',
   identityPoolId: 'us-east-1:d79776bb-4b8e-4654-a10a-a45b1adaa787',
+  
+  // Health check endpoint
+  healthCheckEndpoint: '/health',
   
   // Password reset configuration
   passwordResetConfig: {

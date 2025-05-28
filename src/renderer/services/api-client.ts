@@ -2,6 +2,7 @@ import { get, post, put, del } from 'aws-amplify/api';
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import { authErrorHandler } from './authErrorHandler';
 import { decodeJWTPayload } from '../utils/jwt';
+import { healthCheckService, type HealthCheckResponse, type APIConnectionStatus } from './health-check';
 
 export interface TimeEntry {
   id: string;
@@ -1247,8 +1248,20 @@ class AerotageApiClient {
   }
 
   async createQuickTimeEntry(entry: QuickTimeEntryRequest): Promise<TimeEntry> {
-    console.log('⚡ API Client - Creating quick time entry:', entry);
     return this.request<TimeEntry>('POST', '/time-entries/quick-add', { body: entry });
+  }
+
+  // Health Check API
+  async checkAPIHealth(useBackup: boolean = false): Promise<HealthCheckResponse> {
+    return healthCheckService.checkAPIHealth(useBackup);
+  }
+
+  async testAPIConnectivity(): Promise<{
+    primary: APIConnectionStatus;
+    backup: APIConnectionStatus;
+    recommendedEndpoint: string;
+  }> {
+    return healthCheckService.testConnectivity();
   }
 }
 

@@ -4,6 +4,7 @@ import { Amplify } from 'aws-amplify';
 import { signOut } from 'aws-amplify/auth';
 import { AppProvider } from './context/AppContext';
 import { DataInitializer } from './components/common/DataInitializer';
+import { HealthStatus } from './components/common/HealthStatus';
 import TimeTrackingEnhanced from './pages/TimeTrackingEnhanced';
 import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
@@ -156,7 +157,10 @@ const Navigation: React.FC = () => {
             </div>
 
             {/* Desktop Sign Out */}
-            <div className="hidden lg:flex lg:items-center" style={{ WebkitAppRegion: 'no-drag' } as any}>
+            <div className="hidden lg:flex lg:items-center lg:space-x-4" style={{ WebkitAppRegion: 'no-drag' } as any}>
+              {/* API Health Status */}
+              <HealthStatus className="text-sm" />
+              
               <button
                 onClick={handleLogout}
                 className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
@@ -222,6 +226,11 @@ const Navigation: React.FC = () => {
           <NavLink to="/settings" icon="⚙️">Settings</NavLink>
         </div>
         <div className="border-t border-gray-700 pt-2 mt-2">
+          {/* API Health Status for Mobile */}
+          <div className="px-3 py-2">
+            <HealthStatus className="text-sm" />
+          </div>
+          
           <button
             onClick={() => {
               setIsMobileMenuOpen(false);
