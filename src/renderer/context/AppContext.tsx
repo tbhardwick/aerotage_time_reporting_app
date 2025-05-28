@@ -229,7 +229,6 @@ type AppAction =
   | { type: 'SET_USER'; payload: AppState['user'] }
   | { type: 'ADD_USER'; payload: User }
   | { type: 'UPDATE_USER'; payload: { id: string; updates: Partial<User> } }
-  | { type: 'DELETE_USER'; payload: string }
   | { type: 'SET_USERS'; payload: User[] }
   
   // Team Actions
@@ -282,7 +281,6 @@ const initialState: AppState = {
         permissions: {
           canCreateUsers: true,
           canEditUsers: true,
-          canDeleteUsers: true,
           canViewAllReports: true,
         }
       },
@@ -291,7 +289,6 @@ const initialState: AppState = {
         permissions: {
           canCreateUsers: false,
           canEditUsers: false,
-          canDeleteUsers: false,
           canViewAllReports: false,
         }
       },
@@ -300,7 +297,6 @@ const initialState: AppState = {
         permissions: {
           canCreateUsers: false,
           canEditUsers: false,
-          canDeleteUsers: false,
           canViewAllReports: false,
         }
       }
@@ -596,12 +592,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
             ? { ...user, ...action.payload.updates, updatedAt: new Date().toISOString() }
             : user
         ),
-      };
-
-    case 'DELETE_USER':
-      return {
-        ...state,
-        users: state.users.filter(user => user.id !== action.payload),
       };
 
     case 'SET_USERS':

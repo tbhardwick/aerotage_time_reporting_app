@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import SettingsLayout from '../components/settings/SettingsLayout';
-import { ProfileSettings, PreferencesSettings, SecuritySettings, NotificationSettings } from '../components/settings';
+import ProfileSettings from '../components/settings/ProfileSettings';
+import PreferencesSettings from '../components/settings/PreferencesSettings';
+import SecuritySettings from '../components/settings/SecuritySettings';
+import NotificationSettings from '../components/settings/NotificationSettings';
+import DeveloperSettings from '../components/settings/DeveloperSettings';
 import { HealthStatus } from '../components/common/HealthStatus';
-import ApiIntegrationTest from '../components/common/ApiIntegrationTest';
-import WorkflowTestPanel from '../components/common/WorkflowTestPanel';
-import AdminBootstrap from '../components/common/AdminBootstrap';
 
-const Settings: React.FC = () => {
+export const Settings: React.FC = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('profile');
+
+  // Handle URL parameters for direct tab navigation
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tabParam = urlParams.get('tab');
+    
+    if (tabParam) {
+      const validTabs = ['profile', 'preferences', 'security', 'notifications', 'api-health', 'developer'];
+      if (validTabs.includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    }
+  }, [location.search]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -23,52 +39,21 @@ const Settings: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">API Health Status</h2>
-              <p className="text-gray-600 mb-6">
-                Monitor the health and performance of API connections. This helps ensure optimal application performance and connectivity.
+              <h3 className="text-lg font-medium text-gray-900 mb-2">API Health Status</h3>
+              <p className="text-gray-600 mb-4">
+                Monitor the health and performance of the Aerotage Time Reporting API.
               </p>
             </div>
-            <HealthStatus showDetails={true} className="max-w-4xl" />
+            <HealthStatus 
+              showDetails={true} 
+              autoRefresh={true} 
+              refreshInterval={30000}
+              className="w-full"
+            />
           </div>
         );
       case 'developer':
-        return (
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Developer Tools</h2>
-              <p className="text-gray-600 mb-6">
-                Development and testing tools for API integration, workflow testing, and system administration.
-              </p>
-            </div>
-            
-            {/* API Integration Test */}
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <span className="text-xl mr-2">🧪</span>
-                API Integration Test
-              </h3>
-              <ApiIntegrationTest />
-            </div>
-            
-            {/* Workflow Test */}
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <span className="text-xl mr-2">🔄</span>
-                Workflow Test
-              </h3>
-              <WorkflowTestPanel />
-            </div>
-            
-            {/* Admin Bootstrap */}
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <span className="text-xl mr-2">🛠️</span>
-                Admin Bootstrap
-              </h3>
-              <AdminBootstrap />
-            </div>
-          </div>
-        );
+        return <DeveloperSettings />;
       default:
         return <ProfileSettings />;
     }

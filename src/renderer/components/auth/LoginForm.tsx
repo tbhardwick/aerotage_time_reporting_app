@@ -19,6 +19,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [rememberUsername, setRememberUsername] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [requireNewPassword, setRequireNewPassword] = useState(false);
@@ -32,6 +33,37 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const newPasswordRef = useRef<HTMLInputElement>(null);
   const resetEmailRef = useRef<HTMLInputElement>(null);
   const resetCodeRef = useRef<HTMLInputElement>(null);
+
+  // Load remembered username on component mount
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedUsername');
+    const shouldRemember = localStorage.getItem('rememberUsername') !== 'false';
+    
+    console.log('🔍 Loading remembered username:', {
+      rememberedEmail,
+      rememberPreference: localStorage.getItem('rememberUsername'),
+      shouldRemember
+    });
+    
+    if (rememberedEmail && shouldRemember) {
+      setEmail(rememberedEmail);
+      setRememberUsername(true);
+      console.log('✅ Email pre-filled:', rememberedEmail);
+    } else {
+      setRememberUsername(shouldRemember);
+      console.log('📝 No email to pre-fill, checkbox set to:', shouldRemember);
+    }
+  }, []);
+
+  // Save/clear remembered username when checkbox changes
+  useEffect(() => {
+    localStorage.setItem('rememberUsername', rememberUsername.toString());
+    
+    if (!rememberUsername) {
+      localStorage.removeItem('rememberedUsername');
+    }
+    // Note: Don't save email here - only save on successful login
+  }, [rememberUsername]);
 
   // Focus management effects
   useEffect(() => {
@@ -132,6 +164,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const handleSuccessfulLogin = async () => {
     console.log('🚀 handleSuccessfulLogin called');
     try {
+      // Save username if remember is enabled
+      if (rememberUsername && email) {
+        localStorage.setItem('rememberedUsername', email);
+        console.log('💾 Username saved for next login:', email);
+        console.log('📋 Current localStorage state:', {
+          rememberedUsername: localStorage.getItem('rememberedUsername'),
+          rememberUsername: localStorage.getItem('rememberUsername')
+        });
+      } else {
+        console.log('⏭️ Username not saved - rememberUsername:', rememberUsername, 'email:', email);
+      }
+
       // Step 1: Get user information from Cognito and JWT token
       console.log('👤 Getting current user information...');
       const user = await getCurrentUser();
@@ -607,6 +651,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your password"
               />
+            </div>
+            
+            {/* Remember Username Checkbox */}
+            <div className="flex items-center">
+              <input
+                id="remember-username"
+                name="remember-username"
+                type="checkbox"
+                checked={rememberUsername}
+                onChange={(e) => setRememberUsername(e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-username" className="ml-2 block text-sm text-gray-700">
+                Remember my email address
+              </label>
             </div>
           </div>
 

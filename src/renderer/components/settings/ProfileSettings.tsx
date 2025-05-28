@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { useUserProfile } from '../../hooks';
 import { UpdateUserProfileRequest } from '../../types/user-profile-api';
+import { EmailChangeButton } from './EmailChangeButton';
+import { EmailChangeModal } from './EmailChangeModal';
+import { EmailChangeStatus, EmailChangeRequest } from './EmailChangeStatus';
 
 interface ProfileFormData {
   name: string;
@@ -41,6 +44,8 @@ const ProfileSettings: React.FC = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showEmailChangeModal, setShowEmailChangeModal] = useState(false);
+  const [activeEmailChangeRequest, setActiveEmailChangeRequest] = useState<EmailChangeRequest | null>(null);
 
   // Debug logging
   useEffect(() => {
@@ -69,6 +74,43 @@ const ProfileSettings: React.FC = () => {
       });
     }
   }, [profile]);
+
+  // Load active email change request on component mount
+  useEffect(() => {
+    if (user?.id) {
+      loadActiveEmailChangeRequest();
+    }
+  }, [user?.id]);
+
+  const loadActiveEmailChangeRequest = async () => {
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/users/${user?.id}/email-change-requests`);
+      // const data = await response.json();
+      // const activeRequest = data.find(req => ['pending_verification', 'pending_approval', 'approved'].includes(req.status));
+      // setActiveEmailChangeRequest(activeRequest || null);
+      
+      // Mock data for development
+      const mockRequest: EmailChangeRequest = {
+        id: 'mock-request-1',
+        currentEmail: formData.email,
+        newEmail: 'new.email@example.com',
+        status: 'pending_verification',
+        reason: 'personal_preference',
+        requestedAt: new Date().toISOString(),
+        verificationStatus: {
+          currentEmailVerified: false,
+          newEmailVerified: false
+        },
+        estimatedCompletionTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+      // Uncomment to test with mock data
+      // setActiveEmailChangeRequest(mockRequest);
+    } catch (error) {
+      console.error('Failed to load email change requests:', error);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -145,6 +187,111 @@ const ProfileSettings: React.FC = () => {
     }
     setIsEditing(false);
     setMessage(null);
+  };
+
+  const handleEmailChangeRequest = () => {
+    setShowEmailChangeModal(true);
+  };
+
+  const handleEmailChangeSubmit = async (newEmail: string, reason: string, customReason?: string) => {
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/users/${user?.id}/email-change-request`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ newEmail, reason, customReason })
+      // });
+      // 
+      // if (!response.ok) {
+      //   throw new Error('Failed to submit email change request');
+      // }
+      // 
+      // const data = await response.json();
+      
+      // Mock successful submission
+      console.log('📧 Email change request submitted:', { newEmail, reason, customReason });
+      
+      // Create mock request for UI
+      const mockRequest: EmailChangeRequest = {
+        id: 'new-request-' + Date.now(),
+        currentEmail: formData.email,
+        newEmail,
+        status: 'pending_verification',
+        reason,
+        customReason,
+        requestedAt: new Date().toISOString(),
+        verificationStatus: {
+          currentEmailVerified: false,
+          newEmailVerified: false
+        },
+        estimatedCompletionTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+      setActiveEmailChangeRequest(mockRequest);
+      setMessage({ 
+        type: 'success', 
+        text: 'Email change request submitted successfully! Please check your email addresses for verification links.' 
+      });
+      
+    } catch (error) {
+      console.error('Failed to submit email change request:', error);
+      throw error; // Re-throw to let the modal handle the error
+    }
+  };
+
+  const handleCancelEmailChangeRequest = async (requestId: string) => {
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/email-change-requests/${requestId}/cancel`, {
+      //   method: 'DELETE'
+      // });
+      // 
+      // if (!response.ok) {
+      //   throw new Error('Failed to cancel email change request');
+      // }
+      
+      console.log('❌ Email change request cancelled:', requestId);
+      setActiveEmailChangeRequest(null);
+      setMessage({ 
+        type: 'success', 
+        text: 'Email change request cancelled successfully.' 
+      });
+      
+    } catch (error) {
+      console.error('Failed to cancel email change request:', error);
+      setMessage({ 
+        type: 'error', 
+        text: 'Failed to cancel email change request. Please try again.' 
+      });
+    }
+  };
+
+  const handleResendVerification = async (requestId: string, emailType: 'current' | 'new') => {
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/email-change-requests/${requestId}/resend-verification`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ emailType })
+      // });
+      // 
+      // if (!response.ok) {
+      //   throw new Error('Failed to resend verification email');
+      // }
+      
+      console.log('📧 Verification email resent:', { requestId, emailType });
+      setMessage({ 
+        type: 'success', 
+        text: `Verification email resent to your ${emailType} email address.` 
+      });
+      
+    } catch (error) {
+      console.error('Failed to resend verification email:', error);
+      setMessage({ 
+        type: 'error', 
+        text: 'Failed to resend verification email. Please try again.' 
+      });
+    }
   };
 
   // Show loading state
@@ -349,6 +496,15 @@ const ProfileSettings: React.FC = () => {
         </div>
       )}
 
+      {/* Active Email Change Request */}
+      {activeEmailChangeRequest && (
+        <EmailChangeStatus
+          request={activeEmailChangeRequest}
+          onCancelRequest={handleCancelEmailChangeRequest}
+          onResendVerification={handleResendVerification}
+        />
+      )}
+
       {/* Profile Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
@@ -391,6 +547,17 @@ const ProfileSettings: React.FC = () => {
                 className="w-full px-3 py-2 border border-neutral-200 bg-neutral-50 rounded-lg text-sm text-neutral-500"
               />
               <p className="text-xs text-neutral-500 mt-1">Email cannot be changed here</p>
+              
+              {/* Email Change Button */}
+              {!activeEmailChangeRequest && (
+                <div className="mt-3">
+                  <EmailChangeButton
+                    currentEmail={formData.email}
+                    onEmailChangeRequest={handleEmailChangeRequest}
+                    hasActiveRequest={false}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -558,6 +725,14 @@ const ProfileSettings: React.FC = () => {
           </div>
         )}
       </form>
+
+      {/* Email Change Modal */}
+      <EmailChangeModal
+        isOpen={showEmailChangeModal}
+        onClose={() => setShowEmailChangeModal(false)}
+        currentEmail={formData.email}
+        onSubmit={handleEmailChangeSubmit}
+      />
     </div>
   );
 };

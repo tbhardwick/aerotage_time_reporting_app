@@ -1,5 +1,4 @@
 import { awsConfig } from '../config/aws-config';
-import { get } from 'aws-amplify/api';
 
 export interface HealthCheckResponse {
   success: boolean;
@@ -25,7 +24,7 @@ class HealthCheckService {
   private readonly CACHE_DURATION = 30000; // 30 seconds cache
 
   /**
-   * Test API connectivity using the health check endpoint with AWS Amplify API
+   * Test API connectivity using the public health check endpoint
    */
   async checkAPIHealth(useBackup: boolean = false): Promise<HealthCheckResponse> {
     const now = Date.now();
@@ -37,51 +36,38 @@ class HealthCheckService {
     }
 
     const endpoint = useBackup ? awsConfig.backupApiUrl : awsConfig.apiGatewayUrl;
-    console.log(`🏥 Starting health check for ${endpoint} using Amplify API...`);
+    const healthUrl = `${endpoint}${awsConfig.healthCheckEndpoint}`;
+
+    console.log(`🏥 Starting health check for ${endpoint}...`);
 
     try {
       const startTime = performance.now();
       
-      // Use AWS Amplify API client which handles CORS and authentication
-      const response = await get({
-        apiName: 'AerotageAPI', // This matches the API name in aws-config
-        path: awsConfig.healthCheckEndpoint,
-        options: {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      }).response;
+      // Use simple fetch since the endpoint is now public (no authentication required)
+      const response = await fetch(healthUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
 
       const endTime = performance.now();
       const responseTime = Math.round(endTime - startTime);
 
-      console.log(`📡 Health check response via Amplify: ${response.statusCode} (${responseTime}ms)`);
+      console.log(`📡 Health check response: ${response.status} ${response.statusText} (${responseTime}ms)`);
 
-      if (response.statusCode !== 200) {
-        // Handle specific HTTP status codes
-        if (response.statusCode === 401) {
-          console.error('🚫 Authentication required - token may be expired');
-          throw new Error('Authentication required - please log in again');
-        } else if (response.statusCode === 403) {
-          console.error('🚫 Access forbidden - insufficient permissions');
-          throw new Error('Access forbidden - insufficient permissions');
-        } else {
-          console.error(`❌ HTTP error: ${response.statusCode}`);
-          throw new Error(`HTTP ${response.statusCode}: API request failed`);
-        }
+      if (!response.ok) {
+        console.error(`❌ HTTP error: ${response.status} ${response.statusText}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.body.json();
-      console.log('📊 Health check data received via Amplify:', data);
+      const data = await response.json();
+      console.log('📊 Health check data received:', data);
       
-      // Type the response data properly
-      const healthData = data as {
-        status?: string;
-        version?: string;
-        environment?: string;
-        uptime?: number;
-      };
+      // Handle the standard API format with success boolean and data object
+      const healthData = data.success && data.data ? data.data : data;
       
       const healthResult: HealthCheckResponse = {
         success: true,
@@ -112,7 +98,7 @@ class HealthCheckService {
       console.error('🔍 Health check error details:', {
         errorType: error?.constructor?.name,
         errorMessage: error instanceof Error ? error.message : 'Unknown error',
-        endpoint: `${endpoint}${awsConfig.healthCheckEndpoint}`
+        endpoint: healthUrl
       });
       
       return healthResult;
@@ -120,58 +106,82 @@ class HealthCheckService {
   }
 
   /**
-   * Test connectivity to both primary and backup endpoints using Amplify API
+   * Test connectivity to both primary and backup endpoints
    */
   async testConnectivity(): Promise<{
     primary: APIConnectionStatus;
     backup: APIConnectionStatus;
     recommendedEndpoint: string;
   }> {
-    // For now, just test the primary endpoint since Amplify handles the endpoint selection
-    const primaryResult = await this.testEndpointViaAmplify();
+    const results = await Promise.allSettled([
+      this.testEndpoint(awsConfig.apiGatewayUrl),
+      this.testEndpoint(awsConfig.backupApiUrl),
+    ]);
+
+    const primary: APIConnectionStatus = results[0].status === 'fulfilled' 
+      ? results[0].value 
+      : {
+          isConnected: false,
+          endpoint: awsConfig.apiGatewayUrl,
+          responseTime: 0,
+          lastChecked: new Date().toISOString(),
+          error: results[0].status === 'rejected' ? results[0].reason?.message : 'Unknown error',
+        };
+
+    const backup: APIConnectionStatus = results[1].status === 'fulfilled' 
+      ? results[1].value 
+      : {
+          isConnected: false,
+          endpoint: awsConfig.backupApiUrl,
+          responseTime: 0,
+          lastChecked: new Date().toISOString(),
+          error: results[1].status === 'rejected' ? results[1].reason?.message : 'Unknown error',
+        };
+
+    // Determine recommended endpoint
+    let recommendedEndpoint = awsConfig.apiGatewayUrl; // Default to primary
     
-    // Create a mock backup result since Amplify handles failover internally
-    const backupResult: APIConnectionStatus = {
-      isConnected: false,
-      endpoint: awsConfig.backupApiUrl,
-      responseTime: 0,
-      lastChecked: new Date().toISOString(),
-      error: 'Using Amplify API - backup tested internally',
-    };
+    if (!primary.isConnected && backup.isConnected) {
+      recommendedEndpoint = awsConfig.backupApiUrl;
+    } else if (primary.isConnected && backup.isConnected) {
+      // Both are working, prefer the faster one
+      recommendedEndpoint = primary.responseTime <= backup.responseTime 
+        ? awsConfig.apiGatewayUrl 
+        : awsConfig.backupApiUrl;
+    }
 
     return {
-      primary: primaryResult,
-      backup: backupResult,
-      recommendedEndpoint: awsConfig.apiGatewayUrl,
+      primary,
+      backup,
+      recommendedEndpoint,
     };
   }
 
   /**
-   * Test endpoint using AWS Amplify API
+   * Test a specific endpoint for connectivity
    */
-  private async testEndpointViaAmplify(): Promise<APIConnectionStatus> {
+  private async testEndpoint(endpoint: string): Promise<APIConnectionStatus> {
+    const healthUrl = `${endpoint}${awsConfig.healthCheckEndpoint}`;
     const startTime = performance.now();
 
     try {
-      const response = await get({
-        apiName: 'AerotageAPI',
-        path: awsConfig.healthCheckEndpoint,
-        options: {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      }).response;
+      const response = await fetch(healthUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(5000), // 5 second timeout for connectivity test
+      });
 
       const endTime = performance.now();
       const responseTime = Math.round(endTime - startTime);
 
       return {
-        isConnected: response.statusCode === 200,
-        endpoint: awsConfig.apiGatewayUrl,
+        isConnected: response.ok,
+        endpoint,
         responseTime,
         lastChecked: new Date().toISOString(),
-        error: response.statusCode === 200 ? undefined : `HTTP ${response.statusCode}`,
+        error: response.ok ? undefined : `HTTP ${response.status}: ${response.statusText}`,
       };
 
     } catch (error) {
@@ -180,7 +190,7 @@ class HealthCheckService {
 
       return {
         isConnected: false,
-        endpoint: awsConfig.apiGatewayUrl,
+        endpoint,
         responseTime,
         lastChecked: new Date().toISOString(),
         error: error instanceof Error ? error.message : 'Unknown error',

@@ -4,7 +4,6 @@ import {
   MagnifyingGlassIcon,
   UserPlusIcon,
   PencilIcon,
-  TrashIcon,
   EyeIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -14,6 +13,7 @@ import {
   ShieldCheckIcon,
   CogIcon,
 } from '@heroicons/react/24/outline';
+import { ConfirmationDialog } from '../common/ConfirmationDialog';
 
 interface UserListProps {
   onEditUser?: (userId: string) => void;
@@ -29,6 +29,26 @@ export const UserList: React.FC<UserListProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'manager' | 'employee'>('all');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [bulkConfirmation, setBulkConfirmation] = useState<{
+    isOpen: boolean;
+    action: 'activate' | 'deactivate' | null;
+    userCount: number;
+  }>({
+    isOpen: false,
+    action: null,
+    userCount: 0,
+  });
+  const [statusToggleConfirmation, setStatusToggleConfirmation] = useState<{
+    isOpen: boolean;
+    userId: string | null;
+    userName: string;
+    currentStatus: boolean;
+  }>({
+    isOpen: false,
+    userId: null,
+    userName: '',
+    currentStatus: false,
+  });
 
   // Get team names for display
   const getTeamName = (teamId?: string) => {
@@ -66,21 +86,62 @@ export const UserList: React.FC<UserListProps> = ({
   const handleToggleUserStatus = (userId: string) => {
     const user = state.users.find(u => u.id === userId);
     if (user) {
+      // If user is currently active and we're about to deactivate them, show confirmation
+      if (user.isActive) {
+        setStatusToggleConfirmation({
+          isOpen: true,
+          userId: user.id,
+          userName: user.name || 'No Name',
+          currentStatus: user.isActive,
+        });
+      } else {
+        // Activating a user doesn't need confirmation
+        dispatch({
+          type: 'UPDATE_USER',
+          payload: {
+            id: userId,
+            updates: {
+              isActive: true,
+              updatedAt: new Date().toISOString(),
+            }
+          }
+        });
+      }
+    }
+  };
+
+  const confirmStatusToggle = () => {
+    if (statusToggleConfirmation.userId) {
       dispatch({
         type: 'UPDATE_USER',
         payload: {
-          id: userId,
+          id: statusToggleConfirmation.userId,
           updates: {
-            isActive: !user.isActive,
+            isActive: !statusToggleConfirmation.currentStatus,
             updatedAt: new Date().toISOString(),
           }
         }
       });
     }
+    setStatusToggleConfirmation({
+      isOpen: false,
+      userId: null,
+      userName: '',
+      currentStatus: false,
+    });
   };
 
   // Handle bulk operations
   const handleBulkStatusUpdate = (isActive: boolean) => {
+    setBulkConfirmation({
+      isOpen: true,
+      action: isActive ? 'activate' : 'deactivate',
+      userCount: selectedUsers.length,
+    });
+  };
+
+  const confirmBulkOperation = () => {
+    const isActive = bulkConfirmation.action === 'activate';
     selectedUsers.forEach(userId => {
       dispatch({
         type: 'UPDATE_USER',
@@ -94,6 +155,11 @@ export const UserList: React.FC<UserListProps> = ({
       });
     });
     setSelectedUsers([]);
+    setBulkConfirmation({
+      isOpen: false,
+      action: null,
+      userCount: 0,
+    });
   };
 
   // Format last login time
@@ -378,16 +444,6 @@ export const UserList: React.FC<UserListProps> = ({
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>
-                      {/* Only show delete for inactive users and not current user */}
-                      {!user.isActive && user.id !== state.user?.id && (
-                        <button
-                          onClick={() => dispatch({ type: 'DELETE_USER', payload: user.id })}
-                          className="text-red-600 hover:text-red-900 p-1 rounded"
-                          title="Delete User"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -409,6 +465,41 @@ export const UserList: React.FC<UserListProps> = ({
           </div>
         )}
       </div>
+
+      {/* Bulk Operation Confirmation Dialog */}
+      {bulkConfirmation.isOpen && (
+        <ConfirmationDialog
+          isOpen={bulkConfirmation.isOpen}
+          onClose={() => setBulkConfirmation({
+            isOpen: false,
+            action: null,
+            userCount: 0,
+          })}
+          onConfirm={confirmBulkOperation}
+          title={`${bulkConfirmation.action === 'activate' ? 'Activate' : 'Deactivate'} Users`}
+          message={`Are you sure you want to ${bulkConfirmation.action} ${bulkConfirmation.userCount} user${bulkConfirmation.userCount > 1 ? 's' : ''}?`}
+          confirmText={`${bulkConfirmation.action === 'activate' ? 'Activate' : 'Deactivate'} Users`}
+          type={bulkConfirmation.action === 'deactivate' ? 'warning' : 'info'}
+        />
+      )}
+
+      {/* Status Toggle Confirmation Dialog */}
+      {statusToggleConfirmation.isOpen && (
+        <ConfirmationDialog
+          isOpen={statusToggleConfirmation.isOpen}
+          onClose={() => setStatusToggleConfirmation({
+            isOpen: false,
+            userId: null,
+            userName: '',
+            currentStatus: false,
+          })}
+          onConfirm={confirmStatusToggle}
+          title="Deactivate User"
+          message={`Are you sure you want to deactivate "${statusToggleConfirmation.userName}"? They will lose access to the system until reactivated.`}
+          confirmText="Deactivate User"
+          type="warning"
+        />
+      )}
     </div>
   );
 };

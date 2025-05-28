@@ -13,7 +13,7 @@ interface HealthStatusProps {
 export const HealthStatus: React.FC<HealthStatusProps> = ({
   showDetails = false,
   className = '',
-  autoRefresh = false, // Temporarily disabled due to CORS issues
+  autoRefresh = true, // Re-enabled now that CORS is configured
   refreshInterval = 60000, // 1 minute default
 }) => {
   const [healthStatus, setHealthStatus] = useState<HealthCheckResponse | null>(null);
@@ -28,17 +28,6 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
   const checkHealth = async () => {
     try {
       setLoading(true);
-      
-      // Temporary: Skip health check due to CORS issues
-      console.warn('⚠️ Health check temporarily disabled due to CORS configuration issues');
-      setHealthStatus({
-        success: false,
-        status: 'unknown',
-        timestamp: new Date().toISOString(),
-        message: 'Health check disabled - CORS configuration needed on API server',
-      });
-      setLastChecked(new Date());
-      return;
       
       // Check primary endpoint health
       const health = await apiClient.checkAPIHealth(false);

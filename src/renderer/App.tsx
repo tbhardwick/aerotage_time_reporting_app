@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { amplifyConfig } from './config/aws-config';
+import { UserDropdown } from './components/common/UserDropdown';
 
 // Import session test utilities for development
 import './utils/sessionTestUtils';
@@ -153,7 +154,6 @@ const Navigation: React.FC = () => {
               <NavLink to="/reports" icon="📊">Reports</NavLink>
               <NavLink to="/invoices" icon="📄">Invoices</NavLink>
               <NavLink to="/users" icon="👥">Users</NavLink>
-              <NavLink to="/settings" icon="⚙️">Settings</NavLink>
             </div>
 
             {/* Desktop Sign Out */}
@@ -161,12 +161,7 @@ const Navigation: React.FC = () => {
               {/* API Health Status */}
               <HealthStatus className="text-sm" />
               
-              <button
-                onClick={handleLogout}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-              >
-                Sign Out
-              </button>
+              <UserDropdown />
             </div>
 
             {/* Mobile menu button */}
@@ -222,25 +217,20 @@ const Navigation: React.FC = () => {
         <div onClick={() => setIsMobileMenuOpen(false)}>
           <NavLink to="/users" icon="👥">Users</NavLink>
         </div>
-        <div onClick={() => setIsMobileMenuOpen(false)}>
-          <NavLink to="/settings" icon="⚙️">Settings</NavLink>
-        </div>
         <div className="border-t border-gray-700 pt-2 mt-2">
           {/* API Health Status for Mobile */}
           <div className="px-3 py-2">
             <HealthStatus className="text-sm" />
           </div>
           
-          <button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              handleLogout();
-            }}
-            className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-sm font-medium w-full text-left transition-colors duration-200"
-          >
-            Sign Out
-          </button>
-                </div>
+          {/* Mobile User Dropdown */}
+          <div className="px-3 py-2">
+            <UserDropdown 
+              className="w-full" 
+              onMenuItemClick={() => setIsMobileMenuOpen(false)}
+            />
+          </div>
+        </div>
       </div>
     </div>
     </>
