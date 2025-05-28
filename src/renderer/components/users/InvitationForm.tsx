@@ -191,24 +191,31 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b">
+          <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
             <div>
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+              <h3 className="text-lg font-medium flex items-center" style={{ color: 'var(--text-primary)' }}>
                 <PaperAirplaneIcon className="h-5 w-5 mr-2 text-blue-500" />
                 Send User Invitation
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 Send an email invitation to a new user to join the platform
               </p>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
               disabled={isSubmitting}
             >
               <XMarkIcon className="h-6 w-6" />
@@ -243,161 +250,204 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                       </div>
                     )}
                   </div>
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={() => setSubmitError(null)}
-                      className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-md transition-colors"
-                    >
-                      Dismiss
-                    </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {submitSuccess && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <div className="flex">
+                <CheckCircleIcon className="h-5 w-5 text-green-400 mt-0.5" />
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">
+                    Invitation Sent Successfully!
+                  </h3>
+                  <div className="mt-2 text-sm text-green-700">
+                    <p>The invitation has been sent and the user will receive an email with instructions to join.</p>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
+          {/* Form Content */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Basic Information */}
-            <div className="space-y-6">
-              {/* Email & Role */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                  <EnvelopeIcon className="h-4 w-4 mr-2" />
-                  Invitation Details
-                </h4>
-                <div className="space-y-4">
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email Address *
-                    </label>
-                    <div className="mt-1 relative">
-                      <input
-                        type="email"
-                        {...register('email')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="user@company.com"
-                        disabled={isSubmitting}
-                      />
-                      <EnvelopeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                    )}
-                  </div>
-
-                  {/* Role */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Role *
-                    </label>
-                    <select
-                      {...register('role')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+            <div>
+              <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
+                <UserIcon className="h-4 w-4 mr-2" />
+                Basic Information
+              </h4>
+              
+              <div className="space-y-4">
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Email Address *
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      type="email"
+                      {...register('email')}
+                      className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--background-color)',
+                        color: 'var(--text-primary)'
+                      }}
+                      placeholder="user@company.com"
                       disabled={isSubmitting}
-                    >
-                      <option value="employee">Employee</option>
-                      <option value="manager">Manager</option>
-                      <option value="admin">Administrator</option>
-                    </select>
-                    {errors.role && (
-                      <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
-                    )}
+                    />
+                    <EnvelopeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                   </div>
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                  )}
                 </div>
-              </div>
 
-              {/* Job Information */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                  <BriefcaseIcon className="h-4 w-4 mr-2" />
-                  Job Information
-                </h4>
-                <div className="space-y-4">
-                  {/* Job Title */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Job Title
-                    </label>
-                    <div className="mt-1 relative">
-                      <input
-                        type="text"
-                        {...register('jobTitle')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Senior Designer"
-                        disabled={isSubmitting}
-                      />
-                      <BriefcaseIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                  </div>
-
-                  {/* Department */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Department
-                    </label>
-                    <div className="mt-1 relative">
-                      <input
-                        type="text"
-                        {...register('department')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Design"
-                        disabled={isSubmitting}
-                      />
-                      <BuildingOfficeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                  </div>
-
-                  {/* Team */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Team
-                    </label>
-                    <select
-                      {...register('teamId')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                      disabled={isSubmitting}
-                    >
-                      <option value="">No Team</option>
-                      {state.teams.map(team => (
-                        <option key={team.id} value={team.id}>
-                          {team.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Hourly Rate */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Hourly Rate ($)
-                    </label>
-                    <div className="mt-1 relative">
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        {...register('hourlyRate', { valueAsNumber: true })}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="100.00"
-                        disabled={isSubmitting}
-                      />
-                      <CurrencyDollarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                    {errors.hourlyRate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.hourlyRate.message}</p>
-                    )}
-                  </div>
+                {/* Role */}
+                <div>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Role *
+                  </label>
+                  <select
+                    {...register('role')}
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    <option value="employee">Employee</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Administrator</option>
+                  </select>
+                  {errors.role && (
+                    <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Permissions & Message */}
+            {/* Job Information */}
+            <div>
+              <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
+                <BriefcaseIcon className="h-4 w-4 mr-2" />
+                Job Information
+              </h4>
+              
+              <div className="space-y-4">
+                {/* Job Title */}
+                <div>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    {...register('jobTitle')}
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
+                    placeholder="e.g., Senior Developer"
+                    disabled={isSubmitting}
+                  />
+                  {errors.jobTitle && (
+                    <p className="mt-1 text-sm text-red-600">{errors.jobTitle.message}</p>
+                  )}
+                </div>
+
+                {/* Department */}
+                <div>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    {...register('department')}
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
+                    placeholder="e.g., Engineering"
+                    disabled={isSubmitting}
+                  />
+                  {errors.department && (
+                    <p className="mt-1 text-sm text-red-600">{errors.department.message}</p>
+                  )}
+                </div>
+
+                {/* Team */}
+                <div>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Team
+                  </label>
+                  <select
+                    {...register('teamId')}
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    <option value="">No Team</option>
+                    {state.teams.map(team => (
+                      <option key={team.id} value={team.id}>
+                        {team.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.teamId && (
+                    <p className="mt-1 text-sm text-red-600">{errors.teamId.message}</p>
+                  )}
+                </div>
+
+                {/* Hourly Rate */}
+                <div>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    Hourly Rate ($)
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      {...register('hourlyRate', { valueAsNumber: true })}
+                      className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--background-color)',
+                        color: 'var(--text-primary)'
+                      }}
+                      placeholder="100.00"
+                      disabled={isSubmitting}
+                    />
+                    <CurrencyDollarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
+                  </div>
+                  {errors.hourlyRate && (
+                    <p className="mt-1 text-sm text-red-600">{errors.hourlyRate.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Permissions and Message */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-6">
               {/* Permissions */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+              <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                   <ShieldCheckIcon className="h-4 w-4 mr-2" />
                   Feature Permissions
                 </h4>
@@ -411,14 +461,15 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                           checked={watchedFeatures?.includes(feature.id) || false}
                           onChange={() => handleFeatureToggle(feature.id)}
                           disabled={isSubmitting}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
+                          style={{ borderColor: 'var(--border-color)' }}
                         />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor={`feature-${feature.id}`} className="font-medium text-gray-700">
+                        <label htmlFor={`feature-${feature.id}`} className="font-medium" style={{ color: 'var(--text-primary)' }}>
                           {feature.name}
                         </label>
-                        <p className="text-gray-500">{feature.description}</p>
+                        <p style={{ color: 'var(--text-secondary)' }}>{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -426,36 +477,54 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
               </div>
 
               {/* Personal Message */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                  <UserIcon className="h-4 w-4 mr-2" />
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   Personal Message (Optional)
-                </h4>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Welcome Message
-                  </label>
-                  <textarea
-                    {...register('personalMessage')}
-                    rows={4}
-                    className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Welcome to the team! We're excited to have you join us..."
-                    disabled={isSubmitting}
-                  />
-                  {errors.personalMessage && (
-                    <p className="mt-1 text-sm text-red-600">{errors.personalMessage.message}</p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500">
-                    This message will be included in the invitation email.
-                  </p>
-                </div>
+                </label>
+                <textarea
+                  {...register('personalMessage')}
+                  className="w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)'
+                  }}
+                  rows={4}
+                  placeholder="Add a personal message to include in the invitation email..."
+                  disabled={isSubmitting}
+                />
+                {errors.personalMessage && (
+                  <p className="mt-1 text-sm text-red-600">{errors.personalMessage.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+              <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
+                <EnvelopeIcon className="h-4 w-4 mr-2" />
+                Invitation Preview
+              </h4>
+              <div className="text-sm space-y-2" style={{ color: 'var(--text-secondary)' }}>
+                <p><strong>To:</strong> {watch('email') || 'user@company.com'}</p>
+                <p><strong>Role:</strong> {watch('role')?.charAt(0).toUpperCase() + watch('role')?.slice(1)}</p>
+                {watch('jobTitle') && <p><strong>Job Title:</strong> {watch('jobTitle')}</p>}
+                {watch('department') && <p><strong>Department:</strong> {watch('department')}</p>}
+                {watch('hourlyRate') && <p><strong>Hourly Rate:</strong> ${watch('hourlyRate')}/hour</p>}
+                <p><strong>Features:</strong> {watchedFeatures?.length || 0} selected</p>
+                {watch('personalMessage') && (
+                  <div className="mt-3 p-2 rounded" style={{ backgroundColor: 'var(--background-color)' }}>
+                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Personal Message:</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>{watch('personalMessage')}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-6 border-t">
-            <div className="text-sm text-gray-500">
+          <div className="flex items-center justify-between pt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               <p>The user will receive an email invitation with instructions to join.</p>
             </div>
             <div className="flex space-x-3">
@@ -463,7 +532,18 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="px-4 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--surface-color)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                }}
               >
                 Cancel
               </button>

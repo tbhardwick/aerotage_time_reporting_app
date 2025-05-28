@@ -10,7 +10,7 @@ interface ProjectListProps {
 const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProject }) => {
   const { state, dispatch } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'completed'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused' | 'completed' | 'cancelled'>('all');
   const [clientFilter, setClientFilter] = useState<string>('all');
 
   const filteredProjects = state.projects.filter(project => {
@@ -40,14 +40,13 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
   };
 
   const toggleProjectStatus = (projectId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const newStatus = currentStatus === 'active' ? 'paused' : 'active';
     dispatch({
       type: 'UPDATE_PROJECT',
       payload: {
         id: projectId,
         updates: { 
-          status: newStatus as 'active' | 'inactive' | 'completed',
-          isActive: newStatus === 'active'
+          status: newStatus as 'active' | 'paused' | 'completed' | 'cancelled'
         }
       }
     });
@@ -57,10 +56,12 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-neutral-100 text-neutral-800';
+      case 'paused':
+        return 'bg-yellow-100 text-yellow-800';
       case 'completed':
         return 'bg-blue-100 text-blue-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-neutral-100 text-neutral-800';
     }
@@ -71,11 +72,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
     const totalMinutes = timeEntries.reduce((sum, te) => sum + te.duration, 0);
     const totalHours = totalMinutes / 60;
     
-    if (project.budget?.hours) {
+    if (project.budget?.type === 'hours') {
       return {
         hoursUsed: totalHours,
-        budgetHours: project.budget.hours,
-        percentage: Math.min((totalHours / project.budget.hours) * 100, 100),
+        budgetHours: project.budget.value,
+        percentage: Math.min((totalHours / project.budget.value) * 100, 100),
       };
     }
     
@@ -91,8 +92,8 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-neutral-900">Projects</h2>
-          <p className="text-sm text-neutral-600">Manage your projects and track progress</p>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Projects</h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage your projects and track progress</p>
         </div>
         <button
           onClick={onCreateProject}
@@ -108,14 +109,19 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
         {/* Search */}
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-neutral-400" />
+            <MagnifyingGlassIcon className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
           </div>
           <input
             type="text"
             placeholder="Search projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-10 pr-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           />
         </div>
 
@@ -124,12 +130,18 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="block w-full pl-3 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-3 pr-10 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="paused">Paused</option>
             <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
 
@@ -138,7 +150,12 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
           <select
             value={clientFilter}
             onChange={(e) => setClientFilter(e.target.value)}
-            className="block w-full pl-3 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-3 pr-10 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           >
             <option value="all">All Clients</option>
             {state.clients.map(client => (
@@ -153,12 +170,12 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
       {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-neutral-400 text-lg mb-2">
+          <div className="text-lg mb-2" style={{ color: 'var(--text-secondary)' }}>
             {searchTerm || statusFilter !== 'all' || clientFilter !== 'all' 
               ? 'No projects found' 
               : 'No projects yet'}
           </div>
-          <p className="text-neutral-600 text-sm mb-4">
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
             {searchTerm || statusFilter !== 'all' || clientFilter !== 'all'
               ? 'Try adjusting your filters'
               : 'Get started by creating your first project'}
@@ -182,15 +199,19 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
             return (
               <div
                 key={project.id}
-                className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 hover:shadow-md transition-shadow"
+                className="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+                style={{
+                  backgroundColor: 'var(--surface-color)',
+                  border: '1px solid var(--border-color)'
+                }}
               >
                 {/* Project Header */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                       {project.name}
                     </h3>
-                    <p className="text-sm text-neutral-600 mb-2">
+                    <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
                       {project.client?.name || 'Unknown Client'}
                     </p>
                     <div className="flex items-center space-x-2">
@@ -199,7 +220,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                       >
                         {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                       </span>
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                         {timeEntryCount} time entr{timeEntryCount !== 1 ? 'ies' : 'y'}
                       </span>
                     </div>
@@ -209,14 +230,32 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => onEditProject(project.id)}
-                      className="p-2 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#2563eb';
+                        e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                       title="Edit project"
                     >
                       <PencilIcon className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteProject(project.id)}
-                      className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#dc2626';
+                        e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                       title="Delete project"
                     >
                       <TrashIcon className="w-4 h-4" />
@@ -226,7 +265,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
 
                 {/* Project Description */}
                 {project.description && (
-                  <p className="text-sm text-neutral-600 mb-4 line-clamp-2">
+                  <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
                     {project.description}
                   </p>
                 )}
@@ -235,15 +274,15 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                 {project.budget && (
                   <div className="space-y-3 mb-4">
                     {/* Hours Progress */}
-                    {project.budget.hours && (
+                    {project.budget.type === 'hours' && (
                       <div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-neutral-600">Hours Used</span>
-                          <span className="font-medium">
-                            {progress.hoursUsed.toFixed(1)} / {project.budget.hours}h
+                          <span style={{ color: 'var(--text-secondary)' }}>Hours Used</span>
+                          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                            {progress.hoursUsed.toFixed(1)} / {project.budget.value}h
                           </span>
                         </div>
-                        <div className="w-full bg-neutral-200 rounded-full h-2">
+                        <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--border-color)' }}>
                           <div
                             className={`h-2 rounded-full transition-all ${
                               progress.percentage > 90 
@@ -259,11 +298,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                     )}
 
                     {/* Budget Amount */}
-                    {project.budget.amount && (
+                    {project.budget.type === 'amount' && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-neutral-600">Budget</span>
-                        <span className="font-medium">
-                          ${project.budget.amount.toLocaleString()}
+                        <span style={{ color: 'var(--text-secondary)' }}>Budget</span>
+                        <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                          ${project.budget.value.toLocaleString()}
                         </span>
                       </div>
                     )}
@@ -272,24 +311,37 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
 
                 {/* Hourly Rate */}
                 <div className="flex justify-between text-sm mb-4">
-                  <span className="text-neutral-600">Hourly Rate</span>
-                  <span className="font-medium">${project.hourlyRate}/hr</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Hourly Rate</span>
+                  <span className="font-medium" style={{ color: 'var(--text-primary)' }}>${project.defaultHourlyRate}/hr</span>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="pt-4 border-t border-neutral-100 flex justify-between items-center">
+                <div className="pt-4 flex justify-between items-center" style={{ borderTop: '1px solid var(--border-color)' }}>
                   <button
                     onClick={() => toggleProjectStatus(project.id, project.status)}
-                    className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${
-                      project.status === 'active'
-                        ? 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-                        : 'text-green-600 hover:text-green-800 hover:bg-green-50'
-                    }`}
+                    className={`text-xs font-medium px-3 py-1 rounded-full transition-colors`}
+                    style={{
+                      color: project.status === 'active' ? 'var(--text-secondary)' : '#16a34a',
+                      backgroundColor: 'transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (project.status === 'active') {
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                        e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                      } else {
+                        e.currentTarget.style.color = '#15803d';
+                        e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = project.status === 'active' ? 'var(--text-secondary)' : '#16a34a';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                   >
                     {project.status === 'active' ? 'Deactivate' : 'Activate'}
                   </button>
                   
-                  <div className="text-xs text-neutral-500">
+                  <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                     Created {new Date(project.createdAt).toLocaleDateString()}
                   </div>
                 </div>

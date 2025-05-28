@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { PlusIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 interface ClientListProps {
   onEditClient: (clientId: string) => void;
@@ -45,8 +46,8 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-neutral-900">Clients</h2>
-          <p className="text-sm text-neutral-600">Manage your client accounts and contact information</p>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Clients</h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage your client accounts and contact information</p>
         </div>
         <button
           onClick={onCreateClient}
@@ -60,24 +61,29 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
       {/* Search */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <MagnifyingGlassIcon className="h-5 w-5 text-neutral-400" />
+          <MagnifyingGlassIcon className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
         </div>
         <input
           type="text"
           placeholder="Search clients..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+          className="block w-full pl-10 pr-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+          style={{
+            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--background-color)',
+            color: 'var(--text-primary)'
+          }}
         />
       </div>
 
       {/* Clients Grid */}
       {filteredClients.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-neutral-400 text-lg mb-2">
+          <div className="text-lg mb-2" style={{ color: 'var(--text-secondary)' }}>
             {searchTerm ? 'No clients found' : 'No clients yet'}
           </div>
-          <p className="text-neutral-600 text-sm mb-4">
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
             {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding your first client'}
           </p>
           {!searchTerm && (
@@ -98,12 +104,16 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
             return (
               <div
                 key={client.id}
-                className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 hover:shadow-md transition-shadow"
+                className="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+                style={{
+                  backgroundColor: 'var(--surface-color)',
+                  border: '1px solid var(--border-color)'
+                }}
               >
                 {/* Client Header */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                       {client.name}
                     </h3>
                     <div className="flex items-center space-x-2">
@@ -116,7 +126,7 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                       >
                         {client.isActive ? 'Active' : 'Inactive'}
                       </span>
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                         {projectCount} project{projectCount !== 1 ? 's' : ''}
                       </span>
                     </div>
@@ -126,14 +136,32 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => onEditClient(client.id)}
-                      className="p-2 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#2563eb';
+                        e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                       title="Edit client"
                     >
                       <PencilIcon className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClient(client.id)}
-                      className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#dc2626';
+                        e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                       title="Delete client"
                     >
                       <TrashIcon className="w-4 h-4" />
@@ -142,46 +170,56 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                 </div>
 
                 {/* Contact Information */}
-                <div className="space-y-2">
-                  {client.contactInfo?.email && (
-                    <div className="flex items-center text-sm">
-                      <span className="text-neutral-500 w-12">Email:</span>
-                      <span className="text-neutral-900">{client.contactInfo.email}</span>
-                    </div>
-                  )}
-                  {client.contactInfo?.phone && (
-                    <div className="flex items-center text-sm">
-                      <span className="text-neutral-500 w-12">Phone:</span>
-                      <span className="text-neutral-900">{client.contactInfo.phone}</span>
-                    </div>
-                  )}
-                  {client.contactInfo?.address && (
-                    <div className="flex items-start text-sm">
-                      <span className="text-neutral-500 w-12 mt-0.5">Address:</span>
-                      <span className="text-neutral-900 flex-1">{client.contactInfo.address}</span>
-                    </div>
-                  )}
-                  {!client.contactInfo && (
-                    <div className="text-sm text-neutral-500 italic">
-                      No contact information available
-                    </div>
-                  )}
-                </div>
+                {client.contactInfo && (
+                  <div className="space-y-2 mb-4">
+                    {client.contactInfo.email && (
+                      <div className="flex items-center text-sm">
+                        <EnvelopeIcon className="w-4 h-4 mr-2" style={{ color: 'var(--text-secondary)' }} />
+                        <span style={{ color: 'var(--text-secondary)' }}>{client.contactInfo.email}</span>
+                      </div>
+                    )}
+                    {client.contactInfo.phone && (
+                      <div className="flex items-center text-sm">
+                        <PhoneIcon className="w-4 h-4 mr-2" style={{ color: 'var(--text-secondary)' }} />
+                        <span style={{ color: 'var(--text-secondary)' }}>{client.contactInfo.phone}</span>
+                      </div>
+                    )}
+                    {client.contactInfo.address && (
+                      <div className="flex items-start text-sm">
+                        <MapPinIcon className="w-4 h-4 mr-2 mt-0.5" style={{ color: 'var(--text-secondary)' }} />
+                        <span style={{ color: 'var(--text-secondary)' }}>{client.contactInfo.address}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Quick Actions */}
-                <div className="mt-4 pt-4 border-t border-neutral-100 flex justify-between items-center">
+                <div className="pt-4 flex justify-between items-center" style={{ borderTop: '1px solid var(--border-color)' }}>
                   <button
                     onClick={() => toggleClientStatus(client.id, client.isActive)}
-                    className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${
-                      client.isActive
-                        ? 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-                        : 'text-green-600 hover:text-green-800 hover:bg-green-50'
-                    }`}
+                    className="text-xs font-medium px-3 py-1 rounded-full transition-colors"
+                    style={{
+                      color: client.isActive ? 'var(--text-secondary)' : '#16a34a',
+                      backgroundColor: 'transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (client.isActive) {
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                        e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                      } else {
+                        e.currentTarget.style.color = '#15803d';
+                        e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = client.isActive ? 'var(--text-secondary)' : '#16a34a';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                   >
                     {client.isActive ? 'Deactivate' : 'Activate'}
                   </button>
                   
-                  <div className="text-xs text-neutral-500">
+                  <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                     Created {new Date(client.createdAt).toLocaleDateString()}
                   </div>
                 </div>

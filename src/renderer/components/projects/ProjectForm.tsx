@@ -131,15 +131,24 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--surface-color)' }}>
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-neutral-200">
-          <h2 className="text-xl font-semibold text-neutral-900">
+        <div className="flex justify-between items-center p-6" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
             {isEditing ? 'Edit Project' : 'Create New Project'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--border-color)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
@@ -149,15 +158,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Client Selection */}
           <div>
-            <label htmlFor="clientId" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="clientId" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Client *
             </label>
             <select
               id="clientId"
               {...register('clientId')}
-              className={`block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.clientId ? 'border-red-300' : 'border-neutral-300'
+              className={`block w-full px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.clientId ? 'border-red-300' : ''
               }`}
+              style={{
+                border: errors.clientId ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="">Select a client...</option>
               {activeClients.map(client => (
@@ -178,7 +192,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
           {/* Project Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Project Name *
             </label>
             <input
@@ -189,6 +203,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
                 errors.name ? 'border-red-300' : 'border-neutral-300'
               }`}
               placeholder="Enter project name"
+              style={{
+                border: errors.name ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -197,7 +216,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
           {/* Project Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Description
             </label>
             <textarea
@@ -206,12 +225,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               rows={3}
               className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Describe the project scope and objectives"
+              style={{
+                border: errors.description ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
 
           {/* Hourly Rate */}
           <div>
-            <label htmlFor="defaultHourlyRate" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="defaultHourlyRate" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Hourly Rate *
             </label>
             <div className="relative">
@@ -228,6 +252,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
                 placeholder="100"
                 min="0"
                 step="0.01"
+                style={{
+                  border: errors.defaultHourlyRate ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                  backgroundColor: 'var(--background-color)',
+                  color: 'var(--text-primary)'
+                }}
               />
             </div>
             {errors.defaultHourlyRate && (
@@ -237,18 +266,23 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
           {/* Budget Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-neutral-900">Budget (Optional)</h3>
+            <h3 className="text-lg font-medium text-neutral-900" style={{ color: 'var(--text-primary)' }}>Budget (Optional)</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Budget Hours */}
               <div>
-                <label htmlFor="budgetType" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label htmlFor="budgetType" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
                   Budget Type
                 </label>
                 <select
                   id="budgetType"
                   {...register('budgetType')}
                   className="block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  style={{
+                    border: errors.budgetType ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   <option value="hours">Hours</option>
                   <option value="amount">Amount</option>
@@ -257,7 +291,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
               {/* Budget Value */}
               <div>
-                <label htmlFor="budgetValue" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label htmlFor="budgetValue" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
                   Budget Value
                 </label>
                 <div className="relative">
@@ -272,6 +306,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
                     placeholder="0"
                     min="0"
                     step="0.01"
+                    style={{
+                      border: errors.budgetValue ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
                   />
                 </div>
                 {errors.budgetValue && (
@@ -281,7 +320,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
               {/* Budget Spent */}
               <div>
-                <label htmlFor="budgetSpent" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label htmlFor="budgetSpent" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
                   Budget Spent
                 </label>
                 <div className="relative">
@@ -296,6 +335,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
                     placeholder="0"
                     min="0"
                     step="0.01"
+                    style={{
+                      border: errors.budgetSpent ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
                   />
                 </div>
                 {errors.budgetSpent && (
@@ -307,7 +351,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
             {/* Budget Estimate */}
             {watchedBudgetValue && watchedDefaultHourlyRate && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-blue-800" style={{ color: 'var(--text-primary)' }}>
                   <strong>Estimated Budget:</strong> {watchedBudgetValue} hours × ${watchedDefaultHourlyRate}/hr = ${budgetEstimate.toLocaleString()}
                 </p>
               </div>
@@ -315,7 +359,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
             {/* Deadline */}
             <div>
-              <label htmlFor="deadline" className="block text-sm font-medium text-neutral-700 mb-2">
+              <label htmlFor="deadline" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
                 Deadline
               </label>
               <input
@@ -323,6 +367,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
                 id="deadline"
                 {...register('deadline')}
                 className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{
+                  border: errors.deadline ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                  backgroundColor: 'var(--background-color)',
+                  color: 'var(--text-primary)'
+                }}
               />
               {errors.deadline && (
                 <p className="mt-1 text-sm text-red-600">{errors.deadline.message}</p>
@@ -332,27 +381,32 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
 
           {/* Project Status */}
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="status" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Status *
             </label>
             <select
               id="status"
               {...register('status')}
               className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              style={{
+                border: errors.status ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="active">Active</option>
               <option value="paused">Paused</option>
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-neutral-500" style={{ color: 'var(--text-secondary)' }}>
               Only active projects will appear in time tracking dropdowns
             </p>
           </div>
 
           {/* Default Billable */}
           <div>
-            <label htmlFor="defaultBillable" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="defaultBillable" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Default Billable
             </label>
             <input
@@ -360,12 +414,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               id="defaultBillable"
               {...register('defaultBillable')}
               className="mt-1"
+              style={{
+                border: errors.defaultBillable ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
 
           {/* Team Members */}
           <div>
-            <label htmlFor="teamMembersText" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="teamMembersText" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Team Members
             </label>
             <textarea
@@ -374,12 +433,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               rows={3}
               className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter team members separated by commas"
+              style={{
+                border: errors.teamMembersText ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label htmlFor="tagsText" className="block text-sm font-medium text-neutral-700 mb-2">
+            <label htmlFor="tagsText" className="block text-sm font-medium text-neutral-700 mb-2" style={{ color: 'var(--text-primary)' }}>
               Tags
             </label>
             <textarea
@@ -388,15 +452,25 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               rows={3}
               className="block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter tags separated by commas"
+              style={{
+                border: errors.tagsText ? '1px solid #fca5a5' : '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-neutral-200">
+          <div className="flex justify-end space-x-3 pt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               Cancel
             </button>

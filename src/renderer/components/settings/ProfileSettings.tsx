@@ -298,7 +298,7 @@ const ProfileSettings: React.FC = () => {
   if (profileLoading && !profile) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-500">Loading profile...</p>
+        <p className="text-[var(--color-text-secondary)]">Loading profile...</p>
       </div>
     );
   }
@@ -311,10 +311,10 @@ const ProfileSettings: React.FC = () => {
         <div className="space-y-6">
           {/* Header */}
           <div className="text-center py-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+            <div className="bg-[var(--color-primary-50)] border border-[var(--color-primary-200)] rounded-lg p-6 max-w-md mx-auto">
               <div className="text-4xl mb-4">👋</div>
-              <h2 className="text-lg font-semibold text-blue-900 mb-2">Welcome to Aerotage!</h2>
-              <p className="text-blue-700 text-sm mb-4">
+              <h2 className="text-lg font-semibold text-[var(--color-primary-900)] mb-2">Welcome to Aerotage!</h2>
+              <p className="text-[var(--color-primary-700)] text-sm mb-4">
                 It looks like this is your first time here. Let's set up your profile.
               </p>
               <button
@@ -332,7 +332,7 @@ const ProfileSettings: React.FC = () => {
                   });
                   setIsEditing(true);
                 }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200"
               >
                 Create My Profile
               </button>
@@ -342,15 +342,15 @@ const ProfileSettings: React.FC = () => {
           {/* Show the form if editing */}
           {isEditing && (
             <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Create Your Profile</h3>
+              <div className="bg-[var(--color-surface)] p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-4">Create Your Profile</h3>
                 
                 {/* Messages */}
                 {message && (
                   <div className={`p-4 rounded-lg mb-4 ${
                     message.type === 'success' 
-                      ? 'bg-green-50 text-green-800 border border-green-200' 
-                      : 'bg-red-50 text-red-800 border border-red-200'
+                      ? 'bg-[var(--color-success-50)] text-[var(--color-success-800)] border border-[var(--color-success-200)]' 
+                      : 'bg-[var(--color-error-50)] text-[var(--color-error-800)] border border-[var(--color-error-200)]'
                   }`}>
                     {message.text}
                   </div>
@@ -359,7 +359,7 @@ const ProfileSettings: React.FC = () => {
                 {/* Basic Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                       Full Name *
                     </label>
                     <input
@@ -369,12 +369,12 @@ const ProfileSettings: React.FC = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                       Email Address
                     </label>
                     <input
@@ -383,12 +383,12 @@ const ProfileSettings: React.FC = () => {
                       name="email"
                       value={formData.email}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm text-gray-500"
+                      className="w-full px-3 py-2 border border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] rounded-lg text-sm text-[var(--color-text-tertiary)]"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="jobTitle" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                       Job Title
                     </label>
                     <input
@@ -397,12 +397,12 @@ const ProfileSettings: React.FC = () => {
                       name="jobTitle"
                       value={formData.jobTitle}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="department" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                       Department
                     </label>
                     <input
@@ -411,25 +411,25 @@ const ProfileSettings: React.FC = () => {
                       name="department"
                       value={formData.department}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                     />
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[var(--color-border)]">
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
                     disabled={updating}
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
+                    className="px-4 py-2 text-[var(--color-text-secondary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-surface-secondary)] transition-colors duration-200 disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updating}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200 disabled:opacity-50"
                   >
                     {updating ? 'Creating Profile...' : 'Create Profile'}
                   </button>
@@ -444,12 +444,12 @@ const ProfileSettings: React.FC = () => {
     // For other errors, show the regular error state
     return (
       <div className="text-center py-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-red-800 mb-2">Failed to load profile</p>
-          <p className="text-red-600 text-sm mb-4">{profileError}</p>
+        <div className="bg-[var(--color-error-50)] border border-[var(--color-error-200)] rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-[var(--color-error-800)] mb-2">Failed to load profile</p>
+          <p className="text-[var(--color-error-600)] text-sm mb-4">{profileError}</p>
           <button
             onClick={refetch}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+            className="px-4 py-2 bg-[var(--color-error-600)] text-white rounded-lg hover:bg-[var(--color-error-700)] transition-colors duration-200"
           >
             Try Again
           </button>
@@ -462,7 +462,7 @@ const ProfileSettings: React.FC = () => {
   if (!profile && !profileLoading) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-500">No profile data available</p>
+        <p className="text-[var(--color-text-secondary)]">No profile data available</p>
       </div>
     );
   }
@@ -472,13 +472,13 @@ const ProfileSettings: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-neutral-900">Profile Information</h2>
-          <p className="text-sm text-neutral-600">Update your personal and professional information</p>
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Profile Information</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">Update your personal and professional information</p>
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200"
           >
             Edit Profile
           </button>
@@ -489,8 +489,8 @@ const ProfileSettings: React.FC = () => {
       {message && (
         <div className={`p-4 rounded-lg ${
           message.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
+            ? 'bg-[var(--color-success-50)] text-[var(--color-success-800)] border border-[var(--color-success-200)]' 
+            : 'bg-[var(--color-error-50)] text-[var(--color-error-800)] border border-[var(--color-error-200)]'
         }`}>
           {message.text}
         </div>
@@ -509,13 +509,13 @@ const ProfileSettings: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Basic Information
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Full Name *
               </label>
               <input
@@ -528,14 +528,14 @@ const ProfileSettings: React.FC = () => {
                 required
                 className={`w-full px-3 py-2 border rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                    : 'border-neutral-200 bg-neutral-50'
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
                 }`}
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Email Address
               </label>
               <input
@@ -544,9 +544,9 @@ const ProfileSettings: React.FC = () => {
                 name="email"
                 value={formData.email}
                 disabled
-                className="w-full px-3 py-2 border border-neutral-200 bg-neutral-50 rounded-lg text-sm text-neutral-500"
+                className="w-full px-3 py-2 border border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] rounded-lg text-sm text-[var(--color-text-tertiary)]"
               />
-              <p className="text-xs text-neutral-500 mt-1">Email cannot be changed here</p>
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Email cannot be changed here</p>
               
               {/* Email Change Button */}
               {!activeEmailChangeRequest && (
@@ -563,7 +563,7 @@ const ProfileSettings: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="jobTitle" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="jobTitle" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Job Title
               </label>
               <input
@@ -575,14 +575,14 @@ const ProfileSettings: React.FC = () => {
                 disabled={!isEditing}
                 className={`w-full px-3 py-2 border rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                    : 'border-neutral-200 bg-neutral-50'
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
                 }`}
               />
             </div>
 
             <div>
-              <label htmlFor="department" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="department" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Department
               </label>
               <input
@@ -594,8 +594,8 @@ const ProfileSettings: React.FC = () => {
                 disabled={!isEditing}
                 className={`w-full px-3 py-2 border rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                    : 'border-neutral-200 bg-neutral-50'
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
                 }`}
               />
             </div>
@@ -603,7 +603,7 @@ const ProfileSettings: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="hourlyRate" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="hourlyRate" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Hourly Rate ($)
               </label>
               <input
@@ -617,36 +617,36 @@ const ProfileSettings: React.FC = () => {
                 step="0.01"
                 className={`w-full px-3 py-2 border rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                    : 'border-neutral-200 bg-neutral-50'
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Role
               </label>
               <input
                 type="text"
                 value={profile?.role || ''}
                 disabled
-                className="w-full px-3 py-2 border border-neutral-200 bg-neutral-50 rounded-lg text-sm text-neutral-500 capitalize"
+                className="w-full px-3 py-2 border border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] rounded-lg text-sm text-[var(--color-text-tertiary)] capitalize"
               />
-              <p className="text-xs text-neutral-500 mt-1">Role is managed by administrators</p>
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Role is managed by administrators</p>
             </div>
           </div>
         </div>
 
         {/* Contact Information */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Contact Information
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="phone" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Phone Number
               </label>
               <input
@@ -658,14 +658,14 @@ const ProfileSettings: React.FC = () => {
                 disabled={!isEditing}
                 className={`w-full px-3 py-2 border rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                    : 'border-neutral-200 bg-neutral-50'
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
                 }`}
               />
             </div>
 
             <div>
-              <label htmlFor="emergencyContact" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="emergencyContact" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Emergency Contact
               </label>
               <input
@@ -677,15 +677,15 @@ const ProfileSettings: React.FC = () => {
                 disabled={!isEditing}
                 className={`w-full px-3 py-2 border rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                    : 'border-neutral-200 bg-neutral-50'
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
                 }`}
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-neutral-700 mb-1">
+            <label htmlFor="address" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               Address
             </label>
             <textarea
@@ -697,8 +697,8 @@ const ProfileSettings: React.FC = () => {
               rows={3}
               className={`w-full px-3 py-2 border rounded-lg text-sm ${
                 isEditing 
-                  ? 'border-neutral-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
-                  : 'border-neutral-200 bg-neutral-50'
+                  ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
+                  : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
               }`}
             />
           </div>
@@ -706,19 +706,19 @@ const ProfileSettings: React.FC = () => {
 
         {/* Action Buttons */}
         {isEditing && (
-          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-200">
+          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[var(--color-border)]">
             <button
               type="button"
               onClick={handleCancel}
               disabled={updating}
-              className="px-4 py-2 text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors duration-200 disabled:opacity-50"
+              className="px-4 py-2 text-[var(--color-text-secondary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-surface-secondary)] transition-colors duration-200 disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updating}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+              className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200 disabled:opacity-50"
             >
               {updating ? 'Saving...' : 'Save Changes'}
             </button>

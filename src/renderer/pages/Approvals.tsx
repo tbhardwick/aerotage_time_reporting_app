@@ -76,8 +76,8 @@ export function Approvals() {
           <div className="flex items-center space-x-3">
             <CheckCircleIcon className="h-8 w-8 text-indigo-600" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Time Entry Approvals</h1>
-              <p className="text-sm text-gray-500">
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Time Entry Approvals</h1>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 Manage time entry submissions and approvals
               </p>
             </div>
@@ -86,9 +86,9 @@ export function Approvals() {
           {/* User Role Context */}
           <div className="mt-4">
             <div className="flex items-center space-x-2 text-sm">
-              <UserIcon className="h-4 w-4 text-gray-400" />
-              <span className="text-gray-500">Logged in as:</span>
-              <span className="font-medium text-gray-900">{currentUser?.name}</span>
+              <UserIcon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
+              <span style={{ color: 'var(--text-secondary)' }}>Logged in as:</span>
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{currentUser?.name}</span>
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                 currentUser?.role === 'admin' ? 'bg-purple-100 text-purple-800' :
                 currentUser?.role === 'manager' ? 'bg-blue-100 text-blue-800' :
@@ -102,41 +102,54 @@ export function Approvals() {
 
         {/* Tab Interface */}
         <Tab.Group>
-          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
-            {tabs.map((tab, index) => (
+          <Tab.List className="flex space-x-1 rounded-xl p-1" style={{ backgroundColor: 'var(--border-color)' }}>
+            {tabs.map((tab) => (
               <Tab
                 key={tab.name}
                 className={({ selected }) =>
                   classNames(
-                    'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
+                    'w-full rounded-lg py-2.5 text-sm font-medium leading-5 transition-all',
+                    'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
                     selected
-                      ? 'bg-white text-blue-700 shadow'
-                      : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
+                      ? 'text-blue-700 shadow'
+                      : 'hover:opacity-80'
                   )
                 }
+                style={{
+                  backgroundColor: 'var(--surface-color)',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                <div className="flex items-center justify-center space-x-2">
-                  <tab.icon className="h-5 w-5" />
-                  <span>{tab.name}</span>
-                  {tab.badge && (
-                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </div>
+                {({ selected }) => (
+                  <div 
+                    className="flex items-center justify-center space-x-2"
+                    style={{
+                      backgroundColor: selected ? 'var(--surface-color)' : 'transparent',
+                      color: selected ? '#1d4ed8' : 'var(--text-secondary)'
+                    }}
+                  >
+                    <tab.icon className="h-5 w-5" />
+                    <span>{tab.name}</span>
+                    {tab.badge && (
+                      <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                        {tab.badge}
+                      </span>
+                    )}
+                  </div>
+                )}
               </Tab>
             ))}
           </Tab.List>
 
           <Tab.Panels className="mt-6">
-            {tabs.map((tab, index) => (
+            {tabs.map((tab, idx) => (
               <Tab.Panel
-                key={index}
+                key={idx}
                 className={classNames(
-                  'rounded-xl bg-white p-6',
-                  'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'
+                  'rounded-xl p-6',
+                  'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'
                 )}
+                style={{ backgroundColor: 'var(--surface-color)' }}
               >
                 {/* Tab Description */}
                 <div className="mb-6">
@@ -150,10 +163,10 @@ export function Approvals() {
           </Tab.Panels>
         </Tab.Group>
 
-        {/* Help Text for Different Roles */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-blue-900 mb-2">Quick Guide</h3>
-          <div className="text-sm text-blue-700 space-y-1">
+        {/* Help Guide */}
+        <div className="mt-8 border rounded-lg p-4" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)' }}>
+          <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Quick Guide</h3>
+          <div className="text-sm space-y-1" style={{ color: 'var(--text-primary)' }}>
             {currentUser?.role === 'employee' && (
               <>
                 <p>• Use the "Submit Entries" tab to submit your draft time entries for approval</p>

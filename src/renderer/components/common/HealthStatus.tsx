@@ -67,21 +67,21 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
   const getStatusIcon = () => {
     if (loading) {
       return (
-        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--color-primary-600)]"></div>
       );
     }
 
     if (!healthStatus) {
-      return <XCircleIcon className="h-4 w-4 text-gray-400" />;
+      return <XCircleIcon className="h-4 w-4 text-[var(--color-text-tertiary)]" />;
     }
 
     switch (healthStatus.status) {
       case 'healthy':
-        return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
+        return <CheckCircleIcon className="h-4 w-4 text-[var(--color-success-500)]" />;
       case 'unhealthy':
-        return <XCircleIcon className="h-4 w-4 text-red-500" />;
+        return <XCircleIcon className="h-4 w-4 text-[var(--color-error-500)]" />;
       default:
-        return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />;
+        return <ExclamationTriangleIcon className="h-4 w-4 text-[var(--color-warning-500)]" />;
     }
   };
 
@@ -100,16 +100,16 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
   };
 
   const getStatusColor = () => {
-    if (loading) return 'text-blue-600';
-    if (!healthStatus) return 'text-gray-400';
+    if (loading) return 'text-[var(--color-primary-600)]';
+    if (!healthStatus) return 'text-[var(--color-text-tertiary)]';
     
     switch (healthStatus.status) {
       case 'healthy':
-        return 'text-green-600';
+        return 'text-[var(--color-success-600)]';
       case 'unhealthy':
-        return 'text-red-600';
+        return 'text-[var(--color-error-600)]';
       default:
-        return 'text-yellow-600';
+        return 'text-[var(--color-warning-600)]';
     }
   };
 
@@ -135,13 +135,13 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
 
   // Detailed status view
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 p-4 ${className}`}>
+    <div className={`bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-medium text-gray-900">API Health Status</h3>
+        <h3 className="text-lg font-medium text-[var(--color-text-primary)]">API Health Status</h3>
         <button
           onClick={checkHealth}
           disabled={loading}
-          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="inline-flex items-center px-3 py-1 border border-[var(--color-border)] shadow-sm text-sm leading-4 font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)] disabled:opacity-50"
         >
           {loading ? 'Checking...' : 'Refresh'}
         </button>
@@ -157,14 +157,14 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
             </span>
           </div>
           {lastChecked && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-[var(--color-text-tertiary)]">
               Last checked: {lastChecked.toLocaleTimeString()}
             </span>
           )}
         </div>
 
         {healthStatus && (
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-[var(--color-text-secondary)]">
             <p>{healthStatus.message}</p>
             {healthStatus.version && (
               <p>Version: {healthStatus.version}</p>
@@ -177,26 +177,26 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
 
         {/* Connectivity Details */}
         {connectivity && (
-          <div className="mt-4 border-t border-gray-200 pt-4">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">Endpoint Status</h4>
+          <div className="mt-4 border-t border-[var(--color-border)] pt-4">
+            <h4 className="text-sm font-medium text-[var(--color-text-primary)] mb-2">Endpoint Status</h4>
             <div className="space-y-2">
               {/* Primary Endpoint */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   {connectivity.primary.isConnected ? (
-                    <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                    <CheckCircleIcon className="h-4 w-4 text-[var(--color-success-500)]" />
                   ) : (
-                    <XCircleIcon className="h-4 w-4 text-red-500" />
+                    <XCircleIcon className="h-4 w-4 text-[var(--color-error-500)]" />
                   )}
-                  <span className="text-sm text-gray-700">Primary</span>
+                  <span className="text-sm text-[var(--color-text-secondary)]">Primary</span>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-[var(--color-text-tertiary)]">
                   {connectivity.primary.isConnected ? (
-                    <span className="text-green-600">
+                    <span className="text-[var(--color-success-600)]">
                       {formatResponseTime(connectivity.primary.responseTime)}
                     </span>
                   ) : (
-                    <span className="text-red-600">Failed</span>
+                    <span className="text-[var(--color-error-600)]">Failed</span>
                   )}
                 </div>
               </div>
@@ -205,26 +205,26 @@ export const HealthStatus: React.FC<HealthStatusProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   {connectivity.backup.isConnected ? (
-                    <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                    <CheckCircleIcon className="h-4 w-4 text-[var(--color-success-500)]" />
                   ) : (
-                    <XCircleIcon className="h-4 w-4 text-red-500" />
+                    <XCircleIcon className="h-4 w-4 text-[var(--color-error-500)]" />
                   )}
-                  <span className="text-sm text-gray-700">Backup</span>
+                  <span className="text-sm text-[var(--color-text-secondary)]">Backup</span>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-[var(--color-text-tertiary)]">
                   {connectivity.backup.isConnected ? (
-                    <span className="text-green-600">
+                    <span className="text-[var(--color-success-600)]">
                       {formatResponseTime(connectivity.backup.responseTime)}
                     </span>
                   ) : (
-                    <span className="text-red-600">Failed</span>
+                    <span className="text-[var(--color-error-600)]">Failed</span>
                   )}
                 </div>
               </div>
 
               {/* Recommended Endpoint */}
-              <div className="mt-2 p-2 bg-blue-50 rounded-md">
-                <p className="text-sm text-blue-800">
+              <div className="mt-2 p-2 bg-[var(--color-primary-50)] rounded-md">
+                <p className="text-sm text-[var(--color-primary-800)]">
                   <strong>Active Endpoint:</strong> {connectivity.recommendedEndpoint}
                 </p>
               </div>

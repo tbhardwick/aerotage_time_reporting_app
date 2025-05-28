@@ -109,8 +109,8 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Submit Time Entries</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Submit Time Entries</h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             {draftEntries.length} draft {draftEntries.length === 1 ? 'entry' : 'entries'} ready for submission
           </p>
         </div>
@@ -129,24 +129,24 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
 
       {/* Selection Summary */}
       {selectedEntries.length > 0 && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-indigo-900 mb-2">Submission Summary</h3>
+        <div className="border rounded-lg p-4" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
+          <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Submission Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <span className="text-indigo-700 font-medium">Total Entries:</span>
-              <p className="text-indigo-900">{selectedTotals.totalEntries}</p>
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Total Entries:</span>
+              <p style={{ color: 'var(--text-primary)' }}>{selectedTotals.totalEntries}</p>
             </div>
             <div>
-              <span className="text-indigo-700 font-medium">Total Time:</span>
-              <p className="text-indigo-900">{selectedTotals.totalHours}</p>
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Total Time:</span>
+              <p style={{ color: 'var(--text-primary)' }}>{selectedTotals.totalHours}</p>
             </div>
             <div>
-              <span className="text-indigo-700 font-medium">Billable:</span>
-              <p className="text-indigo-900">{selectedTotals.billableHours}</p>
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Billable:</span>
+              <p style={{ color: 'var(--text-primary)' }}>{selectedTotals.billableHours}</p>
             </div>
             <div>
-              <span className="text-indigo-700 font-medium">Non-Billable:</span>
-              <p className="text-indigo-900">{selectedTotals.nonBillableHours}</p>
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Non-Billable:</span>
+              <p style={{ color: 'var(--text-primary)' }}>{selectedTotals.nonBillableHours}</p>
             </div>
           </div>
         </div>
@@ -154,45 +154,46 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
 
       {/* Main Content */}
       {draftEntries.length === 0 ? (
-        <div className="bg-white shadow rounded-lg p-6 text-center">
-          <ClockIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No draft entries</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="shadow rounded-lg p-6 text-center" style={{ backgroundColor: 'var(--surface-color)' }}>
+          <ClockIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
+          <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No draft entries</h3>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
             All your time entries have been submitted for approval or you haven't created any yet.
           </p>
         </div>
       ) : (
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+        <div className="shadow overflow-hidden sm:rounded-md" style={{ backgroundColor: 'var(--surface-color)' }}>
           {/* Select All Header */}
-          <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+          <div className="px-4 py-3" style={{ backgroundColor: 'var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   checked={selectedEntries.length === draftEntries.length && draftEntries.length > 0}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
+                  style={{ borderColor: 'var(--border-color)' }}
                 />
-                <label className="ml-3 text-sm font-medium text-gray-700">
+                <label className="ml-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Select all draft entries
                 </label>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 {selectedEntries.length} of {draftEntries.length} selected
               </span>
             </div>
           </div>
 
           {/* Entries grouped by date */}
-          <div className="divide-y divide-gray-200">
+          <div style={{ borderColor: 'var(--border-color)' }} className="divide-y">
             {Object.entries(entriesByDate)
               .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
               .map(([date, entries]) => (
                 <div key={date} className="p-4">
                   {/* Date Header */}
                   <div className="flex items-center mb-3">
-                    <CalendarIcon className="h-5 w-5 text-gray-400 mr-2" />
-                    <h4 className="text-sm font-medium text-gray-900">
+                    <CalendarIcon className="h-5 w-5 mr-2" style={{ color: 'var(--text-secondary)' }} />
+                    <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       {new Date(date).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -200,7 +201,7 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
                         day: 'numeric'
                       })}
                     </h4>
-                    <span className="ml-2 text-sm text-gray-500">
+                    <span className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                       ({entries.length} {entries.length === 1 ? 'entry' : 'entries'})
                     </span>
                   </div>
@@ -211,31 +212,42 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
                       const project = getProjectDetails(entry);
                       
                       return (
-                        <div key={entry.id} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                        <div 
+                          key={entry.id} 
+                          className="flex items-center space-x-3 p-3 rounded-lg transition-colors"
+                          style={{ border: '1px solid var(--border-color)' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
                           {/* Checkbox */}
                           <input
                             type="checkbox"
                             checked={selectedEntries.includes(entry.id)}
                             onChange={() => handleSelectEntry(entry.id)}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
+                            style={{ borderColor: 'var(--border-color)' }}
                           />
 
                           {/* Entry Details */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                                   {project?.name || 'Unknown Project'}
                                 </p>
                                 {project?.client && (
-                                  <p className="text-sm text-gray-500">
+                                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                                     {project.client.name}
                                   </p>
                                 )}
                               </div>
                               
                               <div className="flex items-center space-x-3">
-                                <div className="flex items-center text-sm text-gray-500">
+                                <div className="flex items-center text-sm" style={{ color: 'var(--text-secondary)' }}>
                                   <ClockIcon className="h-4 w-4 mr-1" />
                                   {formatDuration(entry.duration)}
                                 </div>
@@ -253,7 +265,7 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
                             </div>
 
                             {entry.description && (
-                              <p className="mt-1 text-sm text-gray-600">
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {entry.description}
                               </p>
                             )}
@@ -270,41 +282,41 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="mt-3">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
                     Confirm Submission
                   </h3>
                 </div>
               </div>
               
               <div className="mb-4">
-                <p className="text-sm text-gray-500 mb-3">
+                <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
                   You are about to submit {selectedEntries.length} time {selectedEntries.length === 1 ? 'entry' : 'entries'} for approval:
                 </p>
                 
-                <div className="bg-gray-50 rounded-md p-3 text-sm">
+                <div className="rounded-md p-3 text-sm" style={{ backgroundColor: 'var(--border-color)' }}>
                   <div className="flex justify-between mb-1">
-                    <span>Total entries:</span>
-                    <span className="font-medium">{selectedTotals.totalEntries}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Total entries:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedTotals.totalEntries}</span>
                   </div>
                   <div className="flex justify-between mb-1">
-                    <span>Total time:</span>
-                    <span className="font-medium">{selectedTotals.totalHours}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Total time:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedTotals.totalHours}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Billable time:</span>
-                    <span className="font-medium">{selectedTotals.billableHours}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Billable time:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedTotals.billableHours}</span>
                   </div>
                 </div>
                 
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>
                   Once submitted, these entries cannot be edited until they are approved or rejected.
                 </p>
               </div>
@@ -312,7 +324,18 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  style={{
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--border-color)',
+                    border: '1px solid var(--border-color)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                  }}
                 >
                   Cancel
                 </button>

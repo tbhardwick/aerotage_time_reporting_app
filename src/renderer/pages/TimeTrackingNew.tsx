@@ -134,21 +134,22 @@ const TimeTrackingNew: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
           Time Tracking
         </h1>
-        <p style={{ color: '#4b5563' }}>Track your time and manage your daily work activities</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Track your time and manage your daily work activities</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Timer Section */}
         <div style={{ 
-          backgroundColor: 'white', 
+          backgroundColor: 'var(--surface-color)', 
           padding: '1.5rem', 
           borderRadius: '0.5rem', 
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
+          boxShadow: 'var(--shadow)',
+          border: '1px solid var(--border-color)'
         }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: 'var(--text-primary)' }}>
             Timer
           </h3>
           <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
@@ -157,7 +158,7 @@ const TimeTrackingNew: React.FC = () => {
               fontFamily: 'monospace', 
               fontWeight: 'bold', 
               marginBottom: '1rem',
-              color: state.timer.isRunning ? '#16a34a' : '#6b7280'
+              color: state.timer.isRunning ? '#16a34a' : 'var(--text-secondary)'
             }}>
               {formatTime(state.timer.elapsedTime)}
             </div>
@@ -196,11 +197,12 @@ const TimeTrackingNew: React.FC = () => {
           </div>
           {state.timer.isRunning && (
             <div style={{ 
-              backgroundColor: '#f0fdf4', 
+              backgroundColor: state.timer.isRunning ? 'rgba(34, 197, 94, 0.1)' : 'var(--border-color)', 
               padding: '0.75rem', 
               borderRadius: '0.5rem',
               border: '1px solid #16a34a',
-              fontSize: '0.875rem'
+              fontSize: '0.875rem',
+              color: 'var(--text-primary)'
             }}>
               <strong>Current:</strong> {state.projects.find(p => p.id === state.timer.currentProjectId)?.name}<br/>
               <strong>Client:</strong> {state.projects.find(p => p.id === state.timer.currentProjectId)?.client?.name}<br/>
@@ -211,12 +213,13 @@ const TimeTrackingNew: React.FC = () => {
 
         {/* Project Selection */}
         <div style={{ 
-          backgroundColor: 'white', 
+          backgroundColor: 'var(--surface-color)', 
           padding: '1.5rem', 
           borderRadius: '0.5rem', 
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
+          boxShadow: 'var(--shadow)',
+          border: '1px solid var(--border-color)'
         }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: 'var(--text-primary)' }}>
             Project Selection
           </h3>
           <select 
@@ -226,10 +229,11 @@ const TimeTrackingNew: React.FC = () => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #d1d5db',
+              border: '1px solid var(--border-color)',
               borderRadius: '0.5rem',
               marginBottom: '1rem',
-              backgroundColor: state.timer.isRunning ? '#f9fafb' : 'white'
+              backgroundColor: state.timer.isRunning ? 'var(--border-color)' : 'var(--background-color)',
+              color: 'var(--text-primary)'
             }}
           >
             <option value="">Select a project...</option>
@@ -243,11 +247,13 @@ const TimeTrackingNew: React.FC = () => {
           {/* Project Details */}
           {selectedProjectId && (
             <div style={{ 
-              backgroundColor: '#f8fafc', 
+              backgroundColor: 'var(--background-color)', 
               padding: '0.75rem', 
               borderRadius: '0.5rem',
               marginBottom: '1rem',
-              fontSize: '0.875rem'
+              fontSize: '0.875rem',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)'
             }}>
               {(() => {
                 const project = state.projects.find(p => p.id === selectedProjectId);
@@ -276,46 +282,54 @@ const TimeTrackingNew: React.FC = () => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #d1d5db',
+              border: '1px solid var(--border-color)',
               borderRadius: '0.5rem',
               resize: 'none',
-              backgroundColor: state.timer.isRunning ? '#f9fafb' : 'white'
+              backgroundColor: state.timer.isRunning ? 'var(--border-color)' : 'var(--background-color)',
+              color: 'var(--text-primary)'
             }}
           />
         </div>
 
         {/* Time Entries */}
-        <div className="bg-white p-6 rounded-lg shadow-md col-span-full">
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>
+        <div style={{ 
+          backgroundColor: 'var(--surface-color)', 
+          padding: '1.5rem', 
+          borderRadius: '0.5rem', 
+          boxShadow: 'var(--shadow)',
+          border: '1px solid var(--border-color)'
+        }} className="col-span-full">
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: 'var(--text-primary)' }}>
             Time Entries
           </h3>
           
           {/* Summary */}
           <div style={{ 
-            backgroundColor: '#f9fafb', 
+            backgroundColor: 'var(--background-color)', 
             padding: '1rem', 
             borderRadius: '0.5rem',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            border: '1px solid var(--border-color)'
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', textAlign: 'center' }}>
               <div>
-                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>Total Time</p>
-                <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>{formatDuration(totalTime)}</p>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Total Time</p>
+                <p style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)' }}>{formatDuration(totalTime)}</p>
               </div>
               <div>
-                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>Billable</p>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Billable</p>
                 <p style={{ fontSize: '1.125rem', fontWeight: '600', color: '#16a34a' }}>{formatDuration(billableTime)}</p>
               </div>
               <div>
-                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>Non-billable</p>
-                <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>{formatDuration(nonBillableTime)}</p>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Non-billable</p>
+                <p style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)' }}>{formatDuration(nonBillableTime)}</p>
               </div>
             </div>
           </div>
           
           {/* Time Entries List */}
           {state.timeEntries.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
               No time entries yet. Start the timer to create your first entry!
             </div>
           ) : (
@@ -325,25 +339,26 @@ const TimeTrackingNew: React.FC = () => {
               const project = state.projects.find(p => p.id === entry.projectId);
               return (
                 <div key={entry.id} style={{ 
-                  border: '1px solid #e5e7eb', 
+                  border: '1px solid var(--border-color)', 
                   borderRadius: '0.5rem', 
                   padding: '1rem',
-                  marginBottom: '0.5rem'
+                  marginBottom: '0.5rem',
+                  backgroundColor: 'var(--background-color)'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ marginBottom: '0.5rem' }}>
                         <span style={{ 
                           backgroundColor: 
-                            entry.status === 'draft' ? '#f3f4f6' : 
+                            entry.status === 'draft' ? 'var(--border-color)' : 
                             entry.status === 'submitted' ? '#fef3c7' :
                             entry.status === 'approved' ? '#dcfce7' : 
-                            entry.status === 'rejected' ? '#fee2e2' : '#f3f4f6', 
+                            entry.status === 'rejected' ? '#fee2e2' : 'var(--border-color)', 
                           color: 
-                            entry.status === 'draft' ? '#374151' : 
+                            entry.status === 'draft' ? 'var(--text-primary)' : 
                             entry.status === 'submitted' ? '#92400e' :
                             entry.status === 'approved' ? '#166534' : 
-                            entry.status === 'rejected' ? '#dc2626' : '#374151', 
+                            entry.status === 'rejected' ? '#dc2626' : 'var(--text-primary)', 
                           padding: '0.25rem 0.5rem', 
                           borderRadius: '9999px', 
                           fontSize: '0.75rem',
@@ -362,14 +377,14 @@ const TimeTrackingNew: React.FC = () => {
                           {entry.isBillable ? 'Billable' : 'Non-billable'}
                         </span>
                       </div>
-                      <h4 style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{project?.name || 'Unknown Project'}</h4>
-                      <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem' }}>
+                      <h4 style={{ fontWeight: '500', marginBottom: '0.25rem', color: 'var(--text-primary)' }}>{project?.name || 'Unknown Project'}</h4>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
                         {project?.client?.name || 'Unknown Client'}
                       </p>
-                      <p style={{ fontSize: '0.875rem' }}>{entry.description}</p>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>{entry.description}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>{formatDuration(entry.duration)}</p>
+                      <p style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--text-primary)' }}>{formatDuration(entry.duration)}</p>
                       <div style={{ marginTop: '0.5rem' }}>
                         {entry.status === 'draft' && (
                           <>
@@ -406,7 +421,7 @@ const TimeTrackingNew: React.FC = () => {
                         )}
                         {entry.status === 'submitted' && (
                           <span style={{
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             fontSize: '0.875rem',
                             fontStyle: 'italic'
                           }}>

@@ -143,7 +143,7 @@ const NotificationSettings: React.FC = () => {
   if (!user) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-500">Loading notification settings...</p>
+        <p className="text-[var(--color-text-secondary)]">Loading notification settings...</p>
       </div>
     );
   }
@@ -152,16 +152,16 @@ const NotificationSettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Notification Settings</h2>
-        <p className="text-sm text-neutral-600">Configure how and when you receive notifications</p>
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Notification Settings</h2>
+        <p className="text-sm text-[var(--color-text-secondary)]">Configure how and when you receive notifications</p>
       </div>
 
       {/* Messages */}
       {message && (
         <div className={`p-4 rounded-lg ${
           message.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
+            ? 'bg-[var(--color-success-50)] text-[var(--color-success-800)] border border-[var(--color-success-200)]' 
+            : 'bg-[var(--color-error-50)] text-[var(--color-error-800)] border border-[var(--color-error-200)]'
         }`}>
           {message.text}
         </div>
@@ -171,7 +171,7 @@ const NotificationSettings: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Email Notifications */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Email Notifications
           </h3>
           
@@ -182,16 +182,16 @@ const NotificationSettings: React.FC = () => {
               name="emailEnabled"
               checked={formData.emailEnabled}
               onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
             />
-            <label htmlFor="emailEnabled" className="ml-2 text-sm text-neutral-700">
+            <label htmlFor="emailEnabled" className="ml-2 text-sm text-[var(--color-text-secondary)]">
               Enable email notifications
             </label>
           </div>
 
           {formData.emailEnabled && (
             <div>
-              <label htmlFor="emailFrequency" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="emailFrequency" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                 Email Frequency
               </label>
               <select
@@ -199,7 +199,7 @@ const NotificationSettings: React.FC = () => {
                 name="emailFrequency"
                 value={formData.emailFrequency}
                 onChange={handleInputChange}
-                className="w-full md:w-64 px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full md:w-64 px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
               >
                 <option value="immediate">Immediate</option>
                 <option value="daily">Daily digest</option>
@@ -212,7 +212,7 @@ const NotificationSettings: React.FC = () => {
 
         {/* Time Tracking Notifications */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Time Tracking
           </h3>
           
@@ -224,16 +224,16 @@ const NotificationSettings: React.FC = () => {
                 name="timerReminders"
                 checked={formData.timerReminders}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="timerReminders" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="timerReminders" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Timer reminders when not tracking time
               </label>
             </div>
 
             {formData.timerReminders && (
               <div className="ml-6">
-                <label htmlFor="timerReminderInterval" className="block text-sm font-medium text-neutral-700 mb-1">
+                <label htmlFor="timerReminderInterval" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                   Reminder interval
                 </label>
                 <select
@@ -241,7 +241,7 @@ const NotificationSettings: React.FC = () => {
                   name="timerReminderInterval"
                   value={formData.timerReminderInterval}
                   onChange={handleInputChange}
-                  className="w-full md:w-48 px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full md:w-48 px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                 >
                   <option value={15}>Every 15 minutes</option>
                   <option value={30}>Every 30 minutes</option>
@@ -258,9 +258,9 @@ const NotificationSettings: React.FC = () => {
                 name="goalNotifications"
                 checked={formData.goalNotifications}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="goalNotifications" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="goalNotifications" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Time goal notifications
               </label>
             </div>
@@ -268,7 +268,7 @@ const NotificationSettings: React.FC = () => {
             {formData.goalNotifications && (
               <div className="ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="dailyTimeGoal" className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label htmlFor="dailyTimeGoal" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                     Daily goal (hours)
                   </label>
                   <input
@@ -280,11 +280,11 @@ const NotificationSettings: React.FC = () => {
                     min="1"
                     max="16"
                     step="0.5"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                   />
                 </div>
                 <div>
-                  <label htmlFor="weeklyTimeGoal" className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label htmlFor="weeklyTimeGoal" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                     Weekly goal (hours)
                   </label>
                   <input
@@ -296,7 +296,7 @@ const NotificationSettings: React.FC = () => {
                     min="1"
                     max="80"
                     step="0.5"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                   />
                 </div>
               </div>
@@ -306,7 +306,7 @@ const NotificationSettings: React.FC = () => {
 
         {/* Work Events */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Work Events
           </h3>
           
@@ -318,9 +318,9 @@ const NotificationSettings: React.FC = () => {
                 name="timeEntrySubmissionReminders"
                 checked={formData.timeEntrySubmissionReminders}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="timeEntrySubmissionReminders" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="timeEntrySubmissionReminders" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Time entry submission reminders
               </label>
             </div>
@@ -332,9 +332,9 @@ const NotificationSettings: React.FC = () => {
                 name="approvalNotifications"
                 checked={formData.approvalNotifications}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="approvalNotifications" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="approvalNotifications" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Time entry approval/rejection notifications
               </label>
             </div>
@@ -346,9 +346,9 @@ const NotificationSettings: React.FC = () => {
                 name="projectDeadlineReminders"
                 checked={formData.projectDeadlineReminders}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="projectDeadlineReminders" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="projectDeadlineReminders" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Project deadline reminders
               </label>
             </div>
@@ -360,9 +360,9 @@ const NotificationSettings: React.FC = () => {
                 name="overdueTaskNotifications"
                 checked={formData.overdueTaskNotifications}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="overdueTaskNotifications" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="overdueTaskNotifications" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Overdue task notifications
               </label>
             </div>
@@ -371,7 +371,7 @@ const NotificationSettings: React.FC = () => {
 
         {/* Billing & Invoices */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Billing & Invoices
           </h3>
           
@@ -383,9 +383,9 @@ const NotificationSettings: React.FC = () => {
                 name="invoiceStatusUpdates"
                 checked={formData.invoiceStatusUpdates}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="invoiceStatusUpdates" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="invoiceStatusUpdates" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Invoice status updates
               </label>
             </div>
@@ -397,9 +397,9 @@ const NotificationSettings: React.FC = () => {
                 name="paymentReminders"
                 checked={formData.paymentReminders}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="paymentReminders" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="paymentReminders" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Payment reminders
               </label>
             </div>
@@ -408,7 +408,7 @@ const NotificationSettings: React.FC = () => {
 
         {/* Team Updates */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Team Updates
           </h3>
           
@@ -420,9 +420,9 @@ const NotificationSettings: React.FC = () => {
                 name="teamActivityUpdates"
                 checked={formData.teamActivityUpdates}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="teamActivityUpdates" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="teamActivityUpdates" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 Team activity updates
               </label>
             </div>
@@ -434,9 +434,9 @@ const NotificationSettings: React.FC = () => {
                 name="userInvitationUpdates"
                 checked={formData.userInvitationUpdates}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
               />
-              <label htmlFor="userInvitationUpdates" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="userInvitationUpdates" className="ml-2 text-sm text-[var(--color-text-secondary)]">
                 User invitation updates
               </label>
             </div>
@@ -445,7 +445,7 @@ const NotificationSettings: React.FC = () => {
 
         {/* System Notifications */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             System
           </h3>
           
@@ -456,9 +456,9 @@ const NotificationSettings: React.FC = () => {
               name="systemNotifications"
               checked={formData.systemNotifications}
               onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
             />
-            <label htmlFor="systemNotifications" className="ml-2 text-sm text-neutral-700">
+            <label htmlFor="systemNotifications" className="ml-2 text-sm text-[var(--color-text-secondary)]">
               Enable system/desktop notifications
             </label>
           </div>
@@ -466,7 +466,7 @@ const NotificationSettings: React.FC = () => {
 
         {/* Quiet Hours */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
             Quiet Hours
           </h3>
           
@@ -477,9 +477,9 @@ const NotificationSettings: React.FC = () => {
               name="quietHoursEnabled"
               checked={formData.quietHoursEnabled}
               onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
             />
-            <label htmlFor="quietHoursEnabled" className="ml-2 text-sm text-neutral-700">
+            <label htmlFor="quietHoursEnabled" className="ml-2 text-sm text-[var(--color-text-secondary)]">
               Enable quiet hours (no notifications during these times)
             </label>
           </div>
@@ -488,7 +488,7 @@ const NotificationSettings: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="quietHoursStart" className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label htmlFor="quietHoursStart" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                     Start time
                   </label>
                   <input
@@ -497,11 +497,11 @@ const NotificationSettings: React.FC = () => {
                     name="quietHoursStart"
                     value={formData.quietHoursStart}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                   />
                 </div>
                 <div>
-                  <label htmlFor="quietHoursEnd" className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label htmlFor="quietHoursEnd" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                     End time
                   </label>
                   <input
@@ -510,7 +510,7 @@ const NotificationSettings: React.FC = () => {
                     name="quietHoursEnd"
                     value={formData.quietHoursEnd}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
                   />
                 </div>
               </div>
@@ -522,22 +522,22 @@ const NotificationSettings: React.FC = () => {
                   name="weekendsQuiet"
                   checked={formData.weekendsQuiet}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                  className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
                 />
-                <label htmlFor="weekendsQuiet" className="ml-2 text-sm text-neutral-700">
-                  Extend quiet hours to weekends
+                <label htmlFor="weekendsQuiet" className="ml-2 text-sm text-[var(--color-text-secondary)]">
+                  Apply quiet hours to weekends
                 </label>
               </div>
             </div>
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-200">
+        {/* Save Button */}
+        <div className="pt-6 border-t border-[var(--color-border)]">
           <button
             type="submit"
             disabled={isSaving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+            className="px-6 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200 disabled:opacity-50"
           >
             {isSaving ? 'Saving...' : 'Save Notification Settings'}
           </button>

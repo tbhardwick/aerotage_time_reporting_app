@@ -209,7 +209,7 @@ const DeveloperSettings: React.FC = () => {
   if (!developerInfo) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Loading developer information...</p>
+        <p className="text-[var(--color-text-secondary)]">Loading developer information...</p>
       </div>
     );
   }
@@ -218,82 +218,82 @@ const DeveloperSettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Developer Settings</h3>
-        <p className="text-gray-600">
+        <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">Developer Settings</h3>
+        <p className="text-[var(--color-text-secondary)]">
           Development tools, debugging information, and advanced settings.
         </p>
       </div>
 
       {/* System Information */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
         <div className="flex items-center space-x-2 mb-4">
-          <InformationCircleIcon className="h-5 w-5 text-blue-500" />
-          <h4 className="text-md font-medium text-gray-900">System Information</h4>
+          <InformationCircleIcon className="h-5 w-5 text-[var(--color-primary-500)]" />
+          <h4 className="text-md font-medium text-[var(--color-text-primary)]">System Information</h4>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium text-gray-700">App Version:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.appVersion}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">App Version:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.appVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Electron:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.electronVersion}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Electron:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.electronVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Node.js:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.nodeVersion}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Node.js:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.nodeVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Chrome:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.chromeVersion}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Chrome:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.chromeVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Platform:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.platform}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Platform:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.platform}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Language:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.language}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Language:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.language}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Screen:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.screenResolution} ({developerInfo.colorDepth}-bit)</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Screen:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.screenResolution} ({developerInfo.colorDepth}-bit)</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Timezone:</span>
-            <span className="ml-2 text-gray-600">{developerInfo.timezone}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">Timezone:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.timezone}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Online:</span>
-            <span className={`ml-2 ${developerInfo.onLine ? 'text-green-600' : 'text-red-600'}`}>
+            <span className="font-medium text-[var(--color-text-secondary)]">Online:</span>
+            <span className={`ml-2 ${developerInfo.onLine ? 'text-[var(--color-success-600)]' : 'text-[var(--color-error-600)]'}`}>
               {developerInfo.onLine ? '✅ Connected' : '❌ Offline'}
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-700">Cookies:</span>
-            <span className={`ml-2 ${developerInfo.cookieEnabled ? 'text-green-600' : 'text-red-600'}`}>
+            <span className="font-medium text-[var(--color-text-secondary)]">Cookies:</span>
+            <span className={`ml-2 ${developerInfo.cookieEnabled ? 'text-[var(--color-success-600)]' : 'text-[var(--color-error-600)]'}`}>
               {developerInfo.cookieEnabled ? '✅ Enabled' : '❌ Disabled'}
             </span>
           </div>
           <div className="md:col-span-2">
-            <span className="font-medium text-gray-700">User Agent:</span>
-            <span className="ml-2 text-gray-600 break-all">{developerInfo.userAgent}</span>
+            <span className="font-medium text-[var(--color-text-secondary)]">User Agent:</span>
+            <span className="ml-2 text-[var(--color-text-tertiary)] break-all">{developerInfo.userAgent}</span>
           </div>
         </div>
       </div>
 
       {/* API Testing */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <CodeBracketIcon className="h-5 w-5 text-green-500" />
-            <h4 className="text-md font-medium text-gray-900">API Testing</h4>
+            <CodeBracketIcon className="h-5 w-5 text-[var(--color-success-500)]" />
+            <h4 className="text-md font-medium text-[var(--color-text-primary)]">API Testing</h4>
           </div>
           <button
             onClick={testApiConnection}
             disabled={isTestingApi}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="inline-flex items-center px-3 py-2 border border-[var(--color-border)] shadow-sm text-sm leading-4 font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)] disabled:opacity-50"
           >
             <ArrowPathIcon className={`h-4 w-4 mr-2 ${isTestingApi ? 'animate-spin' : ''}`} />
             {isTestingApi ? 'Testing...' : 'Test API'}
@@ -301,13 +301,13 @@ const DeveloperSettings: React.FC = () => {
         </div>
 
         {apiTestResult && (
-          <div className="bg-gray-50 rounded-md p-4">
-            <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
+          <div className="bg-[var(--color-surface-secondary)] rounded-md p-4">
+            <pre className="text-sm text-[var(--color-text-primary)] whitespace-pre-wrap font-mono">
               {apiTestResult}
             </pre>
             <button
               onClick={() => copyToClipboard(apiTestResult)}
-              className="mt-2 inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+              className="mt-2 inline-flex items-center px-2 py-1 border border-[var(--color-border)] shadow-sm text-xs font-medium rounded text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)]"
             >
               <ClipboardDocumentIcon className="h-3 w-3 mr-1" />
               Copy
@@ -317,15 +317,15 @@ const DeveloperSettings: React.FC = () => {
       </div>
 
       {/* Local Storage Management */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <DocumentTextIcon className="h-5 w-5 text-purple-500" />
-            <h4 className="text-md font-medium text-gray-900">Local Storage</h4>
+            <DocumentTextIcon className="h-5 w-5 text-[var(--color-secondary-500)]" />
+            <h4 className="text-md font-medium text-[var(--color-text-primary)]">Local Storage</h4>
           </div>
           <button
             onClick={loadLocalStorageItems}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-3 py-2 border border-[var(--color-border)] shadow-sm text-sm leading-4 font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)]"
           >
             <ArrowPathIcon className="h-4 w-4 mr-2" />
             Refresh
@@ -334,10 +334,10 @@ const DeveloperSettings: React.FC = () => {
 
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {localStorageItems.map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <div key={item.key} className="flex items-center justify-between p-2 bg-[var(--color-surface-secondary)] rounded">
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 truncate">{item.key}</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-sm font-medium text-[var(--color-text-primary)] truncate">{item.key}</div>
+                <div className="text-xs text-[var(--color-text-tertiary)]">
                   {item.size} bytes • {item.value.substring(0, 50)}
                   {item.value.length > 50 ? '...' : ''}
                 </div>
@@ -345,14 +345,14 @@ const DeveloperSettings: React.FC = () => {
               <div className="flex items-center space-x-2 ml-4">
                 <button
                   onClick={() => copyToClipboard(item.value)}
-                  className="p-1 text-gray-400 hover:text-gray-600"
+                  className="p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
                   title="Copy value"
                 >
                   <ClipboardDocumentIcon className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => clearLocalStorageItem(item.key)}
-                  className="p-1 text-red-400 hover:text-red-600"
+                  className="p-1 text-[var(--color-error-400)] hover:text-[var(--color-error-600)]"
                   title="Delete item"
                 >
                   <TrashIcon className="h-4 w-4" />
@@ -363,40 +363,40 @@ const DeveloperSettings: React.FC = () => {
         </div>
 
         {localStorageItems.length === 0 && (
-          <p className="text-gray-500 text-center py-4">No localStorage items found</p>
+          <p className="text-[var(--color-text-tertiary)] text-center py-4">No localStorage items found</p>
         )}
       </div>
 
       {/* Debug Tools */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
         <div className="flex items-center space-x-2 mb-4">
-          <CogIcon className="h-5 w-5 text-gray-500" />
-          <h4 className="text-md font-medium text-gray-900">Debug Tools</h4>
+          <CogIcon className="h-5 w-5 text-[var(--color-text-tertiary)]" />
+          <h4 className="text-md font-medium text-[var(--color-text-primary)]">Debug Tools</h4>
         </div>
 
         <div className="space-y-3">
           <button
             onClick={exportDebugInfo}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-[var(--color-border)] shadow-sm text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)]"
           >
             <DocumentTextIcon className="h-4 w-4 mr-2" />
             Export Debug Information
           </button>
 
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-[var(--color-text-tertiary)]">
             Downloads a JSON file with system info, localStorage data, and API configuration for debugging.
           </div>
         </div>
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-lg border border-red-200 p-6">
+      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-error-200)] p-6">
         <div className="flex items-center space-x-2 mb-4">
-          <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />
-          <h4 className="text-md font-medium text-red-900">Danger Zone</h4>
+          <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-error-500)]" />
+          <h4 className="text-md font-medium text-[var(--color-error-900)]">Danger Zone</h4>
           <button
             onClick={() => setShowDangerZone(!showDangerZone)}
-            className="ml-auto text-sm text-red-600 hover:text-red-800"
+            className="ml-auto text-sm text-[var(--color-error-600)] hover:text-[var(--color-error-800)]"
           >
             {showDangerZone ? 'Hide' : 'Show'}
           </button>
@@ -404,20 +404,20 @@ const DeveloperSettings: React.FC = () => {
 
         {showDangerZone && (
           <div className="space-y-3">
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <p className="text-sm text-red-800 mb-3">
+            <div className="bg-[var(--color-error-50)] border border-[var(--color-error-200)] rounded-md p-4">
+              <p className="text-sm text-[var(--color-error-800)] mb-3">
                 ⚠️ These actions are irreversible and will affect your current session.
               </p>
               
               <button
                 onClick={clearAllLocalStorage}
-                className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                className="inline-flex items-center px-4 py-2 border border-[var(--color-error-300)] shadow-sm text-sm font-medium rounded-md text-[var(--color-error-700)] bg-[var(--color-error-50)] hover:bg-[var(--color-error-100)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-error-500)]"
               >
                 <TrashIcon className="h-4 w-4 mr-2" />
                 Clear All Local Storage
               </button>
               
-              <p className="text-xs text-red-600 mt-2">
+              <p className="text-xs text-[var(--color-error-600)] mt-2">
                 This will log you out and clear all locally stored data.
               </p>
             </div>

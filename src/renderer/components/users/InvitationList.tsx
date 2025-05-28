@@ -183,14 +183,14 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
 
   if (loading) {
     return (
-      <div className="bg-white shadow rounded-lg">
+      <div className="shadow rounded-lg" style={{ backgroundColor: 'var(--surface-color)' }}>
         <div className="px-4 py-5 sm:p-6">
           <div className="flex items-center justify-center h-32">
             <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span className="ml-2 text-gray-600">Loading invitations...</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>Loading invitations...</span>
           </div>
         </div>
       </div>
@@ -198,16 +198,16 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
   }
 
   return (
-    <div className="bg-white shadow rounded-lg">
+    <div className="shadow rounded-lg" style={{ backgroundColor: 'var(--surface-color)' }}>
       <div className="px-4 py-5 sm:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-medium text-gray-900 flex items-center">
+            <h3 className="text-lg font-medium flex items-center" style={{ color: 'var(--text-primary)' }}>
               <EnvelopeIcon className="h-5 w-5 mr-2 text-blue-500" />
               User Invitations
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Manage pending and completed user invitations
             </p>
           </div>
@@ -216,7 +216,12 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+              className="rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -231,7 +236,18 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
             <button
               onClick={fetchInvitations}
               disabled={loading}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex items-center px-3 py-2 shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              style={{
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--surface-color)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--border-color)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+              }}
             >
               <ArrowPathIcon className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -283,9 +299,9 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
         {/* Invitations List */}
         {filteredInvitations.length === 0 ? (
           <div className="text-center py-12">
-            <EnvelopeIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No invitations found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <EnvelopeIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
+            <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No invitations found</h3>
+            <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
               {selectedStatus === 'all' 
                 ? 'No user invitations have been sent yet.'
                 : `No ${selectedStatus} invitations found.`
@@ -295,15 +311,22 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
         ) : (
           <div className="space-y-4">
             {filteredInvitations.map((invitation) => (
-              <div key={invitation.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+              <div key={invitation.id} className="rounded-lg p-4 transition-colors" style={{ border: '1px solid var(--border-color)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       <div className="flex-shrink-0">
-                        <UserIcon className="h-6 w-6 text-gray-400" />
+                        <UserIcon className="h-6 w-6" style={{ color: 'var(--text-secondary)' }} />
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900">{invitation.email}</h4>
+                        <h4 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{invitation.email}</h4>
                         <div className="flex items-center space-x-2 mt-1">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(invitation.status)}`}>
                             {getStatusIcon(invitation.status)}
@@ -317,7 +340,7 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
                       {invitation.jobTitle && (
                         <div>
                           <span className="font-medium">Job Title:</span> {invitation.jobTitle}
@@ -347,7 +370,7 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
                       </div>
                     )}
 
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                       Resent {invitation.resentCount} times
                       {invitation.lastResentAt && (
                         <span> • Last resent: {formatDate(invitation.lastResentAt)}</span>
@@ -362,7 +385,22 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
                         <button
                           onClick={() => handleResend(invitation)}
                           disabled={actionLoading[`resend-${invitation.id}`] || invitation.resentCount >= 3}
-                          className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="inline-flex items-center px-3 py-1.5 shadow-sm text-xs font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                          style={{
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--surface-color)'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!e.currentTarget.disabled) {
+                              e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!e.currentTarget.disabled) {
+                              e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                            }
+                          }}
                           title={invitation.resentCount >= 3 ? 'Maximum resends reached' : 'Resend invitation'}
                         >
                           {actionLoading[`resend-${invitation.id}`] ? (
@@ -381,7 +419,8 @@ export const InvitationList: React.FC<InvitationListProps> = ({ onRefresh }) => 
                         <button
                           onClick={() => handleCancel(invitation)}
                           disabled={actionLoading[`cancel-${invitation.id}`]}
-                          className="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                          className="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                          title="Cancel invitation"
                         >
                           {actionLoading[`cancel-${invitation.id}`] ? (
                             <svg className="animate-spin h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

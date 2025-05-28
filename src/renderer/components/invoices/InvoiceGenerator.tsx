@@ -211,20 +211,20 @@ const InvoiceGenerator: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-medium text-neutral-900">Generate Invoice</h2>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Generate Invoice</h2>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
           Create invoices from approved time entries
         </p>
       </div>
 
       {availableTimeEntries.length === 0 ? (
         <div className="text-center py-12">
-          <CalendarDaysIcon className="mx-auto h-12 w-12 text-neutral-400" />
-          <h3 className="mt-2 text-sm font-medium text-neutral-900">No approved time entries</h3>
-          <p className="mt-1 text-sm text-neutral-500">
+          <CalendarDaysIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
+          <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No approved time entries</h3>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
             You need approved billable time entries to generate invoices.
           </p>
-          <div className="mt-4 text-xs text-neutral-400 max-w-md mx-auto">
+          <div className="mt-4 text-xs max-w-md mx-auto" style={{ color: 'var(--text-secondary)' }}>
             <p className="mb-2">To create invoices, follow these steps:</p>
             <ol className="text-left space-y-1">
               <li>1. Create time entries (Time Tracking page)</li>
@@ -238,20 +238,22 @@ const InvoiceGenerator: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Selection */}
           <div className="space-y-6">
             {/* Client Selection */}
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                 Select Client
               </label>
               <select
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={selectedClientId}
-                onChange={(e) => {
-                  setSelectedClientId(e.target.value);
-                  setSelectedTimeEntryIds([]); // Clear selections when client changes
+                onChange={(e) => setSelectedClientId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--background-color)',
+                  color: 'var(--text-primary)'
                 }}
               >
                 <option value="">Choose a client...</option>
@@ -263,11 +265,10 @@ const InvoiceGenerator: React.FC = () => {
               </select>
             </div>
 
-            {/* Time Entries Selection */}
             {selectedClientId && (
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="block text-sm font-medium text-neutral-700">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     Select Time Entries
                   </label>
                   <button
@@ -287,36 +288,53 @@ const InvoiceGenerator: React.FC = () => {
                     return (
                       <div
                         key={entry.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                           selectedTimeEntryIds.includes(entry.id)
                             ? 'border-blue-500 bg-blue-50'
-                            : 'border-neutral-200 hover:border-neutral-300'
+                            : ''
                         }`}
+                        style={{
+                          border: selectedTimeEntryIds.includes(entry.id) 
+                            ? '1px solid #3b82f6' 
+                            : '1px solid var(--border-color)',
+                          backgroundColor: selectedTimeEntryIds.includes(entry.id) 
+                            ? 'rgba(59, 130, 246, 0.1)' 
+                            : 'var(--surface-color)'
+                        }}
                         onClick={() => handleTimeEntryToggle(entry.id)}
                       >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                checked={selectedTimeEntryIds.includes(entry.id)}
-                                onChange={() => {}} // Handled by div click
-                                className="text-blue-600"
-                              />
-                              <div>
-                                <div className="font-medium text-sm">{getProjectName(entry.projectId)}</div>
-                                <div className="text-sm text-neutral-500">{entry.description}</div>
-                                <div className="text-xs text-neutral-400">
-                                  {format(new Date(entry.date), 'MMM d, yyyy')}
-                                </div>
-                              </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedTimeEntryIds.includes(entry.id)}
+                              onChange={() => handleTimeEntryToggle(entry.id)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
+                              style={{ borderColor: 'var(--border-color)' }}
+                            />
+                            <div>
+                              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                                {getProjectName(entry.projectId)}
+                              </p>
+                              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                {entry.date} • {formatDuration(entry.duration)}
+                              </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-medium">{formatDuration(entry.duration)}</div>
-                            <div className="text-sm text-neutral-500">{formatCurrency(amount)}</div>
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                              {formatCurrency(amount)}
+                            </p>
+                            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                              {formatCurrency(rate)}/hr
+                            </p>
                           </div>
                         </div>
+                        {entry.description && (
+                          <p className="mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                            {entry.description}
+                          </p>
+                        )}
                       </div>
                     );
                   })}
@@ -328,23 +346,33 @@ const InvoiceGenerator: React.FC = () => {
             {selectedTimeEntryIds.length > 0 && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                     Due Date
                   </label>
                   <input
                     type="date"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                     Notes (Optional)
                   </label>
                   <textarea
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)'
+                    }}
                     rows={3}
                     placeholder="Additional notes for the invoice..."
                     value={notes}
@@ -357,45 +385,46 @@ const InvoiceGenerator: React.FC = () => {
 
           {/* Right Column - Summary */}
           {selectedTimeEntryIds.length > 0 && (
-            <div className="bg-neutral-50 rounded-xl p-6">
-              <h3 className="text-lg font-medium text-neutral-900 mb-4">Invoice Summary</h3>
+            <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--border-color)' }}>
+              <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Invoice Summary</h3>
               
               {/* Project Breakdown */}
               <div className="space-y-3 mb-6">
                 {calculationSummary.projectBreakdown.map((project, index) => (
                   <div key={index} className="flex justify-between text-sm">
                     <div>
-                      <div className="font-medium">{project.name}</div>
-                      <div className="text-neutral-500">
+                      <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{project.name}</div>
+                      <div style={{ color: 'var(--text-secondary)' }}>
                         {project.hours.toFixed(1)}h @ {formatCurrency(project.rate)}/hr
                       </div>
                     </div>
-                    <div className="font-medium">{formatCurrency(project.amount)}</div>
+                    <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{formatCurrency(project.amount)}</div>
                   </div>
                 ))}
               </div>
 
               {/* Totals */}
-              <div className="border-t border-neutral-200 pt-4 space-y-2">
+              <div className="pt-4 space-y-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal ({calculationSummary.totalHours.toFixed(1)} hours)</span>
-                  <span>{formatCurrency(calculationSummary.totalAmount)}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Subtotal ({calculationSummary.totalHours.toFixed(1)} hours)</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{formatCurrency(calculationSummary.totalAmount)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Tax (10%)</span>
-                  <span>{formatCurrency(calculationSummary.tax)}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Tax (10%)</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{formatCurrency(calculationSummary.tax)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-semibold border-t border-neutral-200 pt-2">
-                  <span>Total</span>
-                  <span>{formatCurrency(calculationSummary.grandTotal)}</span>
+                <div className="flex justify-between text-lg font-semibold pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-primary)' }}>Total</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{formatCurrency(calculationSummary.grandTotal)}</span>
                 </div>
               </div>
 
+              {/* Generate Button */}
               <button
                 onClick={handleGenerateInvoice}
-                className="w-full mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full mt-6 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
               >
-                <PlusIcon className="w-4 h-4" />
+                <PlusIcon className="w-4 h-4 mr-2 inline" />
                 Generate Invoice
               </button>
             </div>

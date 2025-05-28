@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 import { signOut } from 'aws-amplify/auth';
 import {
   UserIcon,
@@ -10,7 +11,10 @@ import {
   UserCircleIcon,
   ShieldCheckIcon,
   BellIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  SunIcon,
+  MoonIcon,
+  ComputerDesktopIcon
 } from '@heroicons/react/24/outline';
 
 interface UserDropdownProps {
@@ -24,7 +28,9 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
 }) => {
   const { state } = useAppContext();
   const { user } = state;
+  const { theme, effectiveTheme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+  const [isChangingTheme, setIsChangingTheme] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -155,47 +161,59 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
       {/* User Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 w-full"
+        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full"
+        style={{
+          backgroundColor: 'transparent',
+          color: 'var(--text-primary)',
+          '--ring-offset-color': 'var(--background-color)'
+        } as any}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--border-color)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         {/* Avatar */}
-        <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+        <div className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0" style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-primary)' }}>
           {getUserInitials()}
         </div>
         
         {/* User Info */}
         <div className="flex-1 text-left min-w-0">
-          <div className="text-sm font-medium text-white truncate">
+          <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
             {getUserDisplayName()}
           </div>
-          <div className="text-xs text-gray-400 truncate">
+          <div className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
             {formatRole(user?.role)}
           </div>
         </div>
         
         {/* Chevron */}
         <ChevronDownIcon 
-          className={`h-4 w-4 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} 
+          className={`h-4 w-4 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          style={{ color: 'var(--text-secondary)' }}
         />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+        <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50" style={{ backgroundColor: 'var(--surface-color)', color: 'var(--text-primary)' }}>
           {/* User Info Header */}
-          <div className="px-4 py-3 border-b border-gray-200">
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
             <div className="flex items-center space-x-3">
-              <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-lg font-medium text-gray-700">
+              <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--border-color)' }}>
+                <span className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
                   {getUserInitials()}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                   {getUserDisplayName()}
                 </p>
-                <p className="text-sm text-gray-500 truncate">
+                <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
                   {user?.email}
                 </p>
                 <div className="flex items-center mt-1">
@@ -219,14 +237,76 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
             <Link
               to="/settings"
               onClick={handleMenuItemClick}
-              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              className="flex items-center px-4 py-2 text-sm transition-colors duration-200"
+              style={{ 
+                color: 'var(--text-primary)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--border-color)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <Cog6ToothIcon className="h-4 w-4 mr-3 text-gray-400" />
+              <Cog6ToothIcon className="h-4 w-4 mr-3" style={{ color: 'var(--text-secondary)' }} />
               Settings
             </Link>
 
+            {/* Theme Toggle */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Prevent double-clicks by checking if we're already changing theme
+                if (isChangingTheme) {
+                  return;
+                }
+                
+                setIsChangingTheme(true);
+                
+                // Cycle through themes: light → dark → system → light
+                const nextTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+                setTheme(nextTheme);
+                
+                // Reset the changing state after a brief delay
+                setTimeout(() => {
+                  setIsChangingTheme(false);
+                }, 300);
+                
+                // Don't auto-close the dropdown - let user close it manually
+              }}
+              disabled={isChangingTheme}
+              className="flex items-center w-full px-4 py-2 text-sm transition-colors duration-200 disabled:opacity-50"
+              style={{ 
+                color: 'var(--text-primary)',
+              }}
+              onMouseEnter={(e) => {
+                if (!isChangingTheme) {
+                  e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              {theme === 'light' ? (
+                <SunIcon className="h-4 w-4 mr-3" style={{ color: 'var(--text-secondary)' }} />
+              ) : theme === 'dark' ? (
+                <MoonIcon className="h-4 w-4 mr-3" style={{ color: 'var(--text-secondary)' }} />
+              ) : (
+                <ComputerDesktopIcon className="h-4 w-4 mr-3" style={{ color: 'var(--text-secondary)' }} />
+              )}
+              <span className="flex-1 text-left">
+                {isChangingTheme ? 'Switching...' : `Theme: ${theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System'}`}
+              </span>
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                ({effectiveTheme === 'light' ? '☀️' : '🌙'})
+              </span>
+            </button>
+
             {/* Divider */}
-            <div className="border-t border-gray-200 my-1"></div>
+            <div className="my-1" style={{ borderTop: '1px solid var(--border-color)' }}></div>
 
             {/* Help & Support */}
             <button
@@ -235,14 +315,23 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
                 // TODO: Open help modal or navigate to help page
                 console.log('Help & Support clicked');
               }}
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              className="flex items-center w-full px-4 py-2 text-sm transition-colors duration-200"
+              style={{ 
+                color: 'var(--text-primary)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--border-color)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <QuestionMarkCircleIcon className="h-4 w-4 mr-3 text-gray-400" />
+              <QuestionMarkCircleIcon className="h-4 w-4 mr-3" style={{ color: 'var(--text-secondary)' }} />
               Help & Support
             </button>
 
             {/* Divider */}
-            <div className="border-t border-gray-200 my-1"></div>
+            <div className="my-1" style={{ borderTop: '1px solid var(--border-color)' }}></div>
 
             {/* Sign Out */}
             <button
@@ -250,7 +339,13 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
                 handleMenuItemClick();
                 handleLogout();
               }}
-              className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors duration-200"
+              className="flex items-center w-full px-4 py-2 text-sm text-red-700 transition-colors duration-200"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#fef2f2'; // red-50
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4 mr-3 text-red-400" />
               Sign Out
@@ -258,8 +353,8 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-            <p className="text-xs text-gray-500">
+          <div className="px-4 py-2 rounded-b-lg" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--background-color)' }}>
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               Aerotage Time Reporting v1.0
             </p>
           </div>

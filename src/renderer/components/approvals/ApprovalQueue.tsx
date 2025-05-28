@@ -135,8 +135,8 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Approval Queue</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Approval Queue</h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             {submittedCount} {submittedCount === 1 ? 'entry' : 'entries'} pending approval
           </p>
         </div>
@@ -146,7 +146,12 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as 'all' | 'submitted')}
-            className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           >
             <option value="submitted">Pending Only</option>
             <option value="all">All Submissions</option>
@@ -156,9 +161,9 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
 
       {/* Bulk Actions */}
       {selectedEntries.length > 0 && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+        <div className="border rounded-lg p-4" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-indigo-900">
+            <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
               {selectedEntries.length} {selectedEntries.length === 1 ? 'entry' : 'entries'} selected
             </span>
             <div className="flex space-x-2">
@@ -184,40 +189,50 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
       )}
 
       {/* Entries List */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="shadow overflow-hidden sm:rounded-md" style={{ backgroundColor: 'var(--surface-color)' }}>
         {pendingEntries.length === 0 ? (
           <div className="p-6 text-center">
-            <ClockIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No entries found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <ClockIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
+            <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No entries found</h3>
+            <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
               {filter === 'submitted' ? 'No time entries are pending approval.' : 'No time entries have been submitted.'}
             </p>
           </div>
         ) : (
           <>
             {/* Select All Header */}
-            <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <div className="px-4 py-3" style={{ backgroundColor: 'var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   checked={selectedEntries.length === pendingEntries.filter(entry => entry.status === 'submitted').length && submittedCount > 0}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
+                  style={{ borderColor: 'var(--border-color)' }}
                 />
-                <label className="ml-3 text-sm font-medium text-gray-700">
+                <label className="ml-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Select all pending entries
                 </label>
               </div>
             </div>
 
             {/* Entries */}
-            <ul className="divide-y divide-gray-200">
+            <ul style={{ borderColor: 'var(--border-color)' }} className="divide-y">
               {pendingEntries.map((entry) => {
                 const { user, project } = getEntryDetails(entry);
                 const canSelect = entry.status === 'submitted';
                 
                 return (
-                  <li key={entry.id} className="px-4 py-4 hover:bg-gray-50">
+                  <li 
+                    key={entry.id} 
+                    className="px-4 py-4 transition-colors"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
                     <div className="flex items-center space-x-4">
                       {/* Checkbox */}
                       <input
@@ -225,7 +240,8 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                         checked={selectedEntries.includes(entry.id)}
                         onChange={() => handleSelectEntry(entry.id)}
                         disabled={!canSelect}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded disabled:opacity-50"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded disabled:opacity-50"
+                        style={{ borderColor: 'var(--border-color)' }}
                       />
 
                       {/* Entry Details */}
@@ -233,13 +249,13 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <div className="flex-shrink-0">
-                              <UserIcon className="h-6 w-6 text-gray-400" />
+                              <UserIcon className="h-6 w-6" style={{ color: 'var(--text-secondary)' }} />
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                                 {user?.name || 'Unknown User'}
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                                 {project?.name || 'Unknown Project'}
                                 {project?.client && ` - ${project.client.name}`}
                               </p>
@@ -253,7 +269,7 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                           </div>
                         </div>
 
-                        <div className="mt-2 flex items-center space-x-6 text-sm text-gray-500">
+                        <div className="mt-2 flex items-center space-x-6 text-sm" style={{ color: 'var(--text-secondary)' }}>
                           <div className="flex items-center">
                             <CalendarIcon className="h-4 w-4 mr-1" />
                             {entry.date}
@@ -270,21 +286,21 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                         </div>
 
                         {entry.description && (
-                          <p className="mt-1 text-sm text-gray-600">
+                          <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                             {entry.description}
                           </p>
                         )}
 
                         {entry.comment && (
-                          <div className="mt-2 p-2 bg-gray-100 rounded-md">
-                            <p className="text-sm text-gray-700">
+                          <div className="mt-2 p-2 rounded-md" style={{ backgroundColor: 'var(--border-color)' }}>
+                            <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                               <span className="font-medium">Comment:</span> {entry.comment}
                             </p>
                           </div>
                         )}
 
                         {/* Submission/Approval Info */}
-                        <div className="mt-2 text-xs text-gray-500">
+                        <div className="mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
                           {entry.submittedAt && (
                             <span>Submitted on {new Date(entry.submittedAt).toLocaleDateString()}</span>
                           )}
@@ -307,22 +323,27 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
 
       {/* Comment Modal */}
       {showCommentModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
                 {showCommentModal === 'approve' ? 'Approve Entries' : 'Reject Entries'}
               </h3>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   {showCommentModal === 'reject' ? 'Rejection Reason (Required)' : 'Comment (Optional)'}
                 </label>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
-                  className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)'
+                  }}
                   placeholder={showCommentModal === 'reject' ? 'Please provide a reason for rejection...' : 'Add a comment...'}
                 />
               </div>
@@ -333,7 +354,18 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                     setShowCommentModal(null);
                     setComment('');
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  style={{
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--border-color)',
+                    border: '1px solid var(--border-color)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                  }}
                 >
                   Cancel
                 </button>

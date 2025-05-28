@@ -56,20 +56,35 @@ const Projects: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Projects & Clients</h1>
-        <p className="text-neutral-600">Manage your projects, clients, and team assignments</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Projects & Clients</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>Manage your projects, clients, and team assignments</p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-neutral-200">
+      <div style={{ borderBottom: '1px solid var(--border-color)' }}>
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('projects')}
             className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'projects'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                ? 'border-blue-500'
+                : 'border-transparent'
             }`}
+            style={{
+              color: activeTab === 'projects' ? '#2563eb' : 'var(--text-secondary)'
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'projects') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'projects') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.borderColor = 'transparent';
+              }
+            }}
           >
             Projects
           </button>
@@ -77,9 +92,24 @@ const Projects: React.FC = () => {
             onClick={() => setActiveTab('clients')}
             className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'clients'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                ? 'border-blue-500'
+                : 'border-transparent'
             }`}
+            style={{
+              color: activeTab === 'clients' ? '#2563eb' : 'var(--text-secondary)'
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'clients') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'clients') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.borderColor = 'transparent';
+              }
+            }}
           >
             Clients
           </button>
@@ -87,7 +117,7 @@ const Projects: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
+      <div className="rounded-xl shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         {activeTab === 'projects' && (
           <ProjectList
             onEditProject={handleEditProject}

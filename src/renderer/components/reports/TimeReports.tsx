@@ -109,7 +109,7 @@ const TimeReports: React.FC = () => {
     filteredEntries.forEach(entry => {
       const hours = entry.duration / 60; // Convert minutes to hours
       const project = projects.find(p => p.id === entry.projectId);
-      const hourlyRate = project?.hourlyRate || 0;
+      const hourlyRate = project?.defaultHourlyRate || 0;
       const amount = entry.isBillable ? hours * hourlyRate : 0;
 
       result.totalHours += hours;
@@ -144,23 +144,28 @@ const TimeReports: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-neutral-900">Time Reports</h2>
-        <p className="text-neutral-600">View and analyze time tracking data</p>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Time Reports</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>View and analyze time tracking data</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Filters</h3>
+      <div className="rounded-xl shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Filters</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {/* Date Range */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Date Range
             </label>
             <select
               value={filters.dateRange}
               onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value as any }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="today">Today</option>
               <option value="week">This Week</option>
@@ -173,25 +178,35 @@ const TimeReports: React.FC = () => {
           {filters.dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={filters.startDate || ''}
                   onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
-                  className="w-full rounded-lg border-neutral-300 text-sm"
+                  className="w-full rounded-lg text-sm"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   End Date
                 </label>
                 <input
                   type="date"
                   value={filters.endDate || ''}
                   onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
-                  className="w-full rounded-lg border-neutral-300 text-sm"
+                  className="w-full rounded-lg text-sm"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
             </>
@@ -199,13 +214,18 @@ const TimeReports: React.FC = () => {
 
           {/* Project Filter */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Project
             </label>
             <select
               value={filters.projectId || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, projectId: e.target.value || undefined }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="">All Projects</option>
               {projects.map(project => (
@@ -218,13 +238,18 @@ const TimeReports: React.FC = () => {
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Status
             </label>
             <select
               value={filters.status || 'all'}
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value === 'all' ? 'all' : e.target.value as any }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>
@@ -241,100 +266,101 @@ const TimeReports: React.FC = () => {
               type="checkbox"
               checked={filters.billableOnly}
               onChange={(e) => setFilters(prev => ({ ...prev, billableOnly: e.target.checked }))}
-              className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+              className="rounded text-blue-600 focus:ring-blue-500"
+              style={{ borderColor: 'var(--border-color)' }}
             />
-            <span className="ml-2 text-sm text-neutral-700">Show billable time only</span>
+            <span className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>Show billable time only</span>
           </label>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-soft p-6">
+        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ClockIcon className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Total Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">{summary.totalHours.toFixed(1)}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summary.totalHours.toFixed(1)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-soft p-6">
+        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <CurrencyDollarIcon className="h-8 w-8 text-green-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Billable Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">{summary.billableHours.toFixed(1)}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summary.billableHours.toFixed(1)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-soft p-6">
+        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ChartBarIcon className="h-8 w-8 text-purple-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Total Amount</p>
-              <p className="text-2xl font-bold text-neutral-900">${summary.totalAmount.toLocaleString()}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Amount</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>${summary.totalAmount.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-soft p-6">
+        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <CalendarIcon className="h-8 w-8 text-orange-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Entries</p>
-              <p className="text-2xl font-bold text-neutral-900">{summary.entriesCount}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Entries</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summary.entriesCount}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Project Breakdown */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Project Breakdown</h3>
+      <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Project Breakdown</h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-neutral-200">
-            <thead className="bg-neutral-50">
+          <table className="min-w-full divide-y" style={{ borderColor: 'var(--border-color)' }}>
+            <thead style={{ backgroundColor: 'var(--background-color)' }}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Project
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Client
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Hours
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Rate
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-neutral-200">
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {Object.entries(summary.projectBreakdown).map(([projectId, data]) => {
                 const project = projects.find(p => p.id === projectId);
                 const client = clients.find(c => c.id === project?.clientId);
                 return (
                   <tr key={projectId}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       {project?.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-secondary)' }}>
                       {client?.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>
                       {data.hours.toFixed(1)}h
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>
                       ${data.amount.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                      ${project?.hourlyRate}/hr
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      ${project?.defaultHourlyRate || 'N/A'}/hr
                     </td>
                   </tr>
                 );
@@ -345,60 +371,60 @@ const TimeReports: React.FC = () => {
       </div>
 
       {/* Detailed Time Entries */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Time Entries</h3>
+      <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Time Entries</h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-neutral-200">
-            <thead className="bg-neutral-50">
+          <table className="min-w-full divide-y" style={{ borderColor: 'var(--border-color)' }}>
+            <thead style={{ backgroundColor: 'var(--background-color)' }}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Project
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Duration
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Billable
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Amount
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-neutral-200">
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {filteredEntries.map(entry => {
                 const project = projects.find(p => p.id === entry.projectId);
                 const hours = entry.duration / 60;
-                const amount = entry.isBillable ? hours * (project?.hourlyRate || 0) : 0;
+                const amount = entry.isBillable ? hours * (project?.defaultHourlyRate || 0) : 0;
                 
                 return (
                   <tr key={entry.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                      {format(parseISO(entry.date), 'MMM dd, yyyy')}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>
+                      {format(parseISO(entry.date), 'MMM d, yyyy')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       {project?.name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-neutral-900 max-w-xs truncate">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                       {entry.description}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>
                       {formatHours(entry.duration)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         entry.isBillable 
                           ? 'bg-green-100 text-green-800' 
-                          : 'bg-neutral-100 text-neutral-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}>
                         {entry.isBillable ? 'Billable' : 'Non-billable'}
                       </span>
@@ -408,12 +434,12 @@ const TimeReports: React.FC = () => {
                         entry.status === 'approved' ? 'bg-green-100 text-green-800' :
                         entry.status === 'submitted' ? 'bg-yellow-100 text-yellow-800' :
                         entry.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        'bg-neutral-100 text-neutral-800'
+                        'bg-gray-100 text-gray-800'
                       }`}>
-                        {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                        {entry.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>
                       ${amount.toFixed(2)}
                     </td>
                   </tr>

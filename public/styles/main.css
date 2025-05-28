@@ -12,9 +12,19 @@
   --title-bar-height: 52px;
 }
 
-/* Dark mode variables */
+/* Dark mode variables - explicit class-based */
+.dark {
+  --background-color: #1e1e1e;
+  --surface-color: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1a6;
+  --border-color: #424242;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark mode variables - system preference fallback */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background-color: #1e1e1e;
     --surface-color: #2d2d2d;
     --text-primary: #ffffff;
@@ -267,4 +277,117 @@ h2 {
 /* Animation for smooth transitions */
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Global theme-aware form elements */
+input, select, textarea {
+  background-color: var(--background-color) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px #3b82f6 !important;
+}
+
+input:disabled, select:disabled, textarea:disabled {
+  background-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  opacity: 0.6;
+}
+
+/* Theme-aware utility classes */
+.theme-bg-primary {
+  background-color: var(--background-color);
+}
+
+.theme-bg-surface {
+  background-color: var(--surface-color);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-border {
+  border-color: var(--border-color);
+}
+
+.theme-shadow {
+  box-shadow: var(--shadow);
+}
+
+/* Theme-aware card components */
+.theme-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  color: var(--text-primary);
+}
+
+.theme-card-white {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Theme-aware table styling */
+table {
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+}
+
+th {
+  background-color: var(--background-color);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+td {
+  border-color: var(--border-color);
+}
+
+/* Theme-aware button hover states */
+.theme-hover:hover {
+  background-color: var(--border-color);
+}
+
+/* Ensure proper contrast for status badges */
+.status-badge-draft {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Override any hardcoded Tailwind colors that might interfere */
+.bg-white {
+  background-color: var(--surface-color) !important;
+}
+
+.text-gray-900, .text-neutral-900 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600, .text-neutral-600 {
+  color: var(--text-secondary) !important;
+}
+
+.border-gray-200, .border-neutral-200 {
+  border-color: var(--border-color) !important;
+}
+
+.divide-gray-200, .divide-neutral-200 {
+  border-color: var(--border-color) !important;
+}
+
+.bg-gray-50, .bg-neutral-50 {
+  background-color: var(--background-color) !important;
+}
+
+.bg-gray-100, .bg-neutral-100 {
+  background-color: var(--border-color) !important;
 } 

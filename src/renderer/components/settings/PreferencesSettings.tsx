@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useUserPreferences } from '../../hooks';
 import { UpdateUserPreferencesRequest } from '../../types/user-profile-api';
 
 interface PreferencesFormData {
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'system';
   notifications: boolean;
   timezone: string;
   defaultTimeEntryDuration: number;
@@ -56,6 +57,7 @@ const dateFormats = [
 const PreferencesSettings: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const { user } = state;
+  const { setTheme, effectiveTheme } = useTheme();
   
   // Use the preferences API hook
   const { 
@@ -132,6 +134,13 @@ const PreferencesSettings: React.FC = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
     }));
+
+    // Apply theme change immediately for better UX
+    if (name === 'theme') {
+      if (value === 'light' || value === 'dark' || value === 'system') {
+        setTheme(value as 'light' | 'dark' | 'system');
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -145,7 +154,7 @@ const PreferencesSettings: React.FC = () => {
     try {
       // Prepare the update request according to API structure
       const updates: UpdateUserPreferencesRequest = {
-        theme: formData.theme,
+        theme: formData.theme === 'system' ? effectiveTheme : formData.theme,
         notifications: formData.notifications,
         timezone: formData.timezone,
         timeTracking: {
@@ -188,6 +197,8 @@ const PreferencesSettings: React.FC = () => {
         },
       });
 
+      setTheme(updatedPreferences.theme);
+
       setMessage({ type: 'success', text: 'Preferences updated successfully!' });
 
     } catch (error) {
@@ -203,7 +214,7 @@ const PreferencesSettings: React.FC = () => {
   if (preferencesLoading && !preferences) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-500">Loading preferences...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Loading preferences...</p>
       </div>
     );
   }
@@ -216,10 +227,10 @@ const PreferencesSettings: React.FC = () => {
         <div className="space-y-6">
           {/* Header */}
           <div className="text-center py-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+            <div className="rounded-lg p-4 max-w-md mx-auto" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
               <div className="text-2xl mb-2">⚙️</div>
-              <h2 className="text-lg font-semibold text-blue-900 mb-2">Set Up Your Preferences</h2>
-              <p className="text-blue-700 text-sm">
+              <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Set Up Your Preferences</h2>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 We'll use sensible defaults, but you can customize everything to your liking.
               </p>
             </div>
@@ -239,14 +250,14 @@ const PreferencesSettings: React.FC = () => {
             )}
 
             {/* Basic Preferences */}
-            <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-              <h3 className="text-md font-medium text-gray-900 border-b border-gray-200 pb-2">
+            <div className="p-6 rounded-lg shadow-md space-y-4" style={{ backgroundColor: 'var(--surface-color)' }}>
+              <h3 className="text-md font-medium pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }}>
                 Essential Settings
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="theme" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="theme" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                     Theme
                   </label>
                   <select
@@ -254,15 +265,21 @@ const PreferencesSettings: React.FC = () => {
                     name="theme"
                     value={formData.theme}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    style={{ 
+                      backgroundColor: 'var(--background-color)', 
+                      color: 'var(--text-primary)', 
+                      border: '1px solid var(--border-color)' 
+                    }}
                   >
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>
+                    <option value="system">System</option>
                   </select>
                 </div>
 
                 <div>
-                  <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="timezone" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                     Timezone
                   </label>
                   <select
@@ -270,7 +287,12 @@ const PreferencesSettings: React.FC = () => {
                     name="timezone"
                     value={formData.timezone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    style={{ 
+                      backgroundColor: 'var(--background-color)', 
+                      color: 'var(--text-primary)', 
+                      border: '1px solid var(--border-color)' 
+                    }}
                   >
                     {timezones.map(tz => (
                       <option key={tz} value={tz}>{tz}</option>
@@ -286,16 +308,17 @@ const PreferencesSettings: React.FC = () => {
                   name="notifications"
                   checked={formData.notifications}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)' }}
                 />
-                <label htmlFor="notifications" className="ml-2 text-sm text-gray-700">
+                <label htmlFor="notifications" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                   Enable notifications
                 </label>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+            <div className="flex items-center justify-end space-x-3 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
               <button
                 type="submit"
                 disabled={updating}
@@ -312,9 +335,9 @@ const PreferencesSettings: React.FC = () => {
     // For other errors, show the regular error state
     return (
       <div className="text-center py-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-red-800 mb-2">Failed to load preferences</p>
-          <p className="text-red-600 text-sm mb-4">{preferencesError}</p>
+        <div className="rounded-lg p-4 max-w-md mx-auto" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+          <p className="mb-2" style={{ color: 'var(--text-primary)' }}>Failed to load preferences</p>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{preferencesError}</p>
           <button
             onClick={refetch}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
@@ -330,7 +353,7 @@ const PreferencesSettings: React.FC = () => {
   if (!preferences && !preferencesLoading) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral-500">No preferences data available</p>
+        <p style={{ color: 'var(--text-secondary)' }}>No preferences data available</p>
       </div>
     );
   }
@@ -339,8 +362,8 @@ const PreferencesSettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Preferences</h2>
-        <p className="text-sm text-neutral-600">Customize your application experience</p>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Preferences</h2>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Customize your application experience</p>
       </div>
 
       {/* Messages */}
@@ -358,13 +381,13 @@ const PreferencesSettings: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Appearance */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }}>
             Appearance
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="theme" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="theme" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Theme
               </label>
               <select
@@ -372,15 +395,21 @@ const PreferencesSettings: React.FC = () => {
                 name="theme"
                 value={formData.theme}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
+                <option value="system">System</option>
               </select>
             </div>
 
             <div>
-              <label htmlFor="dateFormat" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="dateFormat" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Date Format
               </label>
               <select
@@ -388,7 +417,12 @@ const PreferencesSettings: React.FC = () => {
                 name="dateFormat"
                 value={formData.dateFormat}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 {dateFormats.map(format => (
                   <option key={format} value={format}>{format}</option>
@@ -399,7 +433,7 @@ const PreferencesSettings: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="timeFormat" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="timeFormat" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Time Format
               </label>
               <select
@@ -407,7 +441,12 @@ const PreferencesSettings: React.FC = () => {
                 name="timeFormat"
                 value={formData.timeFormat}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 <option value="12h">12 Hour (AM/PM)</option>
                 <option value="24h">24 Hour</option>
@@ -415,7 +454,7 @@ const PreferencesSettings: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="currency" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="currency" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Currency
               </label>
               <select
@@ -423,7 +462,12 @@ const PreferencesSettings: React.FC = () => {
                 name="currency"
                 value={formData.currency}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 {currencies.map(currency => (
                   <option key={currency} value={currency}>{currency}</option>
@@ -435,13 +479,13 @@ const PreferencesSettings: React.FC = () => {
 
         {/* Time Tracking */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }}>
             Time Tracking
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="defaultTimeEntryDuration" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="defaultTimeEntryDuration" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Default Time Entry Duration (minutes)
               </label>
               <input
@@ -452,12 +496,17 @@ const PreferencesSettings: React.FC = () => {
                 onChange={handleInputChange}
                 min="1"
                 max="480"
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               />
             </div>
 
             <div>
-              <label htmlFor="reminderInterval" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="reminderInterval" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Timer Reminder Interval (minutes)
               </label>
               <select
@@ -465,7 +514,12 @@ const PreferencesSettings: React.FC = () => {
                 name="reminderInterval"
                 value={formData.reminderInterval}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 <option value={0}>No reminders</option>
                 <option value={15}>Every 15 minutes</option>
@@ -484,9 +538,10 @@ const PreferencesSettings: React.FC = () => {
                 name="autoStartTimer"
                 checked={formData.autoStartTimer}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)' }}
               />
-              <label htmlFor="autoStartTimer" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="autoStartTimer" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Auto-start timer when opening the application
               </label>
             </div>
@@ -498,9 +553,10 @@ const PreferencesSettings: React.FC = () => {
                 name="showTimerInMenuBar"
                 checked={formData.showTimerInMenuBar}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)' }}
               />
-              <label htmlFor="showTimerInMenuBar" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="showTimerInMenuBar" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Show timer in menu bar
               </label>
             </div>
@@ -512,9 +568,10 @@ const PreferencesSettings: React.FC = () => {
                 name="defaultBillableStatus"
                 checked={formData.defaultBillableStatus}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)' }}
               />
-              <label htmlFor="defaultBillableStatus" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="defaultBillableStatus" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Mark new time entries as billable by default
               </label>
             </div>
@@ -523,13 +580,13 @@ const PreferencesSettings: React.FC = () => {
 
         {/* Working Hours */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }}>
             Working Hours
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="workingHoursStart" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="workingHoursStart" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Start Time
               </label>
               <input
@@ -538,12 +595,17 @@ const PreferencesSettings: React.FC = () => {
                 name="workingHoursStart"
                 value={formData.workingHoursStart}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               />
             </div>
 
             <div>
-              <label htmlFor="workingHoursEnd" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="workingHoursEnd" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 End Time
               </label>
               <input
@@ -552,7 +614,12 @@ const PreferencesSettings: React.FC = () => {
                 name="workingHoursEnd"
                 value={formData.workingHoursEnd}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               />
             </div>
           </div>
@@ -560,13 +627,13 @@ const PreferencesSettings: React.FC = () => {
 
         {/* Notifications & Timezone */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-neutral-900 border-b border-neutral-200 pb-2">
+          <h3 className="text-md font-medium pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }}>
             Notifications & Location
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="timezone" className="block text-sm font-medium text-neutral-700 mb-1">
+              <label htmlFor="timezone" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Timezone
               </label>
               <select
@@ -574,7 +641,12 @@ const PreferencesSettings: React.FC = () => {
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 {timezones.map(tz => (
                   <option key={tz} value={tz}>{tz}</option>
@@ -589,9 +661,10 @@ const PreferencesSettings: React.FC = () => {
                 name="notifications"
                 checked={formData.notifications}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 border-neutral-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)' }}
               />
-              <label htmlFor="notifications" className="ml-2 text-sm text-neutral-700">
+              <label htmlFor="notifications" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Enable notifications
               </label>
             </div>
@@ -599,7 +672,7 @@ const PreferencesSettings: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-200">
+        <div className="flex items-center justify-end space-x-3 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
           <button
             type="submit"
             disabled={updating}

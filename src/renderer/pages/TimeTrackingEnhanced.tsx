@@ -9,11 +9,11 @@ const TimeTrackingEnhanced: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header with Tab Navigation */}
-      <div className="border-b border-neutral-200">
+      <div style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Time Tracking</h1>
-            <p className="text-neutral-600">Track your time and manage your work activities</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Time Tracking</h1>
+            <p style={{ color: 'var(--text-secondary)' }}>Track your time and manage your work activities</p>
           </div>
         </div>
 
@@ -24,8 +24,21 @@ const TimeTrackingEnhanced: React.FC = () => {
             className={`flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'timer'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                : 'border-transparent hover:border-gray-300'
             }`}
+            style={{
+              color: activeTab === 'timer' ? '#2563eb' : 'var(--text-secondary)'
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'timer') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'timer') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }
+            }}
           >
             <ClockIcon className="w-5 h-5 mr-2" />
             Timer & Entries
@@ -35,8 +48,21 @@ const TimeTrackingEnhanced: React.FC = () => {
             className={`flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'calendar'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                : 'border-transparent hover:border-gray-300'
             }`}
+            style={{
+              color: activeTab === 'calendar' ? '#2563eb' : 'var(--text-secondary)'
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'calendar') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'calendar') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }
+            }}
           >
             <CalendarDaysIcon className="w-5 h-5 mr-2" />
             Daily & Weekly View

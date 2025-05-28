@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { signOut } from 'aws-amplify/auth';
-import { AppProvider } from './context/AppContext';
+import { AppProvider, useAppContext } from './context/AppContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { DataInitializer } from './components/common/DataInitializer';
 import { HealthStatus } from './components/common/HealthStatus';
 import TimeTrackingEnhanced from './pages/TimeTrackingEnhanced';
@@ -22,16 +23,17 @@ import './utils/sessionTestUtils';
 import './utils/sessionDebugUtils';
 import './utils/debugUtils';
 import './utils/dataDebugUtils';
+import './utils/themeTestUtils';
 
 // Configure AWS Amplify
 Amplify.configure(amplifyConfig);
 
 const Dashboard: React.FC = () => (
   <div className="text-center">
-    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+    <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
       Welcome to Aerotage Time Reporting
     </h1>
-    <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+    <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
       Track your time efficiently, manage projects, and generate professional reports with our comprehensive time tracking solution.
     </p>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
@@ -82,9 +84,23 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }
         flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
         ${isActive 
       ? 'bg-blue-600 text-white' 
-      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+      : ''
     }
       `}
+      style={{
+        color: isActive ? 'white' : 'var(--text-primary)',
+        backgroundColor: isActive ? '#2563eb' : 'transparent'
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'var(--border-color)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }
+      }}
       aria-current={isActive ? 'page' : undefined}
     >
       {icon && <span className="text-lg">{icon}</span>}
@@ -142,7 +158,7 @@ const Navigation: React.FC = () => {
 
     return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900 shadow-lg" role="navigation" aria-label="Main navigation" style={{ WebkitAppRegion: 'drag' } as any}>
+      <nav className="fixed top-0 left-0 right-0 z-50 shadow-lg" role="navigation" aria-label="Main navigation" style={{ WebkitAppRegion: 'drag', backgroundColor: 'var(--surface-color)', borderBottom: '1px solid var(--border-color)' } as any}>
         <div className={`max-w-7xl mx-auto ${isMac ? 'pr-4 sm:pr-6 lg:pr-8 pl-20' : 'px-4 sm:px-6 lg:px-8'}`}>
           <div className="flex items-center justify-between h-16">
                         {/* Desktop Navigation */}
@@ -195,7 +211,7 @@ const Navigation: React.FC = () => {
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
-      <div className={`mx-4 sm:mx-6 lg:mx-8 ${isMac ? 'ml-20 mr-4 sm:mr-6 lg:mr-8' : ''} mt-2 px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-lg shadow-2xl border border-gray-700`}>
+      <div className={`mx-4 sm:mx-6 lg:mx-8 ${isMac ? 'ml-20 mr-4 sm:mr-6 lg:mr-8' : ''} mt-2 px-2 pt-2 pb-3 space-y-1 rounded-lg shadow-2xl border`} style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <div onClick={() => setIsMobileMenuOpen(false)}>
           <NavLink to="/" icon="🏠">Dashboard</NavLink>
         </div>
@@ -217,7 +233,7 @@ const Navigation: React.FC = () => {
         <div onClick={() => setIsMobileMenuOpen(false)}>
           <NavLink to="/users" icon="👥">Users</NavLink>
         </div>
-        <div className="border-t border-gray-700 pt-2 mt-2">
+        <div className="pt-2 mt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
           {/* API Health Status for Mobile */}
           <div className="px-3 py-2">
             <HealthStatus className="text-sm" />
@@ -241,32 +257,44 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <AppProvider>
-        <DataInitializer>
-          <ProtectedRoute>
-            <Router>
-              <div className="min-h-screen bg-gray-50 font-sans">
-                <Navigation />
-                <main className="flex-1 pt-16" role="main">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route path="/time-tracking" element={<TimeTrackingEnhanced />} />
-                      <Route path="/projects" element={<Projects />} />
-                      <Route path="/approvals" element={<Approvals />} />
-                      <Route path="/reports" element={<Reports />} />
-                      <Route path="/invoices" element={<Invoices />} />
-                      <Route path="/users" element={<Users />} />
-                      <Route path="/settings" element={<Settings />} />
-                    </Routes>
-                  </div>
-                </main>
-              </div>
-            </Router>
-          </ProtectedRoute>
-        </DataInitializer>
+        <AppContextConsumer>
+          {({ state }) => (
+            <ThemeProvider user={state.user}>
+              <DataInitializer>
+                <ProtectedRoute>
+                  <Router>
+                    <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--background-color)', color: 'var(--text-primary)' }}>
+                      <Navigation />
+                      <main className="flex-1 pt-16" role="main">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                          <Routes>
+                            <Route path="/" element={<Dashboard />} />
+                            <Route path="/time-tracking" element={<TimeTrackingEnhanced />} />
+                            <Route path="/projects" element={<Projects />} />
+                            <Route path="/approvals" element={<Approvals />} />
+                            <Route path="/reports" element={<Reports />} />
+                            <Route path="/invoices" element={<Invoices />} />
+                            <Route path="/users" element={<Users />} />
+                            <Route path="/settings" element={<Settings />} />
+                          </Routes>
+                        </div>
+                      </main>
+                    </div>
+                  </Router>
+                </ProtectedRoute>
+              </DataInitializer>
+            </ThemeProvider>
+          )}
+        </AppContextConsumer>
       </AppProvider>
     </ErrorBoundary>
   );
+};
+
+// Helper component to consume AppContext
+const AppContextConsumer: React.FC<{ children: (context: { state: any }) => React.ReactNode }> = ({ children }) => {
+  const { state } = useAppContext();
+  return <>{children({ state })}</>;
 };
 
 export default App; 

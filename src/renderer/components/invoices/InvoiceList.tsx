@@ -144,8 +144,8 @@ const InvoiceList: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-medium text-neutral-900">Invoices</h2>
-        <div className="text-sm text-neutral-500">
+        <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Invoices</h2>
+        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           {filteredInvoices.length} of {state.invoices.length} invoices
         </div>
       </div>
@@ -156,13 +156,23 @@ const InvoiceList: React.FC = () => {
           <input
             type="text"
             placeholder="Search invoices..."
-            className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <select
-          className="px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          style={{
+            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--background-color)',
+            color: 'var(--text-primary)'
+          }}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as Invoice['status'] | 'all')}
         >
@@ -178,9 +188,9 @@ const InvoiceList: React.FC = () => {
       {/* Invoice Grid */}
       {filteredInvoices.length === 0 ? (
         <div className="text-center py-12">
-          <DocumentTextIcon className="mx-auto h-12 w-12 text-neutral-400" />
-          <h3 className="mt-2 text-sm font-medium text-neutral-900">No invoices found</h3>
-          <p className="mt-1 text-sm text-neutral-500">
+          <DocumentTextIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
+          <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No invoices found</h3>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
             {searchTerm || statusFilter !== 'all' 
               ? 'Try adjusting your search or filter criteria.'
               : 'Get started by generating your first invoice.'
@@ -192,15 +202,19 @@ const InvoiceList: React.FC = () => {
           {filteredInvoices.map((invoice) => (
             <div
               key={invoice.id}
-              className="bg-white rounded-xl shadow-soft border border-neutral-200 p-6 hover:shadow-md transition-shadow"
+              className="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+              style={{
+                backgroundColor: 'var(--surface-color)',
+                border: '1px solid var(--border-color)'
+              }}
             >
               {/* Header */}
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                     {invoice.invoiceNumber}
                   </h3>
-                  <p className="text-sm text-neutral-500">
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {invoice.clientName || getClientName(invoice.clientId)}
                   </p>
                 </div>
@@ -211,10 +225,10 @@ const InvoiceList: React.FC = () => {
 
               {/* Amount */}
               <div className="mb-4">
-                <div className="text-2xl font-bold text-neutral-900">
+                <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {formatCurrency(invoice.totalAmount, invoice.currency)}
                 </div>
-                <div className="text-sm text-neutral-500">
+                <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {formatCurrency(invoice.subtotal, invoice.currency)} + {formatCurrency(invoice.taxAmount, invoice.currency)} tax
                 </div>
               </div>
@@ -222,16 +236,16 @@ const InvoiceList: React.FC = () => {
               {/* Details */}
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Issue Date:</span>
-                  <span className="text-neutral-900">{formatDate(invoice.issueDate)}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Issue Date:</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{formatDate(invoice.issueDate)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Due Date:</span>
-                  <span className="text-neutral-900">{formatDate(invoice.dueDate)}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Due Date:</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{formatDate(invoice.dueDate)}</span>
                 </div>
                 <div className="text-sm">
-                  <span className="text-neutral-500">Projects:</span>
-                  <div className="text-neutral-900 mt-1">
+                  <span style={{ color: 'var(--text-secondary)' }}>Projects:</span>
+                  <div className="mt-1" style={{ color: 'var(--text-primary)' }}>
                     {getProjectNames(invoice.projectIds)}
                   </div>
                 </div>
@@ -240,7 +254,17 @@ const InvoiceList: React.FC = () => {
               {/* Actions */}
               <div className="flex gap-2">
                 <button
-                  className="flex-1 px-3 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center gap-1"
+                  className="flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1"
+                  style={{
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--border-color)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                  }}
                   title="View Invoice"
                 >
                   <EyeIcon className="w-4 h-4" />
@@ -257,7 +281,17 @@ const InvoiceList: React.FC = () => {
                       <PaperAirplaneIcon className="w-4 h-4" />
                     </button>
                     <button
-                      className="px-3 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                      className="px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                      style={{
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--border-color)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                      }}
                       title="Edit Invoice"
                     >
                       <PencilIcon className="w-4 h-4" />
@@ -274,16 +308,14 @@ const InvoiceList: React.FC = () => {
                     <CheckCircleIcon className="w-4 h-4" />
                   </button>
                 )}
-                
-                {(invoice.status === 'draft' || invoice.status === 'cancelled') && (
-                  <button
-                    onClick={() => handleDeleteInvoice(invoice.id)}
-                    className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
-                    title="Delete Invoice"
-                  >
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
-                )}
+
+                <button
+                  onClick={() => handleDeleteInvoice(invoice.id)}
+                  className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                  title="Delete Invoice"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}

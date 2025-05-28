@@ -70,33 +70,63 @@ export const Users: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>User Management</h1>
+          <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Manage users and send invitations to new team members
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="mb-6" style={{ borderBottom: '1px solid var(--border-color)' }}>
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => handleTabSwitch('users')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'users'
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent'
               }`}
+              style={{
+                color: activeTab === 'users' ? '#2563eb' : 'var(--text-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'users') {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'users') {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }
+              }}
             >
               <UsersIcon className="h-5 w-5 inline mr-2" />
               Active Users
             </button>
             <button
               onClick={() => handleTabSwitch('invitations')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'invitations'
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent'
               }`}
+              style={{
+                color: activeTab === 'invitations' ? '#2563eb' : 'var(--text-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'invitations') {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'invitations') {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }
+              }}
             >
               <EnvelopeIcon className="h-5 w-5 inline mr-2" />
               Invitations
@@ -110,8 +140,8 @@ export const Users: React.FC = () => {
             {/* Action Buttons */}
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">Team Members</h2>
-                <p className="text-sm text-gray-600">Manage existing users and their permissions</p>
+                <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Team Members</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage existing users and their permissions</p>
               </div>
               <div className="flex space-x-3">
                 <button
@@ -123,7 +153,18 @@ export const Users: React.FC = () => {
                 </button>
                 <button
                   onClick={handleCreateUser}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--surface-color)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                  }}
                 >
                   <UserPlusIcon className="h-4 w-4 mr-2" />
                   Create User Manually
@@ -143,8 +184,8 @@ export const Users: React.FC = () => {
             {/* Action Buttons */}
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">User Invitations</h2>
-                <p className="text-sm text-gray-600">Track and manage pending user invitations</p>
+                <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>User Invitations</h2>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Track and manage pending user invitations</p>
               </div>
               <button
                 onClick={handleInviteUser}
@@ -186,17 +227,27 @@ export const Users: React.FC = () => {
 
         {/* View User Modal - User Profile Display */}
         {viewingUserId && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+          <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {(() => {
                 const user = state.users.find((u: any) => u.id === viewingUserId);
                 if (!user) {
                   return (
                     <div className="text-center py-8">
-                      <p className="text-gray-600">User not found.</p>
+                      <p style={{ color: 'var(--text-secondary)' }}>User not found.</p>
                       <button
                         onClick={handleCloseForm}
-                        className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                        className="mt-4 px-4 py-2 rounded-md"
+                        style={{
+                          backgroundColor: 'var(--border-color)',
+                          color: 'var(--text-primary)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                        }}
                       >
                         Close
                       </button>
@@ -207,16 +258,16 @@ export const Users: React.FC = () => {
                 return (
                   <>
                     {/* Header */}
-                    <div className="flex items-center justify-between pb-4 border-b">
+                    <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
                       <div className="flex items-center space-x-4">
-                        <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
-                          <span className="text-xl font-medium text-gray-700">
+                        <div className="h-16 w-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <span className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>
                             {user.name ? user.name.split(' ').map((n: string) => n[0]).join('') : user.email ? user.email[0].toUpperCase() : '?'}
                           </span>
                         </div>
                         <div>
-                          <h3 className="text-xl font-medium text-gray-900">{user.name || 'No Name'}</h3>
-                          <p className="text-sm text-gray-500">{user.email}</p>
+                          <h3 className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>{user.name || 'No Name'}</h3>
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
                           <div className="flex items-center mt-1">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               user.role === 'admin' ? 'bg-red-100 text-red-800' :
@@ -235,7 +286,13 @@ export const Users: React.FC = () => {
                       </div>
                       <button
                         onClick={handleCloseForm}
-                        className="text-gray-400 hover:text-gray-600"
+                        style={{ color: 'var(--text-secondary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--text-primary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'var(--text-secondary)';
+                        }}
                       >
                         <span className="sr-only">Close</span>
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -249,31 +306,31 @@ export const Users: React.FC = () => {
                       {/* Left Column - Basic Information */}
                       <div className="space-y-6">
                         {/* Personal Information */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                             <UserIcon className="h-4 w-4 mr-2" />
                             Personal Information
                           </h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.name || 'Not provided'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Full Name</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.name || 'Not provided'}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Email</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.email}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Email</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.email}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Job Title</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.jobTitle || 'Not provided'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Job Title</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.jobTitle || 'Not provided'}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Department</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.department || 'Not provided'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Department</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.department || 'Not provided'}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</label>
-                              <p className="mt-1 text-sm text-gray-900">
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Start Date</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {user.startDate ? new Date(user.startDate).toLocaleDateString() : 'Not provided'}
                               </p>
                             </div>
@@ -281,23 +338,23 @@ export const Users: React.FC = () => {
                         </div>
 
                         {/* Contact Information */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                             <PhoneIcon className="h-4 w-4 mr-2" />
                             Contact Information
                           </h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.contactInfo?.phone || 'Not provided'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Phone</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.contactInfo?.phone || 'Not provided'}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Address</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.contactInfo?.address || 'Not provided'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Address</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.contactInfo?.address || 'Not provided'}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Emergency Contact</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.contactInfo?.emergencyContact || 'Not provided'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Emergency Contact</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.contactInfo?.emergencyContact || 'Not provided'}</p>
                             </div>
                           </div>
                         </div>
@@ -306,31 +363,31 @@ export const Users: React.FC = () => {
                       {/* Right Column - Role & Settings */}
                       <div className="space-y-6">
                         {/* Role & Team */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                             <ShieldCheckIcon className="h-4 w-4 mr-2" />
                             Role & Team
                           </h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Role</label>
-                              <p className="mt-1 text-sm text-gray-900 capitalize">{user.role}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Role</label>
+                              <p className="mt-1 text-sm capitalize" style={{ color: 'var(--text-primary)' }}>{user.role}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Team</label>
-                              <p className="mt-1 text-sm text-gray-900">
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Team</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {user.teamId ? state.teams.find((t: any) => t.id === user.teamId)?.name || 'Unknown Team' : 'No Team'}
                               </p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Hourly Rate</label>
-                              <p className="mt-1 text-sm text-gray-900">
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Hourly Rate</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {user.hourlyRate ? `$${user.hourlyRate}/hour` : 'Not set'}
                               </p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Status</label>
-                              <p className="mt-1 text-sm text-gray-900">
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Status</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                 }`}>
@@ -342,25 +399,25 @@ export const Users: React.FC = () => {
                         </div>
 
                         {/* Permissions */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                             <ShieldCheckIcon className="h-4 w-4 mr-2" />
                             Permissions
                           </h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Features</label>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Features</label>
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {user.permissions?.features?.map((feature: string) => (
                                   <span key={feature} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     {feature}
                                   </span>
-                                )) || <span className="text-sm text-gray-500">No features assigned</span>}
+                                )) || <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>No features assigned</span>}
                               </div>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Project Access</label>
-                              <p className="mt-1 text-sm text-gray-900">
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Project Access</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {user.permissions?.projects?.length || 0} project(s) assigned
                               </p>
                             </div>
@@ -368,25 +425,25 @@ export const Users: React.FC = () => {
                         </div>
 
                         {/* Preferences */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                             <Cog6ToothIcon className="h-4 w-4 mr-2" />
                             Preferences
                           </h4>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Theme</label>
-                              <p className="mt-1 text-sm text-gray-900 capitalize">{user.preferences?.theme || 'Not set'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Theme</label>
+                              <p className="mt-1 text-sm capitalize" style={{ color: 'var(--text-primary)' }}>{user.preferences?.theme || 'Not set'}</p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Notifications</label>
-                              <p className="mt-1 text-sm text-gray-900">
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Notifications</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {user.preferences?.notifications ? 'Enabled' : 'Disabled'}
                               </p>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">Timezone</label>
-                              <p className="mt-1 text-sm text-gray-900">{user.preferences?.timezone || 'Not set'}</p>
+                              <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Timezone</label>
+                              <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>{user.preferences?.timezone || 'Not set'}</p>
                             </div>
                           </div>
                         </div>
@@ -394,8 +451,8 @@ export const Users: React.FC = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-between items-center pt-6 border-t mt-6">
-                      <div className="text-xs text-gray-500">
+                    <div className="flex justify-between items-center pt-6 mt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
+                      <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                         <p>Created: {user.createdAt ? new Date(user.createdAt).toLocaleString() : 'Unknown'}</p>
                         <p>Last Updated: {user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'Unknown'}</p>
                         {user.lastLogin && <p>Last Login: {new Date(user.lastLogin).toLocaleString()}</p>}
@@ -403,7 +460,18 @@ export const Users: React.FC = () => {
                       <div className="flex space-x-3">
                         <button
                           onClick={handleCloseForm}
-                          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          className="px-4 py-2 rounded-md text-sm font-medium"
+                          style={{
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--surface-color)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                          }}
                         >
                           Close
                         </button>

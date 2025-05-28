@@ -10,155 +10,119 @@ function classNames(...classes: string[]) {
 }
 
 const Reports: React.FC = () => {
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const tabs = [
     {
       name: 'Time Reports',
-      icon: TableCellsIcon,
-      component: TimeReports,
-      description: 'Detailed time tracking reports with filtering',
+      icon: ChartBarIcon,
+      component: <TimeReports />,
+      description: 'Detailed time tracking reports and analytics'
     },
     {
       name: 'Analytics',
-      icon: ChartBarIcon,
-      component: ChartAnalytics,
-      description: 'Visual charts and performance insights',
+      icon: DocumentChartBarIcon,
+      component: <ChartAnalytics />,
+      description: 'Visual charts and performance metrics'
     },
     {
       name: 'Export',
       icon: DocumentArrowDownIcon,
-      component: ExportReports,
-      description: 'Export reports in PDF, Excel, and CSV formats',
-    },
+      component: <ExportReports />,
+      description: 'Export reports in various formats'
+    }
   ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Reports & Analytics</h1>
-        <p className="text-neutral-600">
-          View detailed time reports, analytics, and export data in multiple formats
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Reports & Analytics</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>
+          Comprehensive reporting and analytics for time tracking and project performance
         </p>
       </div>
 
       {/* Tab Interface */}
-      <div className="bg-white rounded-xl shadow-soft">
-        <Tab.Group>
-          <Tab.List className="flex space-x-1 rounded-xl bg-neutral-100 p-1">
-            {tabs.map((tab) => (
-              <Tab
-                key={tab.name}
-                className={({ selected }) =>
-                  classNames(
-                    'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
-                    selected
-                      ? 'bg-white text-blue-700 shadow'
-                      : 'text-neutral-700 hover:bg-white/[0.12] hover:text-neutral-900'
-                  )
-                }
-              >
-                <div className="flex items-center justify-center space-x-2">
-                  <tab.icon className="h-5 w-5" />
-                  <span>{tab.name}</span>
-                </div>
-              </Tab>
-            ))}
-          </Tab.List>
+      <div className="rounded-xl shadow-sm" style={{ backgroundColor: 'var(--surface-color)' }}>
+        <Tab.Group selectedIndex={selectedTab} onChange={setSelectedTab}>
+          <div style={{ borderBottom: '1px solid var(--border-color)' }}>
+            <Tab.List className="flex space-x-8 px-6">
+              {tabs.map((tab, index) => (
+                <Tab
+                  key={tab.name}
+                  className={({ selected }) =>
+                    classNames(
+                      'py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 focus:outline-none transition-colors',
+                      selected
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent'
+                    )
+                  }
+                  style={{
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedTab !== index) {
+                      e.currentTarget.style.color = 'var(--text-primary)';
+                      e.currentTarget.style.borderColor = 'var(--border-color)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedTab !== index) {
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.borderColor = 'transparent';
+                    }
+                  }}
+                >
+                  {({ selected }) => (
+                    <div 
+                      className="flex items-center gap-2"
+                      style={{
+                        color: selected ? '#2563eb' : 'var(--text-secondary)'
+                      }}
+                    >
+                      <tab.icon className="w-5 h-5" />
+                      {tab.name}
+                    </div>
+                  )}
+                </Tab>
+              ))}
+            </Tab.List>
+          </div>
 
-          <Tab.Panels className="mt-2">
-            {tabs.map((tab, idx) => (
-              <Tab.Panel
-                key={idx}
-                className={classNames(
-                  'rounded-xl bg-white p-6',
-                  'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'
-                )}
-              >
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-neutral-900 flex items-center">
-                    <tab.icon className="h-6 w-6 mr-2 text-blue-600" />
-                    {tab.name}
-                  </h2>
-                  <p className="text-neutral-600 text-sm">{tab.description}</p>
+          <Tab.Panels>
+            {tabs.map((tab, index) => (
+              <Tab.Panel key={index} className="p-6">
+                {/* Tab Description */}
+                <div className="mb-6">
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{tab.description}</p>
                 </div>
-                <tab.component />
+
+                {/* Tab Content */}
+                {tab.component}
               </Tab.Panel>
             ))}
           </Tab.Panels>
         </Tab.Group>
       </div>
 
-      {/* Quick Stats Summary */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-soft p-6 text-white">
-        <div className="flex items-center justify-between">
+      {/* Quick Help */}
+      <div className="rounded-xl p-6" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+        <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Reporting Features</h3>
+        <div className="grid md:grid-cols-3 gap-4 text-sm" style={{ color: 'var(--text-primary)' }}>
           <div>
-            <h3 className="text-lg font-semibold mb-2">Reporting Suite</h3>
-            <p className="text-blue-100">
-              Complete time tracking analytics and reporting tools for professional insights
-            </p>
+            <h4 className="font-medium mb-1">Time Reports</h4>
+            <p>Detailed breakdowns of time entries by project, user, and date range with filtering and summary statistics.</p>
           </div>
-          <DocumentChartBarIcon className="h-12 w-12 text-blue-200" />
-        </div>
-        
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/10 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-100">Time Reports</h4>
-            <p className="text-sm text-blue-200">
-              Filter and analyze time entries with detailed breakdowns by project, client, and status
-            </p>
+          <div>
+            <h4 className="font-medium mb-1">Visual Analytics</h4>
+            <p>Interactive charts showing productivity trends, project distribution, and billable vs non-billable time.</p>
           </div>
-          <div className="bg-white/10 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-100">Visual Analytics</h4>
-            <p className="text-sm text-blue-200">
-              Interactive charts showing trends, productivity patterns, and project distribution
-            </p>
+          <div>
+            <h4 className="font-medium mb-1">Export Options</h4>
+            <p>Export reports in PDF, CSV, or Excel formats for external analysis and client presentations.</p>
           </div>
-          <div className="bg-white/10 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-100">Export Options</h4>
-            <p className="text-sm text-blue-200">
-              Professional PDF reports, Excel spreadsheets, and CSV data exports
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Feature Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <div className="flex items-center mb-4">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <TableCellsIcon className="h-6 w-6 text-blue-600" />
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-neutral-900">Advanced Filtering</h3>
-          </div>
-          <p className="text-neutral-600">
-            Filter time entries by date range, project, status, and billable type with real-time summary calculations.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <div className="flex items-center mb-4">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <ChartBarIcon className="h-6 w-6 text-green-600" />
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-neutral-900">Interactive Charts</h3>
-          </div>
-          <p className="text-neutral-600">
-            Visualize productivity trends, project distribution, revenue patterns, and approval rates with dynamic charts.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <div className="flex items-center mb-4">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <DocumentArrowDownIcon className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-neutral-900">Multi-Format Export</h3>
-          </div>
-          <p className="text-neutral-600">
-            Export professional reports in PDF, detailed Excel workbooks, or simple CSV files for external analysis.
-          </p>
         </div>
       </div>
     </div>

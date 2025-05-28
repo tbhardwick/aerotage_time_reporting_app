@@ -194,13 +194,13 @@ export const UserList: React.FC<UserListProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-          <p className="text-gray-600">Manage users, roles, and permissions</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>User Management</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>Manage users, roles, and permissions</p>
         </div>
         <div className="flex items-center space-x-3">
           {selectedUsers.length > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 {selectedUsers.length} selected
               </span>
               <button
@@ -221,16 +221,21 @@ export const UserList: React.FC<UserListProps> = ({
       </div>
 
       {/* Filters */}
-      <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+      <div className="flex items-center space-x-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
         {/* Search */}
         <div className="flex-1 relative">
-          <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
           <input
             type="text"
             placeholder="Search users by name, email, job title, or department..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           />
         </div>
 
@@ -239,13 +244,18 @@ export const UserList: React.FC<UserListProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="appearance-none rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          <ChevronDownIcon className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <ChevronDownIcon className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-secondary)' }} />
         </div>
 
         {/* Role Filter */}
@@ -253,56 +263,61 @@ export const UserList: React.FC<UserListProps> = ({
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as any)}
-            className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="appearance-none rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--background-color)',
+              color: 'var(--text-primary)'
+            }}
           >
             <option value="all">All Roles</option>
             <option value="admin">Admin</option>
             <option value="manager">Manager</option>
             <option value="employee">Employee</option>
           </select>
-          <ChevronDownIcon className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <ChevronDownIcon className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-secondary)' }} />
         </div>
       </div>
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <UserGroupIcon className="h-8 w-8 text-blue-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{state.users.length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Users</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{state.users.length}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <CheckCircleIcon className="h-8 w-8 text-green-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Active Users</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Active Users</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {state.users.filter(u => u.isActive).length}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ShieldCheckIcon className="h-8 w-8 text-purple-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Admins</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Admins</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {state.users.filter(u => u.role === 'admin').length}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <CogIcon className="h-8 w-8 text-orange-600" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Managers</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Managers</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {state.users.filter(u => u.role === 'manager').length}
               </p>
             </div>
@@ -311,12 +326,12 @@ export const UserList: React.FC<UserListProps> = ({
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y" style={{ borderColor: 'var(--border-color)' }}>
+            <thead style={{ backgroundColor: 'var(--background-color)' }}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   <input
                     type="checkbox"
                     checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
@@ -327,31 +342,42 @@ export const UserList: React.FC<UserListProps> = ({
                         setSelectedUsers([]);
                       }
                     }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded text-blue-600 focus:ring-blue-500"
+                    style={{ borderColor: 'var(--border-color)' }}
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Role & Team
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Last Login
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {filteredUsers.map((user) => (
                 <tr
                   key={user.id}
-                  className={`hover:bg-gray-50 ${selectedUsers.includes(user.id) ? 'bg-blue-50' : ''}`}
+                  className={`transition-colors ${selectedUsers.includes(user.id) ? 'bg-blue-50' : ''}`}
+                  onMouseEnter={(e) => {
+                    if (!selectedUsers.includes(user.id)) {
+                      e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!selectedUsers.includes(user.id)) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -364,23 +390,24 @@ export const UserList: React.FC<UserListProps> = ({
                           setSelectedUsers(selectedUsers.filter(id => id !== user.id));
                         }
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded text-blue-600 focus:ring-blue-500"
+                      style={{ borderColor: 'var(--border-color)' }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                          <span className="text-sm font-medium text-gray-700">
+                        <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                             {user.name ? user.name.split(' ').map(n => n[0]).join('') : user.email ? user.email[0].toUpperCase() : '?'}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name || 'No Name'}</div>
-                        <div className="text-sm text-gray-500">{user.email || 'No Email'}</div>
+                        <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{user.name || 'No Name'}</div>
+                        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email || 'No Email'}</div>
                         {user.jobTitle && (
-                          <div className="text-xs text-gray-400">{user.jobTitle}</div>
+                          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{user.jobTitle}</div>
                         )}
                       </div>
                     </div>
@@ -390,11 +417,11 @@ export const UserList: React.FC<UserListProps> = ({
                       <span className={getRoleBadge(user.role)}>
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                         {getTeamName(user.teamId)}
                       </div>
                       {user.department && (
-                        <div className="text-xs text-gray-400">{user.department}</div>
+                        <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{user.department}</div>
                       )}
                     </div>
                   </td>
@@ -422,7 +449,7 @@ export const UserList: React.FC<UserListProps> = ({
                       </button>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-secondary)' }}>
                     <div className="flex items-center">
                       <ClockIcon className="h-4 w-4 mr-1" />
                       {formatLastLogin(user.lastLogin)}
@@ -455,9 +482,9 @@ export const UserList: React.FC<UserListProps> = ({
         {/* Empty State */}
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
-            <UserGroupIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <UserGroupIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
+            <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No users found</h3>
+            <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
               {searchTerm || statusFilter !== 'all' || roleFilter !== 'all'
                 ? 'Try adjusting your search or filter criteria.'
                 : 'Get started by creating your first user using the "Create User Manually" button above.'}

@@ -199,24 +199,38 @@ const DailyWeeklyView: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
             {viewMode === 'daily' ? 'Daily' : 'Weekly'} Time View
           </h1>
-          <p className="text-neutral-600">
+          <p style={{ color: 'var(--text-secondary)' }}>
             Track your daily and weekly time allocation
           </p>
         </div>
 
         {/* View Mode Toggle */}
         <div className="flex items-center space-x-4">
-          <div className="flex bg-neutral-100 rounded-lg p-1">
+          <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--border-color)' }}>
             <button
               onClick={() => setViewMode('daily')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'daily'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'shadow-sm'
+                  : ''
               }`}
+              style={{
+                backgroundColor: viewMode === 'daily' ? 'var(--surface-color)' : 'transparent',
+                color: viewMode === 'daily' ? '#2563eb' : 'var(--text-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                if (viewMode !== 'daily') {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'daily') {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
+              }}
             >
               Daily
             </button>
@@ -224,9 +238,23 @@ const DailyWeeklyView: React.FC = () => {
               onClick={() => setViewMode('weekly')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'weekly'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'shadow-sm'
+                  : ''
               }`}
+              style={{
+                backgroundColor: viewMode === 'weekly' ? 'var(--surface-color)' : 'transparent',
+                color: viewMode === 'weekly' ? '#2563eb' : 'var(--text-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                if (viewMode !== 'weekly') {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'weekly') {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
+              }}
             >
               Weekly
             </button>
@@ -235,18 +263,27 @@ const DailyWeeklyView: React.FC = () => {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between bg-white rounded-lg shadow-sm p-4">
+      <div className="flex items-center justify-between rounded-lg shadow-sm p-4" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         <div className="flex items-center space-x-4">
           <button
             onClick={navigatePrevious}
-            className="p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--border-color)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
             <ChevronLeftIcon className="w-5 h-5" />
           </button>
           
           <div className="flex items-center space-x-2">
-            <CalendarIcon className="w-5 h-5 text-neutral-400" />
-            <h2 className="text-lg font-semibold text-neutral-900">
+            <CalendarIcon className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
               {viewMode === 'daily' 
                 ? format(selectedDate, 'EEEE, MMMM d, yyyy')
                 : `Week of ${format(weekRange.start, 'MMM d')} - ${format(weekRange.end, 'MMM d, yyyy')}`
@@ -256,7 +293,16 @@ const DailyWeeklyView: React.FC = () => {
 
           <button
             onClick={navigateNext}
-            className="p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--border-color)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
             <ChevronRightIcon className="w-5 h-5" />
           </button>
@@ -314,43 +360,43 @@ const WeeklyViewContent: React.FC<{
     <div className="space-y-6">
       {/* Weekly Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ClockIcon className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Total Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {summary.weeklyTotals.totalHours.toFixed(1)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ChartBarIcon className="h-8 w-8 text-green-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Billable Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {summary.weeklyTotals.billableHours.toFixed(1)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <CalendarIcon className="h-8 w-8 text-purple-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Target Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Target Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {summary.weeklyTotals.targetHours.toFixed(1)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
               summary.weeklyTotals.completionPercentage >= 100 
@@ -364,8 +410,8 @@ const WeeklyViewContent: React.FC<{
               </span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Completion</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Completion</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {summary.weeklyTotals.completionPercentage.toFixed(1)}%
               </p>
             </div>
@@ -374,9 +420,9 @@ const WeeklyViewContent: React.FC<{
       </div>
 
       {/* Daily Breakdown */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Daily Breakdown</h3>
-                         <div className="grid grid-cols-7 gap-4">
+      <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Daily Breakdown</h3>
+        <div className="grid grid-cols-7 gap-4">
           {summary.dailySummaries.map((day) => (
             <DayCard key={day.date} summary={day} onOpenQuickEntry={onOpenQuickEntry} />
           ))}
@@ -391,50 +437,47 @@ const DailyViewContent: React.FC<{
   summary: import('../../services/api-client').DailySummary; 
   onOpenQuickEntry: (date: string, startTime?: string, endTime?: string, suggestedDuration?: number) => void;
 }> = ({ summary, onOpenQuickEntry }) => {
-  // Debug: Log the summary structure to understand the API response
-  console.log('📊 Daily Summary Data:', summary);
-  
   return (
     <div className="space-y-6">
       {/* Daily Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ClockIcon className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Total Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {(summary.totalHours || 0).toFixed(1)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <ChartBarIcon className="h-8 w-8 text-green-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Billable Hours</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {(summary.billableHours || 0).toFixed(1)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <CalendarIcon className="h-8 w-8 text-purple-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Entries</p>
-              <p className="text-2xl font-bold text-neutral-900">
-                {summary.entriesCount || 0}
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Target Hours</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                {summary.targetHours || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
               (summary.completionPercentage || 0) >= 100 
@@ -448,8 +491,8 @@ const DailyViewContent: React.FC<{
               </span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Target Progress</p>
-              <p className="text-2xl font-bold text-neutral-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Target Progress</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {(summary.completionPercentage || 0).toFixed(1)}%
               </p>
             </div>
@@ -459,19 +502,19 @@ const DailyViewContent: React.FC<{
 
       {/* Time Gaps Analysis */}
       {summary.timeGaps && summary.timeGaps.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center mb-4">
             <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600 mr-2" />
-            <h3 className="text-lg font-semibold text-neutral-900">Time Gaps Detected</h3>
+            <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Time Gaps Detected</h3>
           </div>
           <div className="space-y-3">
             {summary.timeGaps.map((gap, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <div>
-                  <p className="text-sm font-medium text-neutral-900">
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     {gap.startTime} - {gap.endTime}
                   </p>
-                  <p className="text-xs text-neutral-600">
+                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                     {(gap.duration || 0).toFixed(1)}h untracked
                   </p>
                 </div>
@@ -505,31 +548,47 @@ const DayCard: React.FC<{
   const hasGaps = summary.timeGaps && summary.timeGaps.length > 0;
   
   return (
-    <div className={`p-4 rounded-lg border-2 transition-colors ${
-      isToday 
-        ? 'border-blue-500 bg-blue-50' 
-        : 'border-neutral-200 bg-white hover:border-neutral-300'
-    }`}>
+    <div 
+      className={`p-4 rounded-lg border-2 transition-colors ${
+        isToday 
+          ? 'border-blue-500' 
+          : ''
+      }`}
+      style={{
+        backgroundColor: isToday ? 'rgba(59, 130, 246, 0.1)' : 'var(--surface-color)',
+        borderColor: isToday ? '#3b82f6' : 'var(--border-color)'
+      }}
+      onMouseEnter={(e) => {
+        if (!isToday) {
+          e.currentTarget.style.borderColor = 'var(--text-secondary)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isToday) {
+          e.currentTarget.style.borderColor = 'var(--border-color)';
+        }
+      }}
+    >
       <div className="text-center">
-        <p className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
+        <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>
           {summary.dayOfWeek.slice(0, 3)}
         </p>
-        <p className="text-lg font-bold text-neutral-900 mt-1">
+        <p className="text-lg font-bold mt-1" style={{ color: 'var(--text-primary)' }}>
           {format(parseISO(summary.date), 'd')}
         </p>
         
         <div className="mt-3 space-y-2">
           <div className="text-sm">
-            <p className="font-medium text-neutral-900">
+            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
               {(summary.totalHours || 0).toFixed(1)}h
             </p>
-            <p className="text-xs text-neutral-600">
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               of {summary.targetHours || 0}h target
             </p>
           </div>
           
           {/* Progress bar */}
-          <div className="w-full bg-neutral-200 rounded-full h-2">
+          <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--border-color)' }}>
             <div 
               className={`h-2 rounded-full transition-all ${
                 (summary.completionPercentage || 0) >= 100 

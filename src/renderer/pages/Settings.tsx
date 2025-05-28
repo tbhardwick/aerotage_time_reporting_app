@@ -39,8 +39,8 @@ export const Settings: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">API Health Status</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-lg font-medium mb-2 text-[var(--color-text-primary)]">API Health Status</h3>
+              <p className="mb-4 text-[var(--color-text-secondary)]">
                 Monitor the health and performance of the Aerotage Time Reporting API.
               </p>
             </div>
