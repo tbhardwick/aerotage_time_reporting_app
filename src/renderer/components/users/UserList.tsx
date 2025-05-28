@@ -16,13 +16,11 @@ import {
 } from '@heroicons/react/24/outline';
 
 interface UserListProps {
-  onCreateUser?: () => void;
   onEditUser?: (userId: string) => void;
   onViewUser?: (userId: string) => void;
 }
 
 export const UserList: React.FC<UserListProps> = ({
-  onCreateUser,
   onEditUser,
   onViewUser,
 }) => {
@@ -153,13 +151,6 @@ export const UserList: React.FC<UserListProps> = ({
               </button>
             </div>
           )}
-          <button
-            onClick={onCreateUser}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            <UserPlusIcon className="h-5 w-5" />
-            <span>Add User</span>
-          </button>
         </div>
       </div>
 
@@ -413,19 +404,8 @@ export const UserList: React.FC<UserListProps> = ({
             <p className="mt-1 text-sm text-gray-500">
               {searchTerm || statusFilter !== 'all' || roleFilter !== 'all'
                 ? 'Try adjusting your search or filter criteria.'
-                : 'Get started by creating your first user.'}
+                : 'Get started by creating your first user using the "Create User Manually" button above.'}
             </p>
-            {!searchTerm && statusFilter === 'all' && roleFilter === 'all' && (
-              <div className="mt-6">
-                <button
-                  onClick={onCreateUser}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  <UserPlusIcon className="h-5 w-5 mr-2" />
-                  Add User
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>
