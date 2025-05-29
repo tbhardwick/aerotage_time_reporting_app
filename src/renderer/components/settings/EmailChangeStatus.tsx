@@ -14,12 +14,16 @@ interface EmailChangeStatusProps {
   request: EmailChangeRequest;
   onCancelRequest?: (requestId: string) => Promise<void>;
   onResendVerification?: (requestId: string, emailType: 'current' | 'new') => Promise<void>;
+  onRefreshStatus?: () => Promise<void>;
+  lastUpdated?: Date;
 }
 
 export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({ 
   request, 
   onCancelRequest,
-  onResendVerification 
+  onResendVerification,
+  onRefreshStatus,
+  lastUpdated
 }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -118,11 +122,29 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
           <div>
             <h4 style={{ color: 'var(--text-primary)' }} className="text-lg font-medium">Email Change Request</h4>
             <p style={{ color: 'var(--text-secondary)' }} className="text-sm">{statusConfig.description}</p>
+            {lastUpdated && (
+              <p style={{ color: 'var(--text-tertiary)' }} className="text-xs mt-1">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </p>
+            )}
           </div>
         </div>
-        <span className={`px-3 py-1 text-sm font-medium rounded-full border ${statusConfig.color}`}>
-          {statusConfig.text}
-        </span>
+        <div className="flex items-center space-x-2">
+          <span className={`px-3 py-1 text-sm font-medium rounded-full border ${statusConfig.color}`}>
+            {statusConfig.text}
+          </span>
+          {onRefreshStatus && (
+            <button
+              onClick={onRefreshStatus}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors duration-200"
+              title="Refresh status"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Request Details */}
@@ -164,6 +186,9 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
                   <p>• Check your inbox and spam/junk folders for verification emails</p>
                   <p>• Verification emails may take a few minutes to arrive</p>
                   <p>• If you don't receive emails after 10 minutes, try the resend button</p>
+                  <p>• If resend fails with a server error, the email service may be temporarily down</p>
+                  <p>• Status updates automatically every 30 seconds or when you return to this page</p>
+                  <p>• Use the refresh button (↻) above to manually check for updates</p>
                   <p>• Contact support if you continue having issues receiving emails</p>
                 </div>
               </div>

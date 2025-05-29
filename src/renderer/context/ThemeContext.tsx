@@ -24,20 +24,21 @@ const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export function ThemeProvider({ children, user }: ThemeProviderProps) {
   const isUpdatingFromUserPrefs = useRef(false);
+  const hasInitialized = useRef(false);
   
-  // Initialize theme with proper priority: user preferences > localStorage > system
+  // Initialize theme with proper priority: localStorage > user preferences > system
   const [theme, setThemeState] = useState<Theme>(() => {
-    // First check user preferences if available
-    if (user?.preferences?.theme) {
-      console.log(`🎨 Loading theme from user preferences: ${user.preferences.theme}`);
-      return user.preferences.theme === 'light' ? 'light' : 'dark';
-    }
-    
-    // Then check localStorage
+    // First check localStorage (user's last manual choice)
     const savedTheme = localStorage.getItem('aerotage-theme') as Theme;
     if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
       console.log(`🎨 Loading theme from localStorage: ${savedTheme}`);
       return savedTheme;
+    }
+    
+    // Then check user preferences if available
+    if (user?.preferences?.theme) {
+      console.log(`🎨 Loading theme from user preferences: ${user.preferences.theme}`);
+      return user.preferences.theme === 'light' ? 'light' : 'dark';
     }
     
     // Default to system
@@ -45,23 +46,22 @@ export function ThemeProvider({ children, user }: ThemeProviderProps) {
     return 'system';
   });
 
-  // Update theme when user preferences change (but avoid infinite loops)
+  // Initialize from user preferences when user loads (only once)
   useEffect(() => {
-    if (user?.preferences?.theme && !isUpdatingFromUserPrefs.current) {
-      const userTheme = user.preferences.theme === 'light' ? 'light' : 'dark';
-      if (userTheme !== theme) {
-        console.log(`🎨 User preferences changed, updating theme to: ${userTheme}`);
-        isUpdatingFromUserPrefs.current = true;
+    if (user?.preferences?.theme && !hasInitialized.current) {
+      const savedTheme = localStorage.getItem('aerotage-theme');
+      
+      // If no localStorage theme, use user preferences
+      if (!savedTheme) {
+        const userTheme = user.preferences.theme === 'light' ? 'light' : 'dark';
+        console.log(`🎨 Initializing theme from user preferences: ${userTheme}`);
         setThemeState(userTheme);
         localStorage.setItem('aerotage-theme', userTheme);
-        
-        // Reset the flag after a brief delay
-        setTimeout(() => {
-          isUpdatingFromUserPrefs.current = false;
-        }, 100);
       }
+      
+      hasInitialized.current = true;
     }
-  }, [user?.preferences?.theme]); // Removed 'theme' from dependencies to prevent loop
+  }, [user?.preferences?.theme]);
 
   // Calculate effective theme (resolve 'system' to actual theme)
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>(() => {
@@ -138,14 +138,32 @@ export function ThemeProvider({ children, user }: ThemeProviderProps) {
     setThemeState(newTheme);
     localStorage.setItem('aerotage-theme', newTheme);
     
-    // TODO: Update user preferences via API when available
-    // This should call the backend API to update user.preferences.theme
-    // For now, we only update localStorage and let the backend sync later
+    // Update user preferences via API when available
+    updateUserPreferences(newTheme);
   };
 
   const toggleTheme = () => {
+    // Simple toggle between light and dark (no system option in toggle)
     const newTheme = effectiveTheme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
+  };
+
+  // Helper function to update user preferences
+  const updateUserPreferences = async (newTheme: Theme) => {
+    try {
+      // Only update if we have a user and the theme is not 'system'
+      if (user && newTheme !== 'system') {
+        const { useUserPreferences } = await import('../hooks');
+        // Note: This is a simplified approach. In a real implementation,
+        // you'd want to call the API directly or use a context action
+        console.log(`🔄 Would update user preferences to theme: ${newTheme}`);
+        
+        // TODO: Implement actual API call to update user preferences
+        // This should be done through the preferences API or context action
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to update user preferences:', error);
+    }
   };
 
   return (

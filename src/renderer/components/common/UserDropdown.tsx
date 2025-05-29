@@ -267,6 +267,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
                 
                 // Cycle through themes: light → dark → system → light
                 const nextTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+                console.log(`🎨 UserDropdown theme toggle: ${theme} → ${nextTheme}`);
                 setTheme(nextTheme);
                 
                 // Reset the changing state after a brief delay

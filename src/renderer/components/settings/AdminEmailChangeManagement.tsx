@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../../context/AppContext';
 import { 
   ClockIcon, 
   CheckCircleIcon, 
@@ -17,6 +18,8 @@ interface AdminEmailChangeManagementProps {
 }
 
 const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({ className = '' }) => {
+  const { state } = useAppContext();
+  const { user } = state;
   const [requests, setRequests] = useState<EmailChangeRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,24 +35,80 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
   const [approvalNotes, setApprovalNotes] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [isLoadingRequests, setIsLoadingRequests] = useState(false);
+
+  // Check if current user is admin
+  const isAdmin = user?.role === 'admin';
+  const isAdminOrManager = user?.role === 'admin' || user?.role === 'manager';
 
   useEffect(() => {
     loadRequests();
-  }, [filters]);
+  }, [filters, user?.role]);
 
   const loadRequests = async () => {
+    if (!user?.id) return;
+
+    // Prevent multiple simultaneous API calls
+    if (isLoadingRequests) {
+      console.log('⚠️ Skipping loadRequests - already loading');
+      return;
+    }
+
+    setIsLoadingRequests(true);
     setLoading(true);
     setError(null);
+    
     try {
-      console.log('🔍 Loading email change requests with filters:', filters);
-      const response = await emailChangeService.getRequests(filters);
-      console.log('📧 Loaded email change requests:', response);
+      console.log('🔍 [AdminEmailChangeManagement] Loading email change requests with filters:', filters);
+      console.log('🔍 [AdminEmailChangeManagement] User role:', user?.role);
+      console.log('🔍 [AdminEmailChangeManagement] Is admin:', isAdmin);
+      
+      // NEW BUSINESS LOGIC:
+      // - Admins can see ALL requests
+      // - Regular users (managers/employees) see only their own requests
+      let requestFilters = { ...filters };
+      
+      if (!isAdmin) {
+        // Non-admin users only see their own requests
+        console.log('🔍 [AdminEmailChangeManagement] Non-admin user - filtering by userId:', user.id);
+        requestFilters = {
+          ...filters,
+          userId: user.id // Add userId filter for non-admin users
+        };
+      } else {
+        console.log('🔍 [AdminEmailChangeManagement] Admin user - fetching ALL requests');
+      }
+      
+      const response = await emailChangeService.getRequests(requestFilters);
+      
+      console.log('📧 [AdminEmailChangeManagement] Raw API response:', response);
+      console.log('📧 [AdminEmailChangeManagement] Response.requests type:', typeof response.requests);
+      console.log('📧 [AdminEmailChangeManagement] Response.requests length:', response.requests?.length);
+      console.log('📧 [AdminEmailChangeManagement] Response.requests content:', response.requests);
+      
+      // Validate the response structure
+      if (!response || typeof response !== 'object') {
+        throw new Error('Invalid response format - not an object');
+      }
+      
+      if (!Array.isArray(response.requests)) {
+        console.error('❌ [AdminEmailChangeManagement] response.requests is not an array:', response.requests);
+        throw new Error('Invalid response format - requests is not an array');
+      }
+      
+      console.log('✅ [AdminEmailChangeManagement] Setting requests state with:', response.requests);
       setRequests(response.requests);
+      
+      // Log the state after setting (this will show in the next render)
+      console.log('📊 [AdminEmailChangeManagement] Requests state will be updated to length:', response.requests.length);
+      
     } catch (error) {
-      console.error('Failed to load email change requests:', error);
+      console.error('❌ [AdminEmailChangeManagement] Failed to load email change requests:', error);
       setError(error instanceof Error ? error.message : 'Failed to load email change requests');
+      setRequests([]); // Ensure we have a valid array even on error
     } finally {
       setLoading(false);
+      setIsLoadingRequests(false);
     }
   };
 
@@ -172,11 +231,36 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
   };
 
   const canApprove = (request: EmailChangeRequest) => {
+    // NEW BUSINESS LOGIC:
+    // - Only admins can approve requests
+    // - Admins can approve their own requests (new behavior)
+    // - Admins can approve other users' requests
+    // - Regular users (managers/employees) cannot approve any requests
+    
+    if (!isAdmin) {
+      return false; // Non-admin users cannot approve any requests
+    }
+    
+    // Admin users can approve pending requests
     return request.status === 'pending_approval';
   };
 
   const canReject = (request: EmailChangeRequest) => {
+    // NEW BUSINESS LOGIC:
+    // - Only admins can reject requests
+    // - Admins can reject any pending request
+    // - Regular users cannot reject any requests
+    
+    if (!isAdmin) {
+      return false; // Non-admin users cannot reject any requests
+    }
+    
+    // Admin users can reject pending requests
     return ['pending_approval', 'pending_verification'].includes(request.status);
+  };
+
+  const isSelfApproval = (request: EmailChangeRequest) => {
+    return isAdmin && request.userId === user?.id;
   };
 
   if (loading && requests.length === 0) {
@@ -193,16 +277,30 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Email Change Requests</h3>
-          <p className="text-sm text-gray-600">Manage user email change requests</p>
+          <h3 className="text-lg font-medium text-gray-900">
+            {isAdmin ? 'Email Change Requests (Admin View)' : 'My Email Change Requests'}
+          </h3>
+          <p className="text-sm text-gray-600">
+            {isAdmin 
+              ? 'Manage all user email change requests - you can approve your own requests'
+              : 'View your email change requests - admin approval required'
+            }
+          </p>
         </div>
-        <button
-          onClick={loadRequests}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200"
-        >
-          {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
+        <div className="flex items-center space-x-3">
+          {isAdmin && (
+            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              Admin: Can approve own requests
+            </div>
+          )}
+          <button
+            onClick={loadRequests}
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200"
+          >
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -257,11 +355,36 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
         </div>
       )}
 
+      {/* Business Logic Info */}
+      {!isAdmin && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start space-x-2">
+            <ShieldCheckIcon className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-blue-900">Admin Approval Required</p>
+              <p className="text-sm text-blue-800 mt-1">
+                Email change requests require approval from an administrator. You can view your request status here, but cannot approve or reject requests.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Requests List */}
       {requests.length === 0 ? (
         <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
           <EnvelopeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">No email change requests found</p>
+          <p className="text-gray-600">
+            {isAdmin 
+              ? 'No email change requests found in the system'
+              : 'You have no email change requests'
+            }
+          </p>
+          {!isAdmin && (
+            <p className="text-sm text-gray-500 mt-2">
+              You can create an email change request from your Profile Settings
+            </p>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -278,9 +401,19 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                       <div className={`p-2 rounded-full ${statusConfig.color}`}>
                         <StatusIcon className="h-5 w-5" />
                       </div>
-                      <div>
-                        <h4 className="text-lg font-medium text-gray-900">Email Change Request</h4>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h4 className="text-lg font-medium text-gray-900">Email Change Request</h4>
+                          {isSelfApproval(request) && (
+                            <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                              Your Request
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-600">Request ID: {request.id}</p>
+                        {isAdmin && request.userId && (
+                          <p className="text-sm text-gray-500">User ID: {request.userId}</p>
+                        )}
                       </div>
                       <span className={`px-3 py-1 text-sm font-medium rounded-full border ${statusConfig.color}`}>
                         {statusConfig.text}
@@ -292,10 +425,6 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <UserIcon className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm font-medium text-gray-500">User ID:</span>
-                          <span className="text-sm text-gray-900">{request.userId}</span>
-                        </div>
-                        <div>
                           <span className="text-sm font-medium text-gray-500">From:</span>
                           <p className="text-sm text-gray-900 font-mono">{request.currentEmail}</p>
                         </div>
@@ -404,12 +533,22 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
             <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowApprovalModal(false)} />
             <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl">
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Approve Email Change Request</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  {isSelfApproval(selectedRequest) ? 'Approve Your Email Change Request' : 'Approve Email Change Request'}
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Are you sure you want to approve this email change from{' '}
-                  <span className="font-mono">{selectedRequest.currentEmail}</span> to{' '}
-                  <span className="font-mono">{selectedRequest.newEmail}</span>?
+                  {isSelfApproval(selectedRequest) 
+                    ? `Are you sure you want to approve your own email change from ${selectedRequest.currentEmail} to ${selectedRequest.newEmail}?`
+                    : `Are you sure you want to approve this email change from ${selectedRequest.currentEmail} to ${selectedRequest.newEmail}?`
+                  }
                 </p>
+                {isSelfApproval(selectedRequest) && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Self-Approval:</strong> As an admin, you can approve your own email change requests.
+                    </p>
+                  </div>
+                )}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Approval Notes (Optional)
@@ -419,7 +558,10 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                     onChange={(e) => setApprovalNotes(e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Add any notes about this approval..."
+                    placeholder={isSelfApproval(selectedRequest) 
+                      ? "Add any notes about your self-approval..."
+                      : "Add any notes about this approval..."
+                    }
                   />
                 </div>
                 <div className="flex justify-end space-x-3">

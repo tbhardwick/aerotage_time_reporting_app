@@ -57,7 +57,7 @@ const dateFormats = [
 const PreferencesSettings: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const { user } = state;
-  const { setTheme, effectiveTheme } = useTheme();
+  const { theme, setTheme, effectiveTheme } = useTheme();
   
   // Use the preferences API hook
   const { 
@@ -70,7 +70,7 @@ const PreferencesSettings: React.FC = () => {
   } = useUserPreferences(user?.id || null);
 
   const [formData, setFormData] = useState<PreferencesFormData>({
-    theme: 'light',
+    theme: theme, // Initialize with current theme from context
     notifications: true,
     timezone: 'UTC',
     defaultTimeEntryDuration: 60, // 1 hour in minutes
@@ -97,16 +97,26 @@ const PreferencesSettings: React.FC = () => {
       preferencesLoading,
       preferencesError,
       hasPreferences: !!preferences,
-      preferencesData: preferences ? { theme: preferences.theme, timezone: preferences.timezone } : null
+      preferencesData: preferences ? { theme: preferences.theme, timezone: preferences.timezone } : null,
+      currentThemeFromContext: theme,
+      effectiveTheme
     });
-  }, [user?.id, preferencesLoading, preferencesError, preferences]);
+  }, [user?.id, preferencesLoading, preferencesError, preferences, theme, effectiveTheme]);
+
+  // Sync form theme with context theme
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      theme: theme
+    }));
+  }, [theme]);
 
   // Initialize form data when preferences are loaded
   useEffect(() => {
     if (preferences) {
       console.log('📝 Initializing form data with preferences:', preferences);
       setFormData({
-        theme: preferences.theme,
+        theme: preferences.theme === 'light' || preferences.theme === 'dark' ? preferences.theme : theme,
         notifications: preferences.notifications,
         timezone: preferences.timezone,
         defaultTimeEntryDuration: preferences.timeTracking.defaultTimeEntryDuration,
@@ -124,7 +134,7 @@ const PreferencesSettings: React.FC = () => {
         timeFormat: preferences.formatting.timeFormat,
       });
     }
-  }, [preferences]);
+  }, [preferences, theme]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -138,6 +148,7 @@ const PreferencesSettings: React.FC = () => {
     // Apply theme change immediately for better UX
     if (name === 'theme') {
       if (value === 'light' || value === 'dark' || value === 'system') {
+        console.log(`🎨 Theme changed in preferences form: ${value}`);
         setTheme(value as 'light' | 'dark' | 'system');
       }
     }
@@ -197,7 +208,8 @@ const PreferencesSettings: React.FC = () => {
         },
       });
 
-      setTheme(updatedPreferences.theme);
+      // Ensure theme context is updated with the saved preference
+      setTheme(formData.theme);
 
       setMessage({ type: 'success', text: 'Preferences updated successfully!' });
 

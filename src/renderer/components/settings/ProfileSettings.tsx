@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { useUserProfile } from '../../hooks';
+import { useAutoRefresh } from '../../hooks/useAutoRefresh';
 import { UpdateUserProfileRequest } from '../../types/user-profile-api';
 import { EmailChangeButton } from './EmailChangeButton';
 import { EmailChangeModal } from './EmailChangeModal';
-import { EmailChangeStatus, EmailChangeRequest } from './EmailChangeStatus';
-import { emailChangeService, CreateEmailChangeRequest } from '../../services/emailChangeService';
+import { EmailChangeStatus } from './EmailChangeStatus';
+import { EmailServiceStatus, dispatchEmailServiceEvent } from './EmailServiceStatus';
+import { emailChangeService, CreateEmailChangeRequest, EmailChangeRequest } from '../../services/emailChangeService';
 
 interface ProfileFormData {
   name: string;
@@ -48,6 +50,8 @@ const ProfileSettings: React.FC = () => {
   const [showEmailChangeModal, setShowEmailChangeModal] = useState(false);
   const [activeEmailChangeRequest, setActiveEmailChangeRequest] = useState<EmailChangeRequest | null>(null);
   const [loadingEmailRequest, setLoadingEmailRequest] = useState(false);
+  const [emailChangeMessage, setEmailChangeMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [lastStatusUpdate, setLastStatusUpdate] = useState<Date | null>(null);
 
   // Debug logging
   useEffect(() => {
@@ -93,12 +97,38 @@ const ProfileSettings: React.FC = () => {
       const activeRequest = await emailChangeService.getActiveRequest();
       console.log('📧 Active email change request:', activeRequest);
       setActiveEmailChangeRequest(activeRequest);
+      setLastStatusUpdate(new Date());
     } catch (error) {
       console.error('Failed to load email change requests:', error);
       // Don't show error to user for this background operation
     } finally {
       setLoadingEmailRequest(false);
     }
+  };
+
+  // Auto-refresh email change request status using the custom hook
+  const { manualRefresh } = useAutoRefresh({
+    enabled: !!(user?.id && activeEmailChangeRequest),
+    interval: 30000, // 30 seconds
+    onRefresh: loadActiveEmailChangeRequest,
+    dependencies: [user?.id, activeEmailChangeRequest]
+  });
+
+  // Manual refresh function for user-triggered refresh
+  const handleManualRefresh = async () => {
+    console.log('🔄 Manual refresh triggered by user');
+    await manualRefresh();
+    
+    // Show brief success message
+    setEmailChangeMessage({
+      type: 'success',
+      text: 'Email change status refreshed successfully.'
+    });
+    
+    // Clear the message after 3 seconds
+    setTimeout(() => {
+      setEmailChangeMessage(null);
+    }, 3000);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -192,7 +222,7 @@ const ProfileSettings: React.FC = () => {
       // Refresh the active request
       await loadActiveEmailChangeRequest();
       
-      setMessage({ 
+      setEmailChangeMessage({ 
         type: 'success', 
         text: 'Email change request submitted successfully! Please check your email addresses for verification links.' 
       });
@@ -213,14 +243,14 @@ const ProfileSettings: React.FC = () => {
       // Refresh the active request
       await loadActiveEmailChangeRequest();
       
-      setMessage({ 
+      setEmailChangeMessage({ 
         type: 'success', 
         text: 'Email change request cancelled successfully.' 
       });
       
     } catch (error) {
       console.error('Failed to cancel email change request:', error);
-      setMessage({ 
+      setEmailChangeMessage({ 
         type: 'error', 
         text: error instanceof Error ? error.message : 'Failed to cancel email change request. Please try again.' 
       });
@@ -229,47 +259,81 @@ const ProfileSettings: React.FC = () => {
 
   const handleResendVerification = async (requestId: string, emailType: 'current' | 'new') => {
     try {
-      console.log('📧 Resending verification email:', { requestId, emailType });
-      
-      // Show loading state
-      setMessage({ 
-        type: 'success', 
-        text: `Sending verification email to your ${emailType} email address...` 
-      });
+      console.log(`🔄 Resending verification email for ${emailType} email (Request ID: ${requestId})`);
       
       await emailChangeService.resendVerification(requestId, emailType);
-      console.log('✅ Verification email resent successfully');
       
-      setMessage({ 
-        type: 'success', 
-        text: `Verification email sent to your ${emailType} email address. Please check your inbox and spam folder.` 
+      // Show success message
+      setEmailChangeMessage({
+        type: 'success',
+        text: `Verification email sent to your ${emailType} email address. Please check your inbox and spam folder.`
       });
       
-    } catch (error) {
+      // Dispatch success event for service status tracking
+      dispatchEmailServiceEvent('success', { requestId, emailType });
+      
+      // Refresh the request data
+      await loadActiveEmailChangeRequest();
+      
+    } catch (error: any) {
       console.error('Failed to resend verification email:', error);
       
-      let errorMessage = 'Failed to resend verification email. Please try again.';
+      // Enhanced error handling for email service issues
+      let errorMessage = 'Failed to send verification email. Please try again.';
+      let showServiceStatus = false;
       
-      if (error instanceof Error) {
-        // Use the enhanced error message from the service
-        errorMessage = error.message;
+      if (error.message) {
+        if (error.message.includes('email service is currently experiencing issues')) {
+          errorMessage = 'The email service is temporarily unavailable. Please try again in a few minutes.';
+          showServiceStatus = true;
+        } else if (error.message.includes('too many verification emails')) {
+          errorMessage = 'You have requested too many verification emails recently. Please wait a few minutes before trying again.';
+        } else if (error.message.includes('Failed to send the verification email')) {
+          errorMessage = 'Unable to send verification email. Please check your email address or contact support.';
+        } else if (error.message.includes('Status: 500')) {
+          errorMessage = 'The email service is experiencing technical difficulties. Please try again later or contact support.';
+          showServiceStatus = true;
+        } else {
+          errorMessage = error.message;
+        }
       }
       
-      setMessage({ 
-        type: 'error', 
+      setEmailChangeMessage({
+        type: 'error',
         text: errorMessage
       });
       
-      // Log additional debugging information
+      // Dispatch error event for service status tracking
+      dispatchEmailServiceEvent('error', { 
+        requestId, 
+        emailType, 
+        error: {
+          message: error.message,
+          code: error.code,
+          details: error.details
+        }
+      });
+      
+      // Log detailed error information for debugging
       console.error('Resend verification error details:', {
         requestId,
         emailType,
-        error: error instanceof Error ? {
+        error: {
           message: error.message,
-          stack: error.stack,
-          name: error.name
-        } : error
+          code: error.code,
+          details: error.details
+        }
       });
+      
+      // If it's a service issue, provide additional guidance
+      if (showServiceStatus) {
+        setTimeout(() => {
+          setEmailChangeMessage({
+            type: 'info',
+            text: 'Email service status: If this issue persists, please contact support with Request ID: ' + requestId
+          });
+        }, 3000);
+      }
     }
   };
 
@@ -546,6 +610,8 @@ const ProfileSettings: React.FC = () => {
           request={activeEmailChangeRequest}
           onCancelRequest={handleCancelEmailChangeRequest}
           onResendVerification={handleResendVerification}
+          onRefreshStatus={handleManualRefresh}
+          lastUpdated={lastStatusUpdate || undefined}
         />
       )}
 
@@ -573,6 +639,23 @@ const ProfileSettings: React.FC = () => {
         currentEmail={formData.email}
         onSubmit={handleEmailChangeSubmit}
       />
+
+      {/* Email Change Message */}
+      {emailChangeMessage && (
+        <div className={`p-4 rounded-lg ${
+          emailChangeMessage.type === 'success' ? 'border border-green-200' : emailChangeMessage.type === 'error' ? 'border border-red-200' : 'border border-yellow-200'
+        }`}
+        style={{
+          backgroundColor: emailChangeMessage.type === 'success' ? 'var(--color-success-50)' : emailChangeMessage.type === 'error' ? 'var(--color-error-50)' : 'var(--color-warning-50)',
+          color: emailChangeMessage.type === 'success' ? 'var(--color-success-800)' : emailChangeMessage.type === 'error' ? 'var(--color-error-800)' : 'var(--color-warning-800)',
+          borderColor: emailChangeMessage.type === 'success' ? 'var(--color-success-200)' : emailChangeMessage.type === 'error' ? 'var(--color-error-200)' : 'var(--color-warning-200)'
+        }}>
+          {emailChangeMessage.text}
+        </div>
+      )}
+
+      {/* Email Service Status */}
+      <EmailServiceStatus showDetails={true} className="mb-4" />
 
       {/* Profile Form */}
       <form onSubmit={handleSubmit} className="space-y-6">

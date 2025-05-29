@@ -35,6 +35,7 @@ export interface EmailChangeRequest {
 
 export interface EmailChangeRequestFilters {
   status?: 'pending_verification' | 'pending_approval' | 'approved' | 'rejected' | 'completed' | 'cancelled';
+  userId?: string;
   limit?: number;
   offset?: number;
   sortBy?: 'requestedAt' | 'status' | 'reason';
@@ -283,7 +284,39 @@ class EmailChangeService {
     const queryString = queryParams.toString();
     const path = queryString ? `/email-change?${queryString}` : '/email-change';
     
-    return this.request('GET', path);
+    console.log(`🔍 [EmailChangeService] Making getRequests call to: ${path}`);
+    console.log(`🔍 [EmailChangeService] Filters:`, filters);
+    
+    const result = await this.request<{
+      requests: EmailChangeRequest[];
+      pagination: {
+        total: number;
+        limit: number;
+        offset: number;
+        hasMore: boolean;
+      };
+    }>('GET', path);
+    
+    console.log(`📧 [EmailChangeService] getRequests result:`, result);
+    console.log(`📧 [EmailChangeService] result type:`, typeof result);
+    console.log(`📧 [EmailChangeService] result.requests type:`, typeof result?.requests);
+    console.log(`📧 [EmailChangeService] result.requests length:`, result?.requests?.length);
+    console.log(`📧 [EmailChangeService] result.requests content:`, result?.requests);
+    
+    // Validate the result structure
+    if (!result || typeof result !== 'object') {
+      console.error(`❌ [EmailChangeService] Invalid result structure:`, result);
+      throw new Error('Invalid API response structure');
+    }
+    
+    if (!('requests' in result) || !Array.isArray(result.requests)) {
+      console.error(`❌ [EmailChangeService] result.requests is not an array:`, result);
+      throw new Error('Invalid API response - requests is not an array');
+    }
+    
+    console.log(`✅ [EmailChangeService] Returning valid result with ${result.requests.length} requests`);
+    
+    return result;
   }
 
   /**
