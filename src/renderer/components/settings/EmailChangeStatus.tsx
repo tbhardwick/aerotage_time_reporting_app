@@ -5,7 +5,8 @@ import {
   XCircleIcon, 
   ExclamationTriangleIcon,
   EnvelopeIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline';
 import { EmailChangeRequest } from '../../services/emailChangeService';
 
@@ -152,6 +153,23 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
       {request.status === 'pending_verification' && (
         <div className="space-y-3">
           <h5 style={{ color: 'var(--text-primary)' }} className="text-sm font-medium">Email Verification Status</h5>
+          
+          {/* Email Service Notice */}
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start space-x-2">
+              <InformationCircleIcon className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-blue-900">Email Verification Help</p>
+                <div className="text-sm text-blue-800 mt-1">
+                  <p>• Check your inbox and spam/junk folders for verification emails</p>
+                  <p>• Verification emails may take a few minutes to arrive</p>
+                  <p>• If you don't receive emails after 10 minutes, try the resend button</p>
+                  <p>• Contact support if you continue having issues receiving emails</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div className="space-y-2">
             <div style={{ backgroundColor: 'var(--background-color)', border: '1px solid var(--border-color)' }} className="flex items-center justify-between p-3 rounded-lg">
               <div className="flex items-center space-x-2">

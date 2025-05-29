@@ -231,19 +231,44 @@ const ProfileSettings: React.FC = () => {
     try {
       console.log('📧 Resending verification email:', { requestId, emailType });
       
+      // Show loading state
+      setMessage({ 
+        type: 'success', 
+        text: `Sending verification email to your ${emailType} email address...` 
+      });
+      
       await emailChangeService.resendVerification(requestId, emailType);
       console.log('✅ Verification email resent successfully');
       
       setMessage({ 
         type: 'success', 
-        text: `Verification email resent to your ${emailType} email address.` 
+        text: `Verification email sent to your ${emailType} email address. Please check your inbox and spam folder.` 
       });
       
     } catch (error) {
       console.error('Failed to resend verification email:', error);
+      
+      let errorMessage = 'Failed to resend verification email. Please try again.';
+      
+      if (error instanceof Error) {
+        // Use the enhanced error message from the service
+        errorMessage = error.message;
+      }
+      
       setMessage({ 
         type: 'error', 
-        text: error instanceof Error ? error.message : 'Failed to resend verification email. Please try again.' 
+        text: errorMessage
+      });
+      
+      // Log additional debugging information
+      console.error('Resend verification error details:', {
+        requestId,
+        emailType,
+        error: error instanceof Error ? {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        } : error
       });
     }
   };

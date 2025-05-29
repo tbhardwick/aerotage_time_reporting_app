@@ -316,9 +316,33 @@ class EmailChangeService {
    * Resend verification email
    */
   async resendVerification(requestId: string, emailType: 'current' | 'new'): Promise<{ message: string }> {
-    return this.request('POST', `/email-change/${requestId}/resend`, {
-      body: { emailType }
-    });
+    try {
+      return await this.request('POST', `/email-change/${requestId}/resend`, {
+        body: { emailType }
+      });
+    } catch (error: any) {
+      console.error(`Failed to resend verification email for ${emailType}:`, error);
+      
+      // Handle specific backend errors
+      if (error.message && error.message.includes('Status: 500')) {
+        throw new Error(
+          `The email service is currently experiencing issues. Please try again in a few minutes, or contact support if the problem persists. (Request ID: ${requestId})`
+        );
+      }
+      
+      // Handle rate limiting
+      if (error.code === EmailChangeErrorCodes.VERIFICATION_RATE_LIMITED) {
+        throw new Error('You have requested too many verification emails recently. Please wait a few minutes before trying again.');
+      }
+      
+      // Handle email send failures
+      if (error.code === EmailChangeErrorCodes.EMAIL_SEND_FAILED) {
+        throw new Error('Failed to send the verification email. Please check your email address and try again, or contact support if the issue continues.');
+      }
+      
+      // Re-throw the original error if it's already well-formatted
+      throw error;
+    }
   }
 
   /**
