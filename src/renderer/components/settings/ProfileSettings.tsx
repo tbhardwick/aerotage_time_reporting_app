@@ -5,6 +5,7 @@ import { UpdateUserProfileRequest } from '../../types/user-profile-api';
 import { EmailChangeButton } from './EmailChangeButton';
 import { EmailChangeModal } from './EmailChangeModal';
 import { EmailChangeStatus, EmailChangeRequest } from './EmailChangeStatus';
+import { emailChangeService, CreateEmailChangeRequest } from '../../services/emailChangeService';
 
 interface ProfileFormData {
   name: string;
@@ -46,6 +47,7 @@ const ProfileSettings: React.FC = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showEmailChangeModal, setShowEmailChangeModal] = useState(false);
   const [activeEmailChangeRequest, setActiveEmailChangeRequest] = useState<EmailChangeRequest | null>(null);
+  const [loadingEmailRequest, setLoadingEmailRequest] = useState(false);
 
   // Debug logging
   useEffect(() => {
@@ -54,7 +56,7 @@ const ProfileSettings: React.FC = () => {
       profileLoading,
       profileError,
       hasProfile: !!profile,
-      profileData: profile ? { name: profile.name, email: profile.email } : null
+      profileData: profile ? { name: profile.name, email: profile.email } : null,
     });
   }, [user?.id, profileLoading, profileError, profile]);
 
@@ -83,32 +85,19 @@ const ProfileSettings: React.FC = () => {
   }, [user?.id]);
 
   const loadActiveEmailChangeRequest = async () => {
+    if (!user?.id) return;
+    
+    setLoadingEmailRequest(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/users/${user?.id}/email-change-requests`);
-      // const data = await response.json();
-      // const activeRequest = data.find(req => ['pending_verification', 'pending_approval', 'approved'].includes(req.status));
-      // setActiveEmailChangeRequest(activeRequest || null);
-      
-      // Mock data for development
-      const mockRequest: EmailChangeRequest = {
-        id: 'mock-request-1',
-        currentEmail: formData.email,
-        newEmail: 'new.email@example.com',
-        status: 'pending_verification',
-        reason: 'personal_preference',
-        requestedAt: new Date().toISOString(),
-        verificationStatus: {
-          currentEmailVerified: false,
-          newEmailVerified: false
-        },
-        estimatedCompletionTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      };
-      
-      // Uncomment to test with mock data
-      // setActiveEmailChangeRequest(mockRequest);
+      console.log('🔍 Loading active email change request...');
+      const activeRequest = await emailChangeService.getActiveRequest();
+      console.log('📧 Active email change request:', activeRequest);
+      setActiveEmailChangeRequest(activeRequest);
     } catch (error) {
       console.error('Failed to load email change requests:', error);
+      // Don't show error to user for this background operation
+    } finally {
+      setLoadingEmailRequest(false);
     }
   };
 
@@ -193,41 +182,16 @@ const ProfileSettings: React.FC = () => {
     setShowEmailChangeModal(true);
   };
 
-  const handleEmailChangeSubmit = async (newEmail: string, reason: string, customReason?: string) => {
+  const handleEmailChangeSubmit = async (data: CreateEmailChangeRequest) => {
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/users/${user?.id}/email-change-request`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ newEmail, reason, customReason })
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error('Failed to submit email change request');
-      // }
-      // 
-      // const data = await response.json();
+      console.log('📧 Submitting email change request:', data);
       
-      // Mock successful submission
-      console.log('📧 Email change request submitted:', { newEmail, reason, customReason });
+      const result = await emailChangeService.submitRequest(data);
+      console.log('✅ Email change request submitted successfully:', result);
       
-      // Create mock request for UI
-      const mockRequest: EmailChangeRequest = {
-        id: 'new-request-' + Date.now(),
-        currentEmail: formData.email,
-        newEmail,
-        status: 'pending_verification',
-        reason,
-        customReason,
-        requestedAt: new Date().toISOString(),
-        verificationStatus: {
-          currentEmailVerified: false,
-          newEmailVerified: false
-        },
-        estimatedCompletionTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      };
+      // Refresh the active request
+      await loadActiveEmailChangeRequest();
       
-      setActiveEmailChangeRequest(mockRequest);
       setMessage({ 
         type: 'success', 
         text: 'Email change request submitted successfully! Please check your email addresses for verification links.' 
@@ -241,17 +205,14 @@ const ProfileSettings: React.FC = () => {
 
   const handleCancelEmailChangeRequest = async (requestId: string) => {
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/email-change-requests/${requestId}/cancel`, {
-      //   method: 'DELETE'
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error('Failed to cancel email change request');
-      // }
+      console.log('❌ Cancelling email change request:', requestId);
       
-      console.log('❌ Email change request cancelled:', requestId);
-      setActiveEmailChangeRequest(null);
+      await emailChangeService.cancelRequest(requestId);
+      console.log('✅ Email change request cancelled successfully');
+      
+      // Refresh the active request
+      await loadActiveEmailChangeRequest();
+      
       setMessage({ 
         type: 'success', 
         text: 'Email change request cancelled successfully.' 
@@ -261,25 +222,18 @@ const ProfileSettings: React.FC = () => {
       console.error('Failed to cancel email change request:', error);
       setMessage({ 
         type: 'error', 
-        text: 'Failed to cancel email change request. Please try again.' 
+        text: error instanceof Error ? error.message : 'Failed to cancel email change request. Please try again.' 
       });
     }
   };
 
   const handleResendVerification = async (requestId: string, emailType: 'current' | 'new') => {
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/email-change-requests/${requestId}/resend-verification`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ emailType })
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error('Failed to resend verification email');
-      // }
+      console.log('📧 Resending verification email:', { requestId, emailType });
       
-      console.log('📧 Verification email resent:', { requestId, emailType });
+      await emailChangeService.resendVerification(requestId, emailType);
+      console.log('✅ Verification email resent successfully');
+      
       setMessage({ 
         type: 'success', 
         text: `Verification email resent to your ${emailType} email address.` 
@@ -289,7 +243,7 @@ const ProfileSettings: React.FC = () => {
       console.error('Failed to resend verification email:', error);
       setMessage({ 
         type: 'error', 
-        text: 'Failed to resend verification email. Please try again.' 
+        text: error instanceof Error ? error.message : 'Failed to resend verification email. Please try again.' 
       });
     }
   };
@@ -298,7 +252,7 @@ const ProfileSettings: React.FC = () => {
   if (profileLoading && !profile) {
     return (
       <div className="text-center py-8">
-        <p className="text-[var(--color-text-secondary)]">Loading profile...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Loading profile...</p>
       </div>
     );
   }
@@ -311,10 +265,10 @@ const ProfileSettings: React.FC = () => {
         <div className="space-y-6">
           {/* Header */}
           <div className="text-center py-8">
-            <div className="bg-[var(--color-primary-50)] border border-[var(--color-primary-200)] rounded-lg p-6 max-w-md mx-auto">
+            <div style={{ backgroundColor: 'var(--color-primary-50)', border: '1px solid var(--color-primary-200)' }} className="rounded-lg p-6 max-w-md mx-auto">
               <div className="text-4xl mb-4">👋</div>
-              <h2 className="text-lg font-semibold text-[var(--color-primary-900)] mb-2">Welcome to Aerotage!</h2>
-              <p className="text-[var(--color-primary-700)] text-sm mb-4">
+              <h2 style={{ color: 'var(--color-primary-900)' }} className="text-lg font-semibold mb-2">Welcome to Aerotage!</h2>
+              <p style={{ color: 'var(--color-primary-700)' }} className="text-sm mb-4">
                 It looks like this is your first time here. Let's set up your profile.
               </p>
               <button
@@ -332,7 +286,14 @@ const ProfileSettings: React.FC = () => {
                   });
                   setIsEditing(true);
                 }}
-                className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200"
+                style={{ backgroundColor: '#3b82f6' }}
+                className="px-4 py-2 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                }}
               >
                 Create My Profile
               </button>
@@ -342,16 +303,21 @@ const ProfileSettings: React.FC = () => {
           {/* Show the form if editing */}
           {isEditing && (
             <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
-              <div className="bg-[var(--color-surface)] p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-4">Create Your Profile</h3>
+              <div style={{ backgroundColor: 'var(--surface-color)' }} className="p-6 rounded-lg shadow-md">
+                <h3 style={{ color: 'var(--text-primary)' }} className="text-lg font-medium mb-4">Create Your Profile</h3>
                 
                 {/* Messages */}
                 {message && (
                   <div className={`p-4 rounded-lg mb-4 ${
                     message.type === 'success' 
-                      ? 'bg-[var(--color-success-50)] text-[var(--color-success-800)] border border-[var(--color-success-200)]' 
-                      : 'bg-[var(--color-error-50)] text-[var(--color-error-800)] border border-[var(--color-error-200)]'
-                  }`}>
+                      ? 'border' 
+                      : 'border'
+                  }`}
+                  style={{
+                    backgroundColor: message.type === 'success' ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                    color: message.type === 'success' ? 'var(--color-success-800)' : 'var(--color-error-800)',
+                    borderColor: message.type === 'success' ? 'var(--color-success-200)' : 'var(--color-error-200)'
+                  }}>
                     {message.text}
                   </div>
                 )}
@@ -359,7 +325,7 @@ const ProfileSettings: React.FC = () => {
                 {/* Basic Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    <label htmlFor="name" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                       Full Name *
                     </label>
                     <input
@@ -369,12 +335,17 @@ const ProfileSettings: React.FC = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                      style={{ 
+                        border: '1px solid var(--border-color)', 
+                        backgroundColor: 'var(--surface-color)', 
+                        color: 'var(--text-primary)' 
+                      }}
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    <label htmlFor="email" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                       Email Address
                     </label>
                     <input
@@ -383,12 +354,17 @@ const ProfileSettings: React.FC = () => {
                       name="email"
                       value={formData.email}
                       disabled
-                      className="w-full px-3 py-2 border border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] rounded-lg text-sm text-[var(--color-text-tertiary)]"
+                      style={{ 
+                        border: '1px solid var(--border-color)', 
+                        backgroundColor: 'var(--surface-secondary)', 
+                        color: 'var(--text-tertiary)' 
+                      }}
+                      className="w-full px-3 py-2 rounded-lg text-sm"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="jobTitle" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    <label htmlFor="jobTitle" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                       Job Title
                     </label>
                     <input
@@ -397,12 +373,17 @@ const ProfileSettings: React.FC = () => {
                       name="jobTitle"
                       value={formData.jobTitle}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                      style={{ 
+                        border: '1px solid var(--border-color)', 
+                        backgroundColor: 'var(--surface-color)', 
+                        color: 'var(--text-primary)' 
+                      }}
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="department" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    <label htmlFor="department" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                       Department
                     </label>
                     <input
@@ -411,25 +392,48 @@ const ProfileSettings: React.FC = () => {
                       name="department"
                       value={formData.department}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                      style={{ 
+                        border: '1px solid var(--border-color)', 
+                        backgroundColor: 'var(--surface-color)', 
+                        color: 'var(--text-primary)' 
+                      }}
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[var(--color-border)]">
+                <div style={{ borderTop: '1px solid var(--border-color)' }} className="flex items-center justify-end space-x-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
                     disabled={updating}
-                    className="px-4 py-2 text-[var(--color-text-secondary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-surface-secondary)] transition-colors duration-200 disabled:opacity-50"
+                    style={{
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'var(--surface-color)',
+                      border: '1px solid var(--border-color)'
+                    }}
+                    className="px-4 py-2 rounded-lg hover:opacity-80 transition-colors duration-200 disabled:opacity-50"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updating}
-                    className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200 disabled:opacity-50"
+                    style={{ backgroundColor: '#3b82f6' }}
+                    className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200 disabled:opacity-50"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#2563eb';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#3b82f6';
+                    }}
                   >
                     {updating ? 'Creating Profile...' : 'Create Profile'}
                   </button>
@@ -444,12 +448,19 @@ const ProfileSettings: React.FC = () => {
     // For other errors, show the regular error state
     return (
       <div className="text-center py-8">
-        <div className="bg-[var(--color-error-50)] border border-[var(--color-error-200)] rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-[var(--color-error-800)] mb-2">Failed to load profile</p>
-          <p className="text-[var(--color-error-600)] text-sm mb-4">{profileError}</p>
+        <div style={{ backgroundColor: 'var(--color-error-50)', border: '1px solid var(--color-error-200)' }} className="rounded-lg p-4 max-w-md mx-auto">
+          <p style={{ color: 'var(--color-error-800)' }} className="mb-2">Failed to load profile</p>
+          <p style={{ color: 'var(--color-error-600)' }} className="text-sm mb-4">{profileError}</p>
           <button
             onClick={refetch}
-            className="px-4 py-2 bg-[var(--color-error-600)] text-white rounded-lg hover:bg-[var(--color-error-700)] transition-colors duration-200"
+            style={{ backgroundColor: '#dc2626' }}
+            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#b91c1c';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#dc2626';
+            }}
           >
             Try Again
           </button>
@@ -462,7 +473,7 @@ const ProfileSettings: React.FC = () => {
   if (!profile && !profileLoading) {
     return (
       <div className="text-center py-8">
-        <p className="text-[var(--color-text-secondary)]">No profile data available</p>
+        <p style={{ color: 'var(--text-secondary)' }}>No profile data available</p>
       </div>
     );
   }
@@ -472,13 +483,20 @@ const ProfileSettings: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Profile Information</h2>
-          <p className="text-sm text-[var(--color-text-secondary)]">Update your personal and professional information</p>
+          <h2 style={{ color: 'var(--text-primary)' }} className="text-lg font-semibold">Profile Information</h2>
+          <p style={{ color: 'var(--text-secondary)' }} className="text-sm">Update your personal and professional information</p>
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200"
+            style={{ backgroundColor: '#3b82f6' }}
+            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#2563eb';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#3b82f6';
+            }}
           >
             Edit Profile
           </button>
@@ -487,11 +505,12 @@ const ProfileSettings: React.FC = () => {
 
       {/* Messages */}
       {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-[var(--color-success-50)] text-[var(--color-success-800)] border border-[var(--color-success-200)]' 
-            : 'bg-[var(--color-error-50)] text-[var(--color-error-800)] border border-[var(--color-error-200)]'
-        }`}>
+        <div className="p-4 rounded-lg border"
+        style={{
+          backgroundColor: message.type === 'success' ? 'var(--color-success-50)' : 'var(--color-error-50)',
+          color: message.type === 'success' ? 'var(--color-success-800)' : 'var(--color-error-800)',
+          borderColor: message.type === 'success' ? 'var(--color-success-200)' : 'var(--color-error-200)'
+        }}>
           {message.text}
         </div>
       )}
@@ -505,17 +524,42 @@ const ProfileSettings: React.FC = () => {
         />
       )}
 
+      {/* Email Change Button */}
+      {!activeEmailChangeRequest && !loadingEmailRequest && (
+        <EmailChangeButton
+          currentEmail={formData.email}
+          onEmailChangeRequest={handleEmailChangeRequest}
+          hasActiveRequest={false}
+        />
+      )}
+
+      {/* Loading indicator for email request */}
+      {loadingEmailRequest && (
+        <div style={{ backgroundColor: 'var(--surface-color)' }} className="flex items-center justify-center p-4 rounded-lg">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+          <span style={{ color: 'var(--text-secondary)' }} className="text-sm">Checking email change status...</span>
+        </div>
+      )}
+
+      {/* Email Change Modal */}
+      <EmailChangeModal
+        isOpen={showEmailChangeModal}
+        onClose={() => setShowEmailChangeModal(false)}
+        currentEmail={formData.email}
+        onSubmit={handleEmailChangeSubmit}
+      />
+
       {/* Profile Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
+          <h3 style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }} className="text-md font-medium pb-2">
             Basic Information
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="name" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Full Name *
               </label>
               <input
@@ -526,16 +570,21 @@ const ProfileSettings: React.FC = () => {
                 onChange={handleInputChange}
                 disabled={!isEditing}
                 required
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)' 
+                }}
+                className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="email" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Email Address
               </label>
               <input
@@ -544,26 +593,20 @@ const ProfileSettings: React.FC = () => {
                 name="email"
                 value={formData.email}
                 disabled
-                className="w-full px-3 py-2 border border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] rounded-lg text-sm text-[var(--color-text-tertiary)]"
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: 'var(--surface-secondary)', 
+                  color: 'var(--text-tertiary)' 
+                }}
+                className="w-full px-3 py-2 rounded-lg text-sm"
               />
-              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Email cannot be changed here</p>
-              
-              {/* Email Change Button */}
-              {!activeEmailChangeRequest && (
-                <div className="mt-3">
-                  <EmailChangeButton
-                    currentEmail={formData.email}
-                    onEmailChangeRequest={handleEmailChangeRequest}
-                    hasActiveRequest={false}
-                  />
-                </div>
-              )}
+              <p style={{ color: 'var(--text-tertiary)' }} className="text-xs mt-1">Email cannot be changed here</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="jobTitle" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="jobTitle" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Job Title
               </label>
               <input
@@ -573,16 +616,21 @@ const ProfileSettings: React.FC = () => {
                 value={formData.jobTitle}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)' 
+                }}
+                className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label htmlFor="department" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="department" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Department
               </label>
               <input
@@ -592,10 +640,15 @@ const ProfileSettings: React.FC = () => {
                 value={formData.department}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)' 
+                }}
+                className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    : ''
                 }`}
               />
             </div>
@@ -603,7 +656,7 @@ const ProfileSettings: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="hourlyRate" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="hourlyRate" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Hourly Rate ($)
               </label>
               <input
@@ -615,38 +668,48 @@ const ProfileSettings: React.FC = () => {
                 disabled={!isEditing}
                 min="0"
                 step="0.01"
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)' 
+                }}
+                className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Role
               </label>
               <input
                 type="text"
                 value={profile?.role || ''}
                 disabled
-                className="w-full px-3 py-2 border border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] rounded-lg text-sm text-[var(--color-text-tertiary)] capitalize"
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: 'var(--surface-secondary)', 
+                  color: 'var(--text-tertiary)' 
+                }}
+                className="w-full px-3 py-2 rounded-lg text-sm capitalize"
               />
-              <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Role is managed by administrators</p>
+              <p style={{ color: 'var(--text-tertiary)' }} className="text-xs mt-1">Role is managed by administrators</p>
             </div>
           </div>
         </div>
 
         {/* Contact Information */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
+          <h3 style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }} className="text-md font-medium pb-2">
             Contact Information
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="phone" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Phone Number
               </label>
               <input
@@ -656,16 +719,21 @@ const ProfileSettings: React.FC = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)' 
+                }}
+                className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label htmlFor="emergencyContact" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="emergencyContact" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
                 Emergency Contact
               </label>
               <input
@@ -675,17 +743,22 @@ const ProfileSettings: React.FC = () => {
                 value={formData.emergencyContact}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)' 
+                }}
+                className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                    : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    : ''
                 }`}
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+            <label htmlFor="address" style={{ color: 'var(--text-secondary)' }} className="block text-sm font-medium mb-1">
               Address
             </label>
             <textarea
@@ -695,10 +768,15 @@ const ProfileSettings: React.FC = () => {
               onChange={handleInputChange}
               disabled={!isEditing}
               rows={3}
-              className={`w-full px-3 py-2 border rounded-lg text-sm ${
+              style={{ 
+                border: '1px solid var(--border-color)', 
+                backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                color: 'var(--text-primary)' 
+              }}
+              className={`w-full px-3 py-2 rounded-lg text-sm ${
                 isEditing 
-                  ? 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]' 
-                  : 'border-[var(--color-border-light)] bg-[var(--color-surface-secondary)] text-[var(--color-text-primary)]'
+                  ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                  : ''
               }`}
             />
           </div>
@@ -706,33 +784,43 @@ const ProfileSettings: React.FC = () => {
 
         {/* Action Buttons */}
         {isEditing && (
-          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-[var(--color-border)]">
+          <div style={{ borderTop: '1px solid var(--border-color)' }} className="flex items-center justify-end space-x-3 pt-4">
             <button
               type="button"
               onClick={handleCancel}
               disabled={updating}
-              className="px-4 py-2 text-[var(--color-text-secondary)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-surface-secondary)] transition-colors duration-200 disabled:opacity-50"
+              style={{
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--surface-color)',
+                border: '1px solid var(--border-color)'
+              }}
+              className="px-4 py-2 rounded-lg hover:opacity-80 transition-colors duration-200 disabled:opacity-50"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updating}
-              className="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200 disabled:opacity-50"
+              style={{ backgroundColor: '#3b82f6' }}
+              className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200 disabled:opacity-50"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#2563eb';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#3b82f6';
+              }}
             >
               {updating ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         )}
       </form>
-
-      {/* Email Change Modal */}
-      <EmailChangeModal
-        isOpen={showEmailChangeModal}
-        onClose={() => setShowEmailChangeModal(false)}
-        currentEmail={formData.email}
-        onSubmit={handleEmailChangeSubmit}
-      />
     </div>
   );
 };

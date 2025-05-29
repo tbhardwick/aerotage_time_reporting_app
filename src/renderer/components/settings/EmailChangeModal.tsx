@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { XMarkIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { CreateEmailChangeRequest } from '../../services/emailChangeService';
 
 interface EmailChangeModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentEmail: string;
-  onSubmit: (newEmail: string, reason: string, customReason?: string) => Promise<void>;
+  onSubmit: (data: CreateEmailChangeRequest) => Promise<void>;
 }
 
 type ChangeReason = 'name_change' | 'company_change' | 'personal_preference' | 'security_concern' | 'other';
@@ -44,9 +45,12 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
   currentEmail,
   onSubmit
 }) => {
-  const [newEmail, setNewEmail] = useState('');
-  const [reason, setReason] = useState<ChangeReason | ''>('');
-  const [customReason, setCustomReason] = useState('');
+  const [formData, setFormData] = useState<CreateEmailChangeRequest>({
+    newEmail: '',
+    reason: 'personal_preference',
+    customReason: '',
+    currentPassword: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -54,21 +58,28 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
     const newErrors: { [key: string]: string } = {};
 
     // Email validation
-    if (!newEmail) {
+    if (!formData.newEmail) {
       newErrors.newEmail = 'New email address is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.newEmail)) {
       newErrors.newEmail = 'Please enter a valid email address';
-    } else if (newEmail.toLowerCase() === currentEmail.toLowerCase()) {
+    } else if (formData.newEmail.toLowerCase() === currentEmail.toLowerCase()) {
       newErrors.newEmail = 'New email must be different from current email';
     }
 
+    // Password validation
+    if (!formData.currentPassword) {
+      newErrors.currentPassword = 'Current password is required for verification';
+    } else if (formData.currentPassword.length < 8) {
+      newErrors.currentPassword = 'Password must be at least 8 characters';
+    }
+
     // Reason validation
-    if (!reason) {
+    if (!formData.reason) {
       newErrors.reason = 'Please select a reason for the email change';
     }
 
     // Custom reason validation
-    if (reason === 'other' && !customReason.trim()) {
+    if (formData.reason === 'other' && !formData.customReason?.trim()) {
       newErrors.customReason = 'Please provide a specific reason';
     }
 
@@ -85,11 +96,14 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      await onSubmit(newEmail, reason as string, reason === 'other' ? customReason : undefined);
+      await onSubmit(formData);
       // Reset form on success
-      setNewEmail('');
-      setReason('');
-      setCustomReason('');
+      setFormData({
+        newEmail: '',
+        reason: 'personal_preference',
+        customReason: '',
+        currentPassword: ''
+      });
       setErrors({});
       onClose();
     } catch (error) {
@@ -103,15 +117,18 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
 
   const handleClose = () => {
     if (!isSubmitting) {
-      setNewEmail('');
-      setReason('');
-      setCustomReason('');
+      setFormData({
+        newEmail: '',
+        reason: 'personal_preference',
+        customReason: '',
+        currentPassword: ''
+      });
       setErrors({});
       onClose();
     }
   };
 
-  const getApprovalRequirement = (selectedReason: ChangeReason | '') => {
+  const getApprovalRequirement = (selectedReason: ChangeReason) => {
     switch (selectedReason) {
       case 'personal_preference':
         return { required: false, message: 'Usually approved automatically' };
@@ -130,7 +147,7 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
 
   if (!isOpen) return null;
 
-  const approvalInfo = getApprovalRequirement(reason);
+  const approvalInfo = getApprovalRequirement(formData.reason);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -142,14 +159,21 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
         />
         
         {/* Modal */}
-        <div className="relative w-full max-w-md transform overflow-hidden rounded-lg bg-white shadow-xl transition-all">
+        <div className="relative w-full max-w-md transform overflow-hidden rounded-lg shadow-xl transition-all" style={{ backgroundColor: 'var(--surface-color)' }}>
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h3 className="text-lg font-medium text-gray-900">Change Email Address</h3>
+          <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
+            <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Change Email Address</h3>
             <button
               onClick={handleClose}
               disabled={isSubmitting}
-              className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+              className="disabled:opacity-50"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
@@ -159,58 +183,92 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {/* Submit Error */}
             {errors.submit && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-800">{errors.submit}</p>
+              <div className="p-3 rounded-md" style={{ backgroundColor: 'var(--color-error-50)', border: '1px solid var(--color-error-200)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-error-800)' }}>{errors.submit}</p>
               </div>
             )}
 
             {/* Current Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
                 Current Email
               </label>
               <input
                 type="email"
                 value={currentEmail}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                className="w-full px-3 py-2 rounded-md text-sm"
+                style={{ 
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: 'var(--surface-secondary)', 
+                  color: 'var(--text-tertiary)' 
+                }}
               />
             </div>
 
             {/* New Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
                 New Email Address *
               </label>
               <input
                 type="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
+                value={formData.newEmail}
+                onChange={(e) => setFormData({ ...formData, newEmail: e.target.value })}
                 disabled={isSubmitting}
-                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 ${
-                  errors.newEmail ? 'border-red-300' : 'border-gray-300'
-                }`}
+                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                style={{ 
+                  border: `1px solid ${errors.newEmail ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
+                  backgroundColor: 'var(--surface-color)', 
+                  color: 'var(--text-primary)' 
+                }}
                 placeholder="Enter your new email address"
               />
               {errors.newEmail && (
-                <p className="mt-1 text-sm text-red-600">{errors.newEmail}</p>
+                <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.newEmail}</p>
               )}
+            </div>
+
+            {/* Current Password */}
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                Current Password *
+              </label>
+              <input
+                type="password"
+                value={formData.currentPassword}
+                onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                style={{ 
+                  border: `1px solid ${errors.currentPassword ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
+                  backgroundColor: 'var(--surface-color)', 
+                  color: 'var(--text-primary)' 
+                }}
+                placeholder="Enter your current password"
+              />
+              {errors.currentPassword && (
+                <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.currentPassword}</p>
+              )}
+              <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>Required for security verification</p>
             </div>
 
             {/* Reason */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
                 Reason for Change *
               </label>
               <select
-                value={reason}
-                onChange={(e) => setReason(e.target.value as ChangeReason)}
+                value={formData.reason}
+                onChange={(e) => setFormData({ ...formData, reason: e.target.value as ChangeReason })}
                 disabled={isSubmitting}
-                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 ${
-                  errors.reason ? 'border-red-300' : 'border-gray-300'
-                }`}
+                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                style={{ 
+                  border: `1px solid ${errors.reason ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
+                  backgroundColor: 'var(--surface-color)', 
+                  color: 'var(--text-primary)' 
+                }}
               >
-                <option value="">Select a reason</option>
                 {reasonOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -218,39 +276,42 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
                 ))}
               </select>
               {errors.reason && (
-                <p className="mt-1 text-sm text-red-600">{errors.reason}</p>
+                <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.reason}</p>
               )}
-              {reason && reason !== 'other' && (
-                <p className="mt-1 text-sm text-gray-600">
-                  {reasonOptions.find(opt => opt.value === reason)?.description}
+              {formData.reason && formData.reason !== 'other' && (
+                <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  {reasonOptions.find(opt => opt.value === formData.reason)?.description}
                 </p>
               )}
             </div>
 
             {/* Custom Reason */}
-            {reason === 'other' && (
+            {formData.reason === 'other' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
                   Please Specify *
                 </label>
                 <textarea
-                  value={customReason}
-                  onChange={(e) => setCustomReason(e.target.value)}
+                  value={formData.customReason}
+                  onChange={(e) => setFormData({ ...formData, customReason: e.target.value })}
                   disabled={isSubmitting}
                   rows={3}
-                  className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 ${
-                    errors.customReason ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                  style={{ 
+                    border: `1px solid ${errors.customReason ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
+                    backgroundColor: 'var(--surface-color)', 
+                    color: 'var(--text-primary)' 
+                  }}
                   placeholder="Please provide a detailed reason for the email change"
                 />
                 {errors.customReason && (
-                  <p className="mt-1 text-sm text-red-600">{errors.customReason}</p>
+                  <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.customReason}</p>
                 )}
               </div>
             )}
 
             {/* Approval Information */}
-            {reason && (
+            {formData.reason && (
               <div className={`p-3 rounded-md border ${
                 approvalInfo.required 
                   ? 'bg-yellow-50 border-yellow-200' 
@@ -298,13 +359,18 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
                 type="button"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium rounded-md hover:opacity-80 disabled:opacity-50"
+                style={{
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--surface-color)',
+                  border: '1px solid var(--border-color)'
+                }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || !newEmail || !reason || (reason === 'other' && !customReason)}
+                disabled={isSubmitting || !formData.newEmail || !formData.currentPassword || !formData.reason || (formData.reason === 'other' && !formData.customReason)}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (

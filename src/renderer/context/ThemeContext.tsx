@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -23,6 +23,8 @@ interface ThemeProviderProps {
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export function ThemeProvider({ children, user }: ThemeProviderProps) {
+  const isUpdatingFromUserPrefs = useRef(false);
+  
   // Initialize theme with proper priority: user preferences > localStorage > system
   const [theme, setThemeState] = useState<Theme>(() => {
     // First check user preferences if available
@@ -43,18 +45,23 @@ export function ThemeProvider({ children, user }: ThemeProviderProps) {
     return 'system';
   });
 
-  // Update theme when user preferences change
+  // Update theme when user preferences change (but avoid infinite loops)
   useEffect(() => {
-    if (user?.preferences?.theme) {
+    if (user?.preferences?.theme && !isUpdatingFromUserPrefs.current) {
       const userTheme = user.preferences.theme === 'light' ? 'light' : 'dark';
       if (userTheme !== theme) {
         console.log(`🎨 User preferences changed, updating theme to: ${userTheme}`);
+        isUpdatingFromUserPrefs.current = true;
         setThemeState(userTheme);
-        // Also update localStorage to keep them in sync
         localStorage.setItem('aerotage-theme', userTheme);
+        
+        // Reset the flag after a brief delay
+        setTimeout(() => {
+          isUpdatingFromUserPrefs.current = false;
+        }, 100);
       }
     }
-  }, [user?.preferences?.theme, theme]);
+  }, [user?.preferences?.theme]); // Removed 'theme' from dependencies to prevent loop
 
   // Calculate effective theme (resolve 'system' to actual theme)
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>(() => {
@@ -122,6 +129,11 @@ export function ThemeProvider({ children, user }: ThemeProviderProps) {
   }, [effectiveTheme, theme]);
 
   const setTheme = (newTheme: Theme) => {
+    // Don't update if we're currently updating from user preferences
+    if (isUpdatingFromUserPrefs.current) {
+      return;
+    }
+    
     console.log(`🎨 Theme changing from ${theme} to ${newTheme}`);
     setThemeState(newTheme);
     localStorage.setItem('aerotage-theme', newTheme);

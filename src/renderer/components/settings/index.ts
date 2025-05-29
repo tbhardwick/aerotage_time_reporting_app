@@ -1,5 +1,11 @@
+export { default as SettingsLayout } from './SettingsLayout';
 export { default as ProfileSettings } from './ProfileSettings';
-export { default as PreferencesSettings } from './PreferencesSettings';
 export { default as SecuritySettings } from './SecuritySettings';
+export { default as PreferencesSettings } from './PreferencesSettings';
 export { default as NotificationSettings } from './NotificationSettings';
-export { default as SettingsLayout } from './SettingsLayout'; 
+export { default as DeveloperSettings } from './DeveloperSettings';
+export { EmailChangeButton } from './EmailChangeButton';
+export { EmailChangeModal } from './EmailChangeModal';
+export { EmailChangeStatus } from './EmailChangeStatus';
+export { default as EmailVerificationHandler } from './EmailVerificationHandler';
+export { default as AdminEmailChangeManagement } from './AdminEmailChangeManagement'; 

@@ -3,6 +3,7 @@ import { UserList } from '../components/users/UserList';
 import { UserForm } from '../components/users/UserForm';
 import { InvitationForm } from '../components/users/InvitationForm';
 import { InvitationList } from '../components/users/InvitationList';
+import { AdminEmailChangeManagement } from '../components/settings';
 import { useAppContext } from '../context/AppContext';
 import { 
   UserPlusIcon, 
@@ -12,7 +13,8 @@ import {
   UserIcon,
   PhoneIcon,
   ShieldCheckIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  AtSymbolIcon
 } from '@heroicons/react/24/outline';
 
 export const Users: React.FC = () => {
@@ -21,8 +23,11 @@ export const Users: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'invitations'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'invitations' | 'email-changes'>('users');
   const [invitationListKey, setInvitationListKey] = useState(0);
+
+  // Check if current user is admin or manager
+  const isAdminOrManager = state.user?.role === 'admin' || state.user?.role === 'manager';
 
   const handleInviteUser = () => {
     setShowInvitationForm(true);
@@ -58,7 +63,7 @@ export const Users: React.FC = () => {
     setActiveTab('invitations');
   };
 
-  const handleTabSwitch = (tab: 'users' | 'invitations') => {
+  const handleTabSwitch = (tab: 'users' | 'invitations' | 'email-changes') => {
     if (tab === 'invitations' && activeTab !== 'invitations') {
       // Refresh invitation list when switching to invitations tab
       setInvitationListKey(prev => prev + 1);
@@ -72,7 +77,7 @@ export const Users: React.FC = () => {
       <div>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>User Management</h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Manage users and send invitations to new team members
+            Manage users, send invitations, and handle email change requests
           </p>
         </div>
 
@@ -131,6 +136,34 @@ export const Users: React.FC = () => {
               <EnvelopeIcon className="h-5 w-5 inline mr-2" />
               Invitations
             </button>
+            {isAdminOrManager && (
+              <button
+                onClick={() => handleTabSwitch('email-changes')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'email-changes'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent'
+                }`}
+                style={{
+                  color: activeTab === 'email-changes' ? '#2563eb' : 'var(--text-secondary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeTab !== 'email-changes') {
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeTab !== 'email-changes') {
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                    e.currentTarget.style.borderColor = 'transparent';
+                  }
+                }}
+              >
+                <AtSymbolIcon className="h-5 w-5 inline mr-2" />
+                Email Changes
+              </button>
+            )}
           </nav>
         </div>
 
@@ -197,6 +230,16 @@ export const Users: React.FC = () => {
             </div>
 
             <InvitationList key={invitationListKey} />
+          </div>
+        )}
+
+        {activeTab === 'email-changes' && isAdminOrManager && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Email Change Requests</h2>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Review and manage user email change requests</p>
+            </div>
+            <AdminEmailChangeManagement />
           </div>
         )}
 

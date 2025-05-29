@@ -15,6 +15,7 @@ import Users from './pages/Users';
 import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { EmailVerificationHandler } from './components/settings';
 import { amplifyConfig } from './config/aws-config';
 import { UserDropdown } from './components/common/UserDropdown';
 
@@ -276,6 +277,7 @@ const App: React.FC = () => {
                             <Route path="/invoices" element={<Invoices />} />
                             <Route path="/users" element={<Users />} />
                             <Route path="/settings" element={<Settings />} />
+                            <Route path="/email-verification" element={<EmailVerificationHandler />} />
                           </Routes>
                         </div>
                       </main>
