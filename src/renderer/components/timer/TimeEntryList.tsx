@@ -21,18 +21,33 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
     return `${hours}:${mins.toString().padStart(2, '0')}`;
   };
 
-  const getStatusColor = (status: TimeEntry['status']) => {
+  const getStatusStyle = (status: TimeEntry['status']) => {
     switch (status) {
       case 'draft':
-        return 'bg-gray-100 text-gray-800';
+        return {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)'
+        };
       case 'submitted':
-        return 'bg-yellow-100 text-yellow-800';
+        return {
+          backgroundColor: 'var(--color-warning-50)',
+          color: 'var(--color-warning-800)'
+        };
       case 'approved':
-        return 'bg-green-100 text-green-800';
+        return {
+          backgroundColor: 'var(--color-success-50)',
+          color: 'var(--color-success-800)'
+        };
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return {
+          backgroundColor: 'var(--color-error-50)',
+          color: 'var(--color-error-800)'
+        };
       default:
-        return 'bg-gray-100 text-gray-800';
+        return {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)'
+        };
     }
   };
 
@@ -68,34 +83,75 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+    <div 
+      className="rounded-lg shadow-lg"
+      style={{
+        backgroundColor: 'var(--surface-color)',
+        border: '1px solid var(--border-color)'
+      }}
+    >
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div 
+        className="px-6 py-4 border-b"
+        style={{ borderColor: 'var(--border-color)' }}
+      >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-            <ClockIcon className="w-5 h-5 mr-2" />
-            Time Entries
-          </h3>
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Time Entries</h3>
           
           {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div 
+            className="flex rounded-lg p-1"
+            style={{ backgroundColor: 'var(--color-secondary-50)' }}
+          >
             <button
               onClick={() => setViewMode('daily')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'daily'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors`}
+              style={viewMode === 'daily' 
+                ? {
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                  }
+                : {
+                    color: 'var(--text-secondary)'
+                  }
+              }
+              onMouseEnter={(e) => {
+                if (viewMode !== 'daily') {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'daily') {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
+              }}
             >
               Daily
             </button>
             <button
               onClick={() => setViewMode('weekly')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'weekly'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors`}
+              style={viewMode === 'weekly' 
+                ? {
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                  }
+                : {
+                    color: 'var(--text-secondary)'
+                  }
+              }
+              onMouseEnter={(e) => {
+                if (viewMode !== 'weekly') {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'weekly') {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
+              }}
             >
               Weekly
             </button>
@@ -106,12 +162,19 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
         <div className="flex items-center justify-between">
           <button
             onClick={() => setSelectedDate(new Date(selectedDate.getTime() - (viewMode === 'daily' ? 86400000 : 604800000)))}
-            className="px-3 py-1 text-gray-600 hover:text-gray-900"
+            className="px-3 py-1 transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             ← Previous
           </button>
           
-          <h4 className="font-medium text-gray-900">
+          <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>
             {viewMode === 'daily' 
               ? format(selectedDate, 'EEEE, MMMM d, yyyy')
               : `Week of ${format(startOfWeek(selectedDate, { weekStartsOn: 1 }), 'MMM d')} - ${format(endOfWeek(selectedDate, { weekStartsOn: 1 }), 'MMM d, yyyy')}`
@@ -120,7 +183,14 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
           
           <button
             onClick={() => setSelectedDate(new Date(selectedDate.getTime() + (viewMode === 'daily' ? 86400000 : 604800000)))}
-            className="px-3 py-1 text-gray-600 hover:text-gray-900"
+            className="px-3 py-1 transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             Next →
           </button>
@@ -140,54 +210,77 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
               return (
                 <>
                   {/* Daily Summary */}
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div 
+                    className="rounded-lg p-4 mb-6"
+                    style={{ backgroundColor: 'var(--color-secondary-50)' }}
+                  >
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
-                        <p className="text-sm text-gray-600">Total Time</p>
-                        <p className="text-lg font-semibold text-gray-900">{formatDuration(totalDuration)}</p>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Time</p>
+                        <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{formatDuration(totalDuration)}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">Billable</p>
-                        <p className="text-lg font-semibold text-green-600">{formatDuration(billableDuration)}</p>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Billable</p>
+                        <p className="text-lg font-semibold" style={{ color: 'var(--color-success-600)' }}>{formatDuration(billableDuration)}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">Non-billable</p>
-                        <p className="text-lg font-semibold text-gray-600">{formatDuration(totalDuration - billableDuration)}</p>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Non-billable</p>
+                        <p className="text-lg font-semibold" style={{ color: 'var(--text-secondary)' }}>{formatDuration(totalDuration - billableDuration)}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Time Entries */}
                   {entries.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <ClockIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>No time entries for this date</p>
+                    <div className="text-center py-8">
+                      <ClockIcon className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
+                      <p style={{ color: 'var(--text-secondary)' }}>No time entries for this date</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {entries.map((entry) => (
-                        <div key={entry.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div 
+                          key={entry.id} 
+                          className="rounded-lg p-4 transition-colors"
+                          style={{
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--surface-color)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                          }}
+                        >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(entry.status)}`}>
+                                <span 
+                                  className="px-2 py-1 rounded-full text-xs font-medium"
+                                  style={getStatusStyle(entry.status)}
+                                >
                                   {entry.status}
                                 </span>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  entry.isBillable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                }`}>
+                                <span 
+                                  className="px-2 py-1 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor: entry.isBillable ? 'var(--color-success-50)' : 'var(--surface-secondary)',
+                                    color: entry.isBillable ? 'var(--color-success-800)' : 'var(--text-secondary)'
+                                  }}
+                                >
                                   {entry.isBillable ? 'Billable' : 'Non-billable'}
                                 </span>
                               </div>
-                              <h4 className="font-medium text-gray-900">{getProjectName(entry.projectId)}</h4>
-                              <p className="text-sm text-gray-800">{entry.description}</p>
+                              <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>{getProjectName(entry.projectId)}</h4>
+                              <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{entry.description}</p>
                             </div>
                             
                             <div className="flex items-center space-x-4">
                               <div className="text-right">
-                                <p className="text-lg font-semibold text-gray-900">{formatDuration(entry.duration)}</p>
+                                <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{formatDuration(entry.duration)}</p>
                                 {entry.startTime && entry.endTime && (
-                                  <p className="text-sm text-gray-500">{entry.startTime} - {entry.endTime}</p>
+                                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{entry.startTime} - {entry.endTime}</p>
                                 )}
                               </div>
                               
@@ -195,7 +288,17 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
                                 {entry.status === 'draft' && onSubmit && (
                                   <button
                                     onClick={() => onSubmit(entry.id)}
-                                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                                    className="px-3 py-1 text-sm rounded transition-colors"
+                                    style={{
+                                      backgroundColor: 'var(--color-primary-600)',
+                                      color: 'var(--color-text-on-primary)'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                                    }}
                                   >
                                     Submit
                                   </button>
@@ -203,7 +306,14 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
                                 {onEdit && (
                                   <button
                                     onClick={() => onEdit(entry)}
-                                    className="p-2 text-gray-400 hover:text-gray-600"
+                                    className="p-2 transition-colors"
+                                    style={{ color: 'var(--text-secondary)' }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.color = 'var(--text-primary)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.color = 'var(--text-secondary)';
+                                    }}
                                   >
                                     <PencilIcon className="w-4 h-4" />
                                   </button>
@@ -211,7 +321,14 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
                                 {onDelete && entry.status === 'draft' && (
                                   <button
                                     onClick={() => onDelete(entry.id)}
-                                    className="p-2 text-gray-400 hover:text-red-600"
+                                    className="p-2 transition-colors"
+                                    style={{ color: 'var(--text-secondary)' }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.color = 'var(--color-error-600)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.color = 'var(--text-secondary)';
+                                    }}
                                   >
                                     <TrashIcon className="w-4 h-4" />
                                   </button>
@@ -231,36 +348,50 @@ const TimeEntryList: React.FC<TimeEntryListProps> = ({ onEdit, onDelete, onSubmi
           // Weekly View
           <div className="space-y-4">
             {getWeeklyEntries().map(({ date, entries, totalDuration }) => (
-              <div key={date.toISOString()} className="border border-gray-200 rounded-lg p-4">
+              <div 
+                key={date.toISOString()} 
+                className="rounded-lg p-4"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--surface-color)'
+                }}
+              >
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-gray-900">
+                  <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>
                     {format(date, 'EEEE, MMM d')}
                   </h4>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">{formatDuration(totalDuration)}</p>
-                    <p className="text-sm text-gray-500">{entries.length} entries</p>
+                    <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{formatDuration(totalDuration)}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{entries.length} entries</p>
                   </div>
                 </div>
                 
                 {entries.length > 0 ? (
                   <div className="space-y-2">
                     {entries.map((entry) => (
-                      <div key={entry.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                      <div 
+                        key={entry.id} 
+                        className="flex items-center justify-between py-2 px-3 rounded"
+                        style={{ backgroundColor: 'var(--color-secondary-50)' }}
+                      >
                         <div className="flex-1">
-                          <p className="font-medium text-sm text-gray-900">{getProjectName(entry.projectId)}</p>
-                          <p className="text-xs text-gray-600">{entry.description}</p>
+                          <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>{getProjectName(entry.projectId)}</p>
+                          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{entry.description}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(entry.status)}`}>
+                          <span 
+                            className="px-2 py-1 rounded-full text-xs font-medium"
+                            style={getStatusStyle(entry.status)}
+                          >
                             {entry.status}
                           </span>
-                          <span className="text-sm font-medium text-gray-900">{formatDuration(entry.duration)}</span>
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{formatDuration(entry.duration)}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 italic">No entries</p>
+                  <p className="text-sm italic" style={{ color: 'var(--text-secondary)' }}>No entries</p>
                 )}
               </div>
             ))}

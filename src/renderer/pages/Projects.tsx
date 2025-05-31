@@ -65,13 +65,10 @@ const Projects: React.FC = () => {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('projects')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'projects'
-                ? 'border-blue-500'
-                : 'border-transparent'
-            }`}
+            className="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
             style={{
-              color: activeTab === 'projects' ? '#2563eb' : 'var(--text-secondary)'
+              color: activeTab === 'projects' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+              borderColor: activeTab === 'projects' ? 'var(--color-primary-600)' : 'transparent'
             }}
             onMouseEnter={(e) => {
               if (activeTab !== 'projects') {
@@ -90,13 +87,10 @@ const Projects: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('clients')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'clients'
-                ? 'border-blue-500'
-                : 'border-transparent'
-            }`}
+            className="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
             style={{
-              color: activeTab === 'clients' ? '#2563eb' : 'var(--text-secondary)'
+              color: activeTab === 'clients' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+              borderColor: activeTab === 'clients' ? 'var(--color-primary-600)' : 'transparent'
             }}
             onMouseEnter={(e) => {
               if (activeTab !== 'clients') {

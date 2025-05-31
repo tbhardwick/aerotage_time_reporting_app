@@ -22,49 +22,100 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    this.setState({
-      error,
-      errorInfo
-    });
+    console.error('Error caught by boundary:', error, errorInfo);
+    this.setState({ error, errorInfo });
   }
+
+  handleReload = () => {
+    window.location.reload();
+  };
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+  };
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center h-screen p-8 bg-gray-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl max-w-2xl w-full">
-            <h1 className="text-red-600 mb-4 text-2xl font-bold">
+        <div 
+          className="flex flex-col items-center justify-center h-screen p-8"
+          style={{ backgroundColor: 'var(--background-color)' }}
+        >
+          <div 
+            className="p-8 rounded-lg shadow-xl max-w-2xl w-full"
+            style={{ 
+              backgroundColor: 'var(--surface-color)',
+              borderColor: 'var(--border-color)'
+            }}
+          >
+            <h1 
+              className="mb-4 text-2xl font-bold"
+              style={{ color: 'var(--color-error-600)' }}
+            >
               Something went wrong
             </h1>
             
-            <p className="text-gray-600 mb-4 leading-relaxed">
-              The application encountered an unexpected error. Please try reloading the app.
+            <p 
+              className="mb-4 leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              We're sorry, but something unexpected happened. You can try reloading the page or resetting the application state.
             </p>
-
-            {this.state.error && (
-              <details className="mb-4 p-4 bg-gray-100 rounded text-sm">
-                <summary className="cursor-pointer font-medium mb-2">
-                  Error Details
-                </summary>
-                <pre className="whitespace-pre-wrap text-gray-700 m-0">
-                  {this.state.error.toString()}
-                  {this.state.errorInfo?.componentStack}
-                </pre>
-              </details>
-            )}
-
-            <div className="flex gap-2">
-              <button 
-                onClick={() => window.location.reload()} 
-                className="px-4 py-2 bg-blue-600 text-white border-0 rounded cursor-pointer font-medium hover:bg-blue-700 transition-colors"
+            
+            <details 
+              className="mb-4 p-4 rounded text-sm"
+              style={{ 
+                backgroundColor: 'var(--surface-secondary)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              <summary 
+                className="cursor-pointer font-medium"
+                style={{ color: 'var(--text-primary)' }}
               >
-                Reload App
+                Error Details
+              </summary>
+              <pre 
+                className="whitespace-pre-wrap m-0 mt-2"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {this.state.error?.toString()}
+                {this.state.errorInfo?.componentStack}
+              </pre>
+            </details>
+            
+            <div className="flex space-x-4">
+              <button
+                onClick={this.handleReload}
+                className="px-4 py-2 border-0 rounded cursor-pointer font-medium transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }}
+              >
+                Reload Page
               </button>
               
-              <button 
-                onClick={() => this.setState({ hasError: false, error: undefined, errorInfo: undefined })} 
-                className="px-4 py-2 bg-gray-600 text-white border-0 rounded cursor-pointer font-medium hover:bg-gray-700 transition-colors"
+              <button
+                onClick={this.handleReset}
+                className="px-4 py-2 border-0 rounded cursor-pointer font-medium transition-colors"
+                style={{
+                  backgroundColor: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)',
+                  border: `1px solid var(--border-color)`
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                }}
               >
                 Try Again
               </button>

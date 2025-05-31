@@ -116,43 +116,71 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
     switch (status) {
       case 'pending_verification':
         return {
-          color: 'text-yellow-600 bg-yellow-100 border-yellow-200',
+          style: {
+            color: 'var(--color-warning-800)',
+            backgroundColor: 'var(--color-warning-50)',
+            borderColor: 'var(--color-warning-200)'
+          },
           icon: EnvelopeIcon,
           text: 'Pending Verification'
         };
       case 'pending_approval':
         return {
-          color: 'text-blue-600 bg-blue-100 border-blue-200',
+          style: {
+            color: 'var(--color-primary-800)',
+            backgroundColor: 'var(--color-primary-50)',
+            borderColor: 'var(--color-primary-200)'
+          },
           icon: ClockIcon,
           text: 'Pending Approval'
         };
       case 'approved':
         return {
-          color: 'text-green-600 bg-green-100 border-green-200',
+          style: {
+            color: 'var(--color-success-800)',
+            backgroundColor: 'var(--color-success-50)',
+            borderColor: 'var(--color-success-200)'
+          },
           icon: ShieldCheckIcon,
           text: 'Approved'
         };
       case 'rejected':
         return {
-          color: 'text-red-600 bg-red-100 border-red-200',
+          style: {
+            color: 'var(--color-error-800)',
+            backgroundColor: 'var(--color-error-50)',
+            borderColor: 'var(--color-error-200)'
+          },
           icon: XCircleIcon,
           text: 'Rejected'
         };
       case 'completed':
         return {
-          color: 'text-green-600 bg-green-100 border-green-200',
+          style: {
+            color: 'var(--color-success-800)',
+            backgroundColor: 'var(--color-success-50)',
+            borderColor: 'var(--color-success-200)'
+          },
           icon: CheckCircleIcon,
           text: 'Completed'
         };
       case 'cancelled':
         return {
-          color: 'text-gray-600 bg-gray-100 border-gray-200',
+          style: {
+            color: 'var(--text-secondary)',
+            backgroundColor: 'var(--surface-secondary)',
+            borderColor: 'var(--border-color)'
+          },
           icon: XCircleIcon,
           text: 'Cancelled'
         };
       default:
         return {
-          color: 'text-gray-600 bg-gray-100 border-gray-200',
+          style: {
+            color: 'var(--text-secondary)',
+            backgroundColor: 'var(--surface-secondary)',
+            borderColor: 'var(--border-color)'
+          },
           icon: ClockIcon,
           text: 'Unknown'
         };
@@ -266,8 +294,11 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
   if (loading && requests.length === 0) {
     return (
       <div className={`text-center py-8 ${className}`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading email change requests...</p>
+        <div 
+          className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4"
+          style={{ borderColor: 'var(--color-primary-600)' }}
+        ></div>
+        <p style={{ color: 'var(--text-secondary)' }}>Loading email change requests...</p>
       </div>
     );
   }
@@ -277,10 +308,10 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
             {isAdmin ? 'Email Change Requests (Admin View)' : 'My Email Change Requests'}
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             {isAdmin 
               ? 'Manage all user email change requests - you can approve your own requests'
               : 'View your email change requests - admin approval required'
@@ -289,14 +320,35 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
         </div>
         <div className="flex items-center space-x-3">
           {isAdmin && (
-            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+            <div 
+              className="text-xs px-2 py-1 rounded border"
+              style={{
+                color: 'var(--color-primary-800)',
+                backgroundColor: 'var(--color-primary-50)',
+                borderColor: 'var(--color-primary-200)'
+              }}
+            >
               Admin: Can approve own requests
             </div>
           )}
           <button
             onClick={loadRequests}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200"
+            className="px-4 py-2 rounded-lg disabled:opacity-50 transition-colors duration-200"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
           >
             {loading ? 'Refreshing...' : 'Refresh'}
           </button>
@@ -304,14 +356,31 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
+      <div 
+        className="p-4 rounded-lg border"
+        style={{
+          backgroundColor: 'var(--surface-color)',
+          borderColor: 'var(--border-color)'
+        }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label 
+              className="block text-sm font-medium mb-1"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Status
+            </label>
             <select
               value={filters.status || ''}
               onChange={(e) => setFilters({ ...filters, status: e.target.value as any || undefined, offset: 0 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2"
+              style={{
+                backgroundColor: 'var(--background-color)',
+                borderColor: 'var(--border-color)',
+                color: 'var(--text-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
             >
               <option value="">All Statuses</option>
               <option value="pending_verification">Pending Verification</option>
@@ -323,11 +392,22 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <label 
+              className="block text-sm font-medium mb-1"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Sort By
+            </label>
             <select
               value={filters.sortBy || 'requestedAt'}
               onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any, offset: 0 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2"
+              style={{
+                backgroundColor: 'var(--background-color)',
+                borderColor: 'var(--border-color)',
+                color: 'var(--text-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
             >
               <option value="requestedAt">Request Date</option>
               <option value="status">Status</option>
@@ -335,11 +415,22 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+            <label 
+              className="block text-sm font-medium mb-1"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Order
+            </label>
             <select
               value={filters.sortOrder || 'desc'}
               onChange={(e) => setFilters({ ...filters, sortOrder: e.target.value as any, offset: 0 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2"
+              style={{
+                backgroundColor: 'var(--background-color)',
+                borderColor: 'var(--border-color)',
+                color: 'var(--text-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
             >
               <option value="desc">Newest First</option>
               <option value="asc">Oldest First</option>
@@ -350,19 +441,34 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-800">{error}</p>
+        <div 
+          className="p-4 border rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-error-50)',
+            borderColor: 'var(--color-error-200)'
+          }}
+        >
+          <p className="text-sm" style={{ color: 'var(--color-error-800)' }}>{error}</p>
         </div>
       )}
 
       {/* Business Logic Info */}
       {!isAdmin && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div 
+          className="p-4 border rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-primary-50)',
+            borderColor: 'var(--color-primary-200)'
+          }}
+        >
           <div className="flex items-start space-x-2">
-            <ShieldCheckIcon className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <ShieldCheckIcon 
+              className="h-5 w-5 flex-shrink-0 mt-0.5" 
+              style={{ color: 'var(--color-primary-600)' }}
+            />
             <div>
-              <p className="text-sm font-medium text-blue-900">Admin Approval Required</p>
-              <p className="text-sm text-blue-800 mt-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--color-primary-900)' }}>Admin Approval Required</p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-primary-800)' }}>
                 Email change requests require approval from an administrator. You can view your request status here, but cannot approve or reject requests.
               </p>
             </div>
@@ -372,16 +478,25 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
 
       {/* Requests List */}
       {requests.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-          <EnvelopeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">
+        <div 
+          className="text-center py-8 rounded-lg border"
+          style={{
+            backgroundColor: 'var(--surface-color)',
+            borderColor: 'var(--border-color)'
+          }}
+        >
+          <EnvelopeIcon 
+            className="h-12 w-12 mx-auto mb-4" 
+            style={{ color: 'var(--text-tertiary)' }}
+          />
+          <p style={{ color: 'var(--text-secondary)' }}>
             {isAdmin 
               ? 'No email change requests found in the system'
               : 'You have no email change requests'
             }
           </p>
           {!isAdmin && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm mt-2" style={{ color: 'var(--text-tertiary)' }}>
               You can create an email change request from your Profile Settings
             </p>
           )}
@@ -393,61 +508,80 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
             const StatusIcon = statusConfig.icon;
 
             return (
-              <div key={request.id} className="bg-white border border-gray-200 rounded-lg p-6">
+              <div 
+                key={request.id} 
+                className="border rounded-lg p-6"
+                style={{
+                  backgroundColor: 'var(--surface-color)',
+                  borderColor: 'var(--border-color)'
+                }}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    {/* Header */}
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className={`p-2 rounded-full ${statusConfig.color}`}>
-                        <StatusIcon className="h-5 w-5" />
-                      </div>
+                                          {/* Header */}
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div 
+                          className="p-2 rounded-full border"
+                          style={statusConfig.style}
+                        >
+                          <StatusIcon className="h-5 w-5" />
+                        </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <h4 className="text-lg font-medium text-gray-900">Email Change Request</h4>
+                          <h4 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Email Change Request</h4>
                           {isSelfApproval(request) && (
-                            <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                            <span 
+                              className="px-2 py-1 text-xs font-medium rounded-full"
+                              style={{
+                                backgroundColor: 'var(--color-primary-50)',
+                                color: 'var(--color-primary-800)'
+                              }}
+                            >
                               Your Request
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">Request ID: {request.id}</p>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Request ID: {request.id}</p>
                         {isAdmin && request.userId && (
-                          <p className="text-sm text-gray-500">User ID: {request.userId}</p>
+                          <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>User ID: {request.userId}</p>
                         )}
                       </div>
-                      <span className={`px-3 py-1 text-sm font-medium rounded-full border ${statusConfig.color}`}>
-                        {statusConfig.text}
-                      </span>
+                                              <span 
+                          className="px-3 py-1 text-sm font-medium rounded-full border"
+                          style={statusConfig.style}
+                        >
+                          {statusConfig.text}
+                        </span>
                     </div>
 
                     {/* Request Details */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <UserIcon className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm font-medium text-gray-500">From:</span>
-                          <p className="text-sm text-gray-900 font-mono">{request.currentEmail}</p>
+                          <UserIcon className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>From:</span>
+                          <p className="text-sm font-mono" style={{ color: 'var(--text-primary)' }}>{request.currentEmail}</p>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-500">To:</span>
-                          <p className="text-sm text-gray-900 font-mono">{request.newEmail}</p>
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>To:</span>
+                          <p className="text-sm font-mono" style={{ color: 'var(--text-primary)' }}>{request.newEmail}</p>
                         </div>
                       </div>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-sm font-medium text-gray-500">Reason:</span>
-                          <p className="text-sm text-gray-900">{getReasonDisplay(request.reason, request.customReason)}</p>
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Reason:</span>
+                          <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{getReasonDisplay(request.reason, request.customReason)}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <CalendarIcon className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm font-medium text-gray-500">Requested:</span>
-                          <span className="text-sm text-gray-900">{formatDate(request.requestedAt)}</span>
+                          <CalendarIcon className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Requested:</span>
+                          <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{formatDate(request.requestedAt)}</span>
                         </div>
                         {request.estimatedCompletionTime && (
                           <div className="flex items-center space-x-2">
-                            <ClockIcon className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm font-medium text-gray-500">Est. Completion:</span>
-                            <span className="text-sm text-gray-900">{formatDate(request.estimatedCompletionTime)}</span>
+                            <ClockIcon className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />
+                            <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Est. Completion:</span>
+                            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{formatDate(request.estimatedCompletionTime)}</span>
                           </div>
                         )}
                       </div>
@@ -455,24 +589,40 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
 
                     {/* Verification Status */}
                     {request.status === 'pending_verification' && (
-                      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                        <h5 className="text-sm font-medium text-gray-900 mb-2">Verification Status:</h5>
+                      <div 
+                        className="mb-4 p-3 rounded-lg"
+                        style={{
+                          backgroundColor: 'var(--surface-secondary)',
+                          border: '1px solid var(--border-color)'
+                        }}
+                      >
+                        <h5 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Verification Status:</h5>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              request.verificationStatus.currentEmailVerified ? 'bg-green-500' : 'bg-yellow-500'
-                            }`} />
-                            <span className="text-sm text-gray-700">Current Email</span>
-                            <span className="text-xs text-gray-500">
+                            <div 
+                              className="w-2 h-2 rounded-full"
+                              style={{
+                                backgroundColor: request.verificationStatus.currentEmailVerified 
+                                  ? 'var(--color-success-600)' 
+                                  : 'var(--color-warning-600)'
+                              }}
+                            />
+                            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>Current Email</span>
+                            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                               {request.verificationStatus.currentEmailVerified ? 'Verified' : 'Pending'}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              request.verificationStatus.newEmailVerified ? 'bg-green-500' : 'bg-yellow-500'
-                            }`} />
-                            <span className="text-sm text-gray-700">New Email</span>
-                            <span className="text-xs text-gray-500">
+                            <div 
+                              className="w-2 h-2 rounded-full"
+                              style={{
+                                backgroundColor: request.verificationStatus.newEmailVerified 
+                                  ? 'var(--color-success-600)' 
+                                  : 'var(--color-warning-600)'
+                              }}
+                            />
+                            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>New Email</span>
+                            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                               {request.verificationStatus.newEmailVerified ? 'Verified' : 'Pending'}
                             </span>
                           </div>
@@ -482,12 +632,21 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
 
                     {/* Rejection Reason */}
                     {request.status === 'rejected' && request.rejectionReason && (
-                      <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div 
+                        className="mb-4 p-3 border rounded-lg"
+                        style={{
+                          backgroundColor: 'var(--color-error-50)',
+                          borderColor: 'var(--color-error-200)'
+                        }}
+                      >
                         <div className="flex items-start space-x-2">
-                          <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                          <ExclamationTriangleIcon 
+                            className="h-5 w-5 flex-shrink-0 mt-0.5" 
+                            style={{ color: 'var(--color-error-600)' }}
+                          />
                           <div>
-                            <p className="text-sm font-medium text-red-900">Rejection Reason:</p>
-                            <p className="text-sm text-red-800 mt-1">{request.rejectionReason}</p>
+                            <p className="text-sm font-medium" style={{ color: 'var(--color-error-800)' }}>Rejection Reason:</p>
+                            <p className="text-sm mt-1" style={{ color: 'var(--color-error-800)' }}>{request.rejectionReason}</p>
                           </div>
                         </div>
                       </div>
@@ -502,7 +661,18 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                           setSelectedRequest(request);
                           setShowApprovalModal(true);
                         }}
-                        className="px-3 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100"
+                        className="px-3 py-2 text-sm font-medium border rounded-md transition-colors"
+                        style={{
+                          color: 'var(--color-success-800)',
+                          backgroundColor: 'var(--color-success-50)',
+                          borderColor: 'var(--color-success-200)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-success-100)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-success-50)';
+                        }}
                       >
                         Approve
                       </button>
@@ -513,7 +683,18 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                           setSelectedRequest(request);
                           setShowRejectionModal(true);
                         }}
-                        className="px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100"
+                        className="px-3 py-2 text-sm font-medium border rounded-md transition-colors"
+                        style={{
+                          color: 'var(--color-error-800)',
+                          backgroundColor: 'var(--color-error-50)',
+                          borderColor: 'var(--color-error-200)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-error-100)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-error-50)';
+                        }}
                       >
                         Reject
                       </button>
@@ -530,34 +711,49 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
       {showApprovalModal && selectedRequest && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowApprovalModal(false)} />
-            <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl">
+            <div className="fixed inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={() => setShowApprovalModal(false)} />
+            <div 
+              className="relative w-full max-w-md rounded-lg shadow-xl"
+              style={{ backgroundColor: 'var(--surface-color)' }}
+            >
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
                   {isSelfApproval(selectedRequest) ? 'Approve Your Email Change Request' : 'Approve Email Change Request'}
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                   {isSelfApproval(selectedRequest) 
                     ? `Are you sure you want to approve your own email change from ${selectedRequest.currentEmail} to ${selectedRequest.newEmail}?`
                     : `Are you sure you want to approve this email change from ${selectedRequest.currentEmail} to ${selectedRequest.newEmail}?`
                   }
                 </p>
                 {isSelfApproval(selectedRequest) && (
-                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">
+                  <div 
+                    className="mb-4 p-3 border rounded-lg"
+                    style={{
+                      backgroundColor: 'var(--color-primary-50)',
+                      borderColor: 'var(--color-primary-200)'
+                    }}
+                  >
+                    <p className="text-sm" style={{ color: 'var(--color-primary-800)' }}>
                       <strong>Self-Approval:</strong> As an admin, you can approve your own email change requests.
                     </p>
                   </div>
                 )}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                     Approval Notes (Optional)
                   </label>
                   <textarea
                     value={approvalNotes}
                     onChange={(e) => setApprovalNotes(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      backgroundColor: 'var(--background-color)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-600)'
+                    } as React.CSSProperties}
                     placeholder={isSelfApproval(selectedRequest) 
                       ? "Add any notes about your self-approval..."
                       : "Add any notes about this approval..."
@@ -568,14 +764,43 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                   <button
                     onClick={() => setShowApprovalModal(false)}
                     disabled={actionLoading}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                    className="px-4 py-2 text-sm font-medium border rounded-md disabled:opacity-50 transition-colors"
+                    style={{
+                      color: 'var(--text-primary)',
+                      backgroundColor: 'var(--background-color)',
+                      borderColor: 'var(--border-color)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!actionLoading) {
+                        e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!actionLoading) {
+                        e.currentTarget.style.backgroundColor = 'var(--background-color)';
+                      }
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleApprove}
                     disabled={actionLoading}
-                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 disabled:opacity-50"
+                    className="px-4 py-2 text-sm font-medium border border-transparent rounded-md disabled:opacity-50 transition-colors"
+                    style={{
+                      color: 'var(--color-text-on-success)',
+                      backgroundColor: 'var(--color-success-600)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!actionLoading) {
+                        e.currentTarget.style.backgroundColor = 'var(--color-success-hover)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!actionLoading) {
+                        e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+                      }
+                    }}
                   >
                     {actionLoading ? 'Approving...' : 'Approve'}
                   </button>
@@ -590,22 +815,31 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
       {showRejectionModal && selectedRequest && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowRejectionModal(false)} />
-            <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl">
+            <div className="fixed inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={() => setShowRejectionModal(false)} />
+            <div 
+              className="relative w-full max-w-md rounded-lg shadow-xl"
+              style={{ backgroundColor: 'var(--surface-color)' }}
+            >
               <div className="p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Reject Email Change Request</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Reject Email Change Request</h3>
+                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                   Please provide a reason for rejecting this email change request.
                 </p>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                     Rejection Reason *
                   </label>
                   <textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      backgroundColor: 'var(--background-color)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-600)'
+                    } as React.CSSProperties}
                     placeholder="Explain why this request is being rejected..."
                     required
                   />
@@ -614,14 +848,43 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                   <button
                     onClick={() => setShowRejectionModal(false)}
                     disabled={actionLoading}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                    className="px-4 py-2 text-sm font-medium border rounded-md disabled:opacity-50 transition-colors"
+                    style={{
+                      color: 'var(--text-primary)',
+                      backgroundColor: 'var(--background-color)',
+                      borderColor: 'var(--border-color)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!actionLoading) {
+                        e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!actionLoading) {
+                        e.currentTarget.style.backgroundColor = 'var(--background-color)';
+                      }
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleReject}
                     disabled={actionLoading || !rejectionReason.trim()}
-                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 disabled:opacity-50"
+                    className="px-4 py-2 text-sm font-medium border border-transparent rounded-md disabled:opacity-50 transition-colors"
+                    style={{
+                      color: 'var(--color-text-on-error)',
+                      backgroundColor: 'var(--color-error-600)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!actionLoading && rejectionReason.trim()) {
+                        e.currentTarget.style.backgroundColor = 'var(--color-error-hover)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!actionLoading && rejectionReason.trim()) {
+                        e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+                      }
+                    }}
                   >
                     {actionLoading ? 'Rejecting...' : 'Reject'}
                   </button>

@@ -129,14 +129,21 @@ export const AuthDebugger: React.FC<AuthDebuggerProps> = ({ onClose }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-auto w-full mx-4">
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+      <div className="rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-auto w-full mx-4" style={{ backgroundColor: 'var(--surface-color)' }}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">🔐 Authentication Debugger</h2>
+          <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>🔐 Authentication Debugger</h2>
           {onClose && (
             <button 
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
             >
               ✕
             </button>
@@ -145,41 +152,77 @@ export const AuthDebugger: React.FC<AuthDebuggerProps> = ({ onClose }) => {
 
         <div className="space-y-6">
           {/* Debug Status */}
-          <div className="bg-green-100 p-3 rounded-lg">
-            <h3 className="font-semibold text-green-800 mb-2">🚫 Debug Mode Active</h3>
-            <p className="text-green-700 text-sm">
+          <div 
+            className="p-3 rounded-lg"
+            style={{
+              backgroundColor: 'var(--color-success-50)',
+              border: '1px solid var(--color-success-200)'
+            }}
+          >
+            <h3 className="font-semibold mb-2" style={{ color: 'var(--color-success-800)' }}>🚫 Debug Mode Active</h3>
+            <p className="text-sm" style={{ color: 'var(--color-success-700)' }}>
               Automatic logout is DISABLED for debugging. Authentication errors will be logged but won't trigger logout.
               Check browser console for detailed error logs.
             </p>
           </div>
 
           {/* Auth Status */}
-          <div className="border rounded-lg p-4">
+          <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-color)' }}>
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-semibold">Authentication Status</h3>
+              <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Authentication Status</h3>
               <button 
                 onClick={checkAuthStatus}
                 disabled={loading}
-                className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+                className="px-3 py-1 rounded text-sm disabled:opacity-50 transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary-500)',
+                  color: 'var(--color-text-on-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-500)';
+                  }
+                }}
               >
                 {loading ? 'Checking...' : 'Refresh'}
               </button>
             </div>
             
             {authStatus && (
-              <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto max-h-40">
+              <pre 
+                className="p-3 rounded text-xs overflow-auto max-h-40"
+                style={{
+                  backgroundColor: 'var(--color-secondary-100)',
+                  color: 'var(--text-primary)'
+                }}
+              >
                 {JSON.stringify(authStatus, null, 2)}
               </pre>
             )}
           </div>
 
           {/* Test Suite */}
-          <div className="border rounded-lg p-4">
+          <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-color)' }}>
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-semibold">API Test Suite</h3>
+              <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>API Test Suite</h3>
               <button 
                 onClick={runTestSuite}
-                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                className="px-3 py-1 rounded text-sm transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-success-500)',
+                  color: 'var(--color-text-on-success)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-success-500)';
+                }}
               >
                 Run Tests
               </button>
@@ -190,40 +233,62 @@ export const AuthDebugger: React.FC<AuthDebuggerProps> = ({ onClose }) => {
                 {testResults.map((result, index) => (
                   <div 
                     key={index}
-                    className={`p-2 rounded text-xs ${result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} border`}
+                    className="p-2 rounded text-xs"
+                    style={{
+                      backgroundColor: result.success ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                      border: `1px solid ${result.success ? 'var(--color-success-200)' : 'var(--color-error-200)'}`
+                    }}
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-mono font-medium">{result.apiName}</span>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${result.success ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: result.success ? 'var(--color-success-200)' : 'var(--color-error-200)',
+                          color: result.success ? 'var(--color-success-800)' : 'var(--color-error-800)'
+                        }}
+                      >
                         {result.success ? '✅ SUCCESS' : '❌ FAILED'}
                       </span>
                     </div>
                     
                     {result.duration && (
-                      <div className="text-gray-600 mt-1">Duration: {result.duration}ms</div>
+                      <div className="mt-1" style={{ color: 'var(--text-secondary)' }}>Duration: {result.duration}ms</div>
                     )}
                     
                     {result.error && (
-                      <div className="text-red-700 mt-2 font-mono">{result.error}</div>
+                      <div className="mt-2 font-mono" style={{ color: 'var(--color-error-700)' }}>{result.error}</div>
                     )}
                     
-                    {result.success && result.result && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer text-gray-600">View Result</summary>
-                        <pre className="bg-gray-100 p-2 rounded mt-1 overflow-auto max-h-20">
-                          {JSON.stringify(result.result, null, 2)}
-                        </pre>
-                      </details>
-                    )}
-                    
-                    {!result.success && result.errorDetails && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer text-red-600">View Error Details</summary>
-                        <pre className="bg-red-100 p-2 rounded mt-1 overflow-auto max-h-20">
-                          {JSON.stringify(result.errorDetails, null, 2)}
-                        </pre>
-                      </details>
-                    )}
+                                          {result.success && result.result && (
+                        <details className="mt-2">
+                          <summary className="cursor-pointer" style={{ color: 'var(--text-secondary)' }}>View Result</summary>
+                          <pre 
+                            className="p-2 rounded mt-1 overflow-auto max-h-20"
+                            style={{
+                              backgroundColor: 'var(--color-secondary-100)',
+                              color: 'var(--text-primary)'
+                            }}
+                          >
+                            {JSON.stringify(result.result, null, 2)}
+                          </pre>
+                        </details>
+                      )}
+                      
+                      {!result.success && result.errorDetails && (
+                        <details className="mt-2">
+                          <summary className="cursor-pointer" style={{ color: 'var(--color-error-600)' }}>View Error Details</summary>
+                          <pre 
+                            className="p-2 rounded mt-1 overflow-auto max-h-20"
+                            style={{
+                              backgroundColor: 'var(--color-error-100)',
+                              color: 'var(--color-error-800)'
+                            }}
+                          >
+                            {JSON.stringify(result.errorDetails, null, 2)}
+                          </pre>
+                        </details>
+                      )}
                   </div>
                 ))}
               </div>
@@ -231,9 +296,15 @@ export const AuthDebugger: React.FC<AuthDebuggerProps> = ({ onClose }) => {
           </div>
 
           {/* Instructions */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-blue-800 mb-2">💡 Debugging Tips</h3>
-            <ul className="text-blue-700 text-sm space-y-1">
+          <div 
+            className="p-4 rounded-lg"
+            style={{
+              backgroundColor: 'var(--color-primary-50)',
+              border: '1px solid var(--color-primary-200)'
+            }}
+          >
+            <h3 className="font-semibold mb-2" style={{ color: 'var(--color-primary-800)' }}>💡 Debugging Tips</h3>
+            <ul className="text-sm space-y-1" style={{ color: 'var(--color-primary-700)' }}>
               <li>• Check browser console for detailed authentication logs</li>
               <li>• Run the test suite to identify which API calls are failing</li>
               <li>• Authentication errors will be logged but won't trigger logout</li>

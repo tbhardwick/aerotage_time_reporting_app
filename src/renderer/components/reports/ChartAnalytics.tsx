@@ -34,16 +34,16 @@ const ChartAnalytics: React.FC = () => {
   const { state } = useAppContext();
   const { timeEntries, projects, clients } = state;
 
-  // Chart color palette
+  // Chart color palette - using CSS variables for theme consistency
   const colors = {
-    primary: '#3B82F6',
-    secondary: '#10B981',
-    accent: '#F59E0B',
-    danger: '#EF4444',
-    purple: '#8B5CF6',
-    pink: '#EC4899',
-    indigo: '#6366F1',
-    teal: '#14B8A6',
+    primary: getComputedStyle(document.documentElement).getPropertyValue('--color-primary-600').trim() || '#3B82F6',
+    secondary: getComputedStyle(document.documentElement).getPropertyValue('--color-success-600').trim() || '#10B981',
+    accent: getComputedStyle(document.documentElement).getPropertyValue('--color-warning-500').trim() || '#F59E0B',
+    danger: getComputedStyle(document.documentElement).getPropertyValue('--color-error-500').trim() || '#EF4444',
+    purple: getComputedStyle(document.documentElement).getPropertyValue('--color-purple-500').trim() || '#8B5CF6',
+    pink: getComputedStyle(document.documentElement).getPropertyValue('--color-pink-500').trim() || '#EC4899',
+    indigo: getComputedStyle(document.documentElement).getPropertyValue('--color-indigo-500').trim() || '#6366F1',
+    teal: getComputedStyle(document.documentElement).getPropertyValue('--color-teal-500').trim() || '#14B8A6',
   };
 
   // Weekly hours trend data
@@ -218,7 +218,7 @@ const ChartAnalytics: React.FC = () => {
       const revenue = monthEntries.reduce((sum, entry) => {
         const project = projects.find(p => p.id === entry.projectId);
         const hours = entry.duration / 60;
-        const rate = project?.hourlyRate || 0;
+        const rate = project?.defaultHourlyRate || 0;
         return sum + (hours * rate);
       }, 0);
 
@@ -302,39 +302,51 @@ const ChartAnalytics: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-neutral-900">Analytics & Charts</h2>
-        <p className="text-neutral-600">Visual insights into your time tracking data</p>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Analytics & Charts</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>Visual insights into your time tracking data</p>
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weekly Hours Trend */}
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">Weekly Hours Trend</h3>
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Weekly Hours Trend</h3>
           <div className="h-64">
             <Line data={weeklyTrendData} options={chartOptions} />
           </div>
         </div>
 
         {/* Project Distribution */}
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">Project Time Distribution</h3>
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Project Time Distribution</h3>
           <div className="h-64">
             <Doughnut data={projectDistributionData} options={pieChartOptions} />
           </div>
         </div>
 
         {/* Daily Productivity */}
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">This Week's Productivity</h3>
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>This Week's Productivity</h3>
           <div className="h-64">
             <Bar data={dailyProductivityData} options={chartOptions} />
           </div>
         </div>
 
         {/* Status Breakdown */}
-        <div className="bg-white rounded-xl shadow-soft p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">Entry Status Distribution</h3>
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Entry Status Distribution</h3>
           <div className="h-64">
             <Pie data={statusBreakdownData} options={pieChartOptions} />
           </div>
@@ -342,8 +354,11 @@ const ChartAnalytics: React.FC = () => {
       </div>
 
       {/* Revenue Trend - Full Width */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Revenue Trend (Approved Billable Hours)</h3>
+      <div 
+        className="rounded-xl shadow-soft p-6"
+        style={{ backgroundColor: 'var(--surface-color)' }}
+      >
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Revenue Trend (Approved Billable Hours)</h3>
         <div className="h-80">
           <Line 
             data={revenueTrendData} 
@@ -378,28 +393,46 @@ const ChartAnalytics: React.FC = () => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-soft p-6 text-white">
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{
+            background: 'linear-gradient(to right, var(--color-primary-500), var(--color-primary-600))',
+            color: 'var(--color-text-on-primary)'
+          }}
+        >
           <h4 className="text-lg font-semibold mb-2">Average Daily Hours</h4>
           <p className="text-3xl font-bold">
             {(timeEntries.reduce((sum, entry) => sum + entry.duration, 0) / 60 / Math.max(1, new Set(timeEntries.map(e => e.date)).size)).toFixed(1)}h
           </p>
-          <p className="text-blue-100 text-sm">Across all tracked days</p>
+          <p className="text-sm" style={{ color: 'var(--color-primary-100)' }}>Across all tracked days</p>
         </div>
 
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-soft p-6 text-white">
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{
+            background: 'linear-gradient(to right, var(--color-success-500), var(--color-success-600))',
+            color: 'var(--color-text-on-primary)'
+          }}
+        >
           <h4 className="text-lg font-semibold mb-2">Billable Rate</h4>
           <p className="text-3xl font-bold">
             {((timeEntries.filter(e => e.isBillable).length / Math.max(1, timeEntries.length)) * 100).toFixed(1)}%
           </p>
-          <p className="text-green-100 text-sm">Of all time entries</p>
+          <p className="text-sm" style={{ color: 'var(--color-success-100)' }}>Of all time entries</p>
         </div>
 
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-soft p-6 text-white">
+        <div 
+          className="rounded-xl shadow-soft p-6"
+          style={{
+            background: 'linear-gradient(to right, var(--color-secondary-500), var(--color-secondary-600))',
+            color: 'var(--color-text-on-primary)'
+          }}
+        >
           <h4 className="text-lg font-semibold mb-2">Approval Rate</h4>
           <p className="text-3xl font-bold">
             {((timeEntries.filter(e => e.status === 'approved').length / Math.max(1, timeEntries.filter(e => e.status !== 'draft').length)) * 100).toFixed(1)}%
           </p>
-          <p className="text-purple-100 text-sm">Of submitted entries</p>
+          <p className="text-sm" style={{ color: 'var(--color-secondary-100)' }}>Of submitted entries</p>
         </div>
       </div>
     </div>

@@ -14,43 +14,93 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         <Link 
           to="/time-tracking" 
-          className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
+          className="p-6 rounded-lg transition-colors duration-200 text-center group"
+          style={{
+            backgroundColor: 'var(--color-primary-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+          }}
         >
           <div className="text-2xl mb-2">⏱️</div>
           <h3 className="font-semibold mb-2">Time Tracking</h3>
-          <p className="text-sm text-blue-100">Start tracking your time with our intuitive timer</p>
+          <p className="text-sm opacity-90">Start tracking your time with our intuitive timer</p>
         </Link>
         <Link 
           to="/projects" 
-          className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
+          className="p-6 rounded-lg transition-colors duration-200 text-center group"
+          style={{
+            backgroundColor: 'var(--color-success-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-success-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+          }}
         >
           <div className="text-2xl mb-2">📁</div>
           <h3 className="font-semibold mb-2">Projects</h3>
-          <p className="text-sm text-green-100">Manage your clients and projects</p>
+          <p className="text-sm opacity-90">Manage your clients and projects</p>
         </Link>
         <Link 
           to="/reports" 
-          className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
+          className="p-6 rounded-lg transition-colors duration-200 text-center group"
+          style={{
+            backgroundColor: 'var(--color-secondary-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-secondary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+          }}
         >
           <div className="text-2xl mb-2">📊</div>
           <h3 className="font-semibold mb-2">Reports</h3>
-          <p className="text-sm text-purple-100">Generate insights and export data</p>
+          <p className="text-sm opacity-90">Generate insights and export data</p>
         </Link>
         <Link 
           to="/users" 
-          className="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
+          className="p-6 rounded-lg transition-colors duration-200 text-center group"
+          style={{
+            backgroundColor: 'var(--color-info-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-info-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-info-600)';
+          }}
         >
           <div className="text-2xl mb-2">👥</div>
           <h3 className="font-semibold mb-2">User Management</h3>
-          <p className="text-sm text-indigo-100">Manage users, roles, and permissions</p>
+          <p className="text-sm opacity-90">Manage users, roles, and permissions</p>
         </Link>
         <Link 
           to="/settings" 
-          className="bg-gray-600 hover:bg-gray-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
+          className="p-6 rounded-lg transition-colors duration-200 text-center group"
+          style={{
+            backgroundColor: 'var(--color-neutral-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-neutral-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-neutral-600)';
+          }}
         >
           <div className="text-2xl mb-2">⚙️</div>
           <h3 className="font-semibold mb-2">Settings</h3>
-          <p className="text-sm text-gray-100">Configure your preferences and debug tools</p>
+          <p className="text-sm opacity-90">Configure your preferences and debug tools</p>
         </Link>
       </div>
     </div>

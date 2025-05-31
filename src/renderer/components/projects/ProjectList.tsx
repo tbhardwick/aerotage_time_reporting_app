@@ -52,18 +52,33 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
     });
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusStyle = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return {
+          backgroundColor: 'var(--color-success-50)',
+          color: 'var(--color-success-800)'
+        };
       case 'paused':
-        return 'bg-yellow-100 text-yellow-800';
+        return {
+          backgroundColor: 'var(--color-warning-50)',
+          color: 'var(--color-warning-800)'
+        };
       case 'completed':
-        return 'bg-blue-100 text-blue-800';
+        return {
+          backgroundColor: 'var(--color-primary-50)',
+          color: 'var(--color-primary-800)'
+        };
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return {
+          backgroundColor: 'var(--color-error-50)',
+          color: 'var(--color-error-800)'
+        };
       default:
-        return 'bg-neutral-100 text-neutral-800';
+        return {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)'
+        };
     }
   };
 
@@ -87,6 +102,16 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
     };
   };
 
+  const getProgressBarStyle = (percentage: number) => {
+    if (percentage > 90) {
+      return { backgroundColor: 'var(--color-error-500)' };
+    } else if (percentage > 75) {
+      return { backgroundColor: 'var(--color-warning-500)' };
+    } else {
+      return { backgroundColor: 'var(--color-success-500)' };
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -97,7 +122,18 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
         </div>
         <button
           onClick={onCreateProject}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+          style={{
+            backgroundColor: 'var(--color-primary-600)',
+            color: 'var(--color-text-on-primary)',
+            '--tw-ring-color': 'var(--color-primary-600)'
+          } as React.CSSProperties}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+          }}
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           Add Project
@@ -116,12 +152,13 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
             placeholder="Search projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 text-sm"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
           />
         </div>
 
@@ -130,12 +167,13 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="block w-full pl-3 pr-10 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-3 pr-10 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 text-sm"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -150,12 +188,13 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
           <select
             value={clientFilter}
             onChange={(e) => setClientFilter(e.target.value)}
-            className="block w-full pl-3 pr-10 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-3 pr-10 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 text-sm"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
           >
             <option value="all">All Clients</option>
             {state.clients.map(client => (
@@ -183,7 +222,17 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
           {!searchTerm && statusFilter === 'all' && clientFilter === 'all' && (
             <button
               onClick={onCreateProject}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: 'var(--color-primary-600)',
+                color: 'var(--color-text-on-primary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }}
             >
               <PlusIcon className="w-4 h-4 mr-2" />
               Create Your First Project
@@ -216,7 +265,8 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                     </p>
                     <div className="flex items-center space-x-2">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={getStatusStyle(project.status)}
                       >
                         {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                       </span>
@@ -233,8 +283,8 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: 'var(--text-secondary)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#2563eb';
-                        e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-primary-600)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-primary-50)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.color = 'var(--text-secondary)';
@@ -249,8 +299,8 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: 'var(--text-secondary)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#dc2626';
-                        e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-error-600)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-error-50)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.color = 'var(--text-secondary)';
@@ -284,14 +334,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                         </div>
                         <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--border-color)' }}>
                           <div
-                            className={`h-2 rounded-full transition-all ${
-                              progress.percentage > 90 
-                                ? 'bg-red-500' 
-                                : progress.percentage > 75 
-                                ? 'bg-yellow-500' 
-                                : 'bg-green-500'
-                            }`}
-                            style={{ width: `${Math.min(progress.percentage, 100)}%` }}
+                            className="h-2 rounded-full transition-all"
+                            style={{
+                              width: `${Math.min(progress.percentage, 100)}%`,
+                              ...getProgressBarStyle(progress.percentage)
+                            }}
                           />
                         </div>
                       </div>
@@ -319,9 +366,9 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                 <div className="pt-4 flex justify-between items-center" style={{ borderTop: '1px solid var(--border-color)' }}>
                   <button
                     onClick={() => toggleProjectStatus(project.id, project.status)}
-                    className={`text-xs font-medium px-3 py-1 rounded-full transition-colors`}
+                    className="text-xs font-medium px-3 py-1 rounded-full transition-colors"
                     style={{
-                      color: project.status === 'active' ? 'var(--text-secondary)' : '#16a34a',
+                      color: project.status === 'active' ? 'var(--text-secondary)' : 'var(--color-success-600)',
                       backgroundColor: 'transparent'
                     }}
                     onMouseEnter={(e) => {
@@ -329,12 +376,12 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEditProject, onCreateProjec
                         e.currentTarget.style.color = 'var(--text-primary)';
                         e.currentTarget.style.backgroundColor = 'var(--border-color)';
                       } else {
-                        e.currentTarget.style.color = '#15803d';
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-success-700)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-success-50)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = project.status === 'active' ? 'var(--text-secondary)' : '#16a34a';
+                      e.currentTarget.style.color = project.status === 'active' ? 'var(--text-secondary)' : 'var(--color-success-600)';
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >

@@ -67,7 +67,7 @@ const Invoices: React.FC = () => {
         <div className="rounded-xl shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <DocumentTextIcon className="h-8 w-8 text-blue-600" />
+              <DocumentTextIcon className="h-8 w-8" style={{ color: 'var(--color-primary-600)' }} />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Invoices</p>
@@ -79,7 +79,7 @@ const Invoices: React.FC = () => {
         <div className="rounded-xl shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <ChartBarIcon className="h-8 w-8 text-green-600" />
+              <ChartBarIcon className="h-8 w-8" style={{ color: 'var(--color-success-600)' }} />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Paid Revenue</p>
@@ -93,7 +93,7 @@ const Invoices: React.FC = () => {
         <div className="rounded-xl shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Cog6ToothIcon className="h-8 w-8 text-orange-600" />
+              <Cog6ToothIcon className="h-8 w-8" style={{ color: 'var(--color-warning-600)' }} />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Pending</p>
@@ -119,12 +119,12 @@ const Invoices: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-xs">
                   <span style={{ color: 'var(--text-secondary)' }}>Paid:</span>
-                  <span className="font-medium text-green-600">{invoiceStats.paid}</span>
+                  <span className="font-medium" style={{ color: 'var(--color-success-600)' }}>{invoiceStats.paid}</span>
                 </div>
                 {invoiceStats.overdue > 0 && (
                   <div className="flex justify-between text-xs">
                     <span style={{ color: 'var(--text-secondary)' }}>Overdue:</span>
-                    <span className="font-medium text-red-600">{invoiceStats.overdue}</span>
+                    <span className="font-medium" style={{ color: 'var(--color-error-600)' }}>{invoiceStats.overdue}</span>
                   </div>
                 )}
               </div>
@@ -145,7 +145,7 @@ const Invoices: React.FC = () => {
                     classNames(
                       'py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 focus:outline-none transition-colors',
                       selected
-                        ? 'border-blue-500 text-blue-600'
+                        ? 'border-transparent'
                         : 'border-transparent'
                     )
                   }
@@ -169,19 +169,23 @@ const Invoices: React.FC = () => {
                     <div 
                       className="flex items-center gap-2"
                       style={{
-                        color: selected ? '#2563eb' : 'var(--text-secondary)'
+                        color: selected ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                        borderBottomColor: selected ? 'var(--color-primary-600)' : 'transparent'
                       }}
                     >
                       <tab.icon className="w-5 h-5" />
                       {tab.name}
                       {tab.count !== undefined && (
                         <span
-                          className={classNames(
-                            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                            selectedTab === index
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-neutral-100 text-neutral-800'
-                          )}
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor: selectedTab === index
+                              ? 'var(--color-primary-50)'
+                              : 'var(--color-secondary-50)',
+                            color: selectedTab === index
+                              ? 'var(--color-primary-800)'
+                              : 'var(--color-secondary-800)'
+                          }}
                         >
                           {tab.count}
                         </span>

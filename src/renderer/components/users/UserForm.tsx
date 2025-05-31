@@ -198,16 +198,25 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+    <div 
+      className="fixed inset-0 overflow-y-auto h-full w-full z-50"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+    >
+      <div 
+        className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md"
+        style={{ 
+          backgroundColor: 'var(--surface-color)',
+          borderColor: 'var(--border-color)'
+        }}
+      >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b">
             <div>
-              <h3 className="text-lg font-medium text-gray-900">
-                {isEditMode ? 'Edit User' : 'Create New User'}
-              </h3>
-              <p className="text-sm text-gray-500">
+                          <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
+              {isEditMode ? 'Edit User' : 'Create New User'}
+            </h3>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 {isEditMode 
                   ? 'Update user information, permissions, and preferences'
                   : 'Add a new user to the system with appropriate permissions'
@@ -217,170 +226,229 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
             <button
               type="button"
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
 
           {/* Error Display */}
-          {submitError && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <div className="flex">
-                <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <p className="text-sm text-red-700 mt-1">{submitError}</p>
-                </div>
+                  {submitError && (
+          <div 
+            className="rounded-md p-4"
+            style={{
+              backgroundColor: 'var(--color-error-50)',
+              border: '1px solid var(--color-error-200)'
+            }}
+          >
+            <div className="flex">
+              <ExclamationTriangleIcon className="h-5 w-5" style={{ color: 'var(--color-error-400)' }} />
+              <div className="ml-3">
+                <h3 className="text-sm font-medium" style={{ color: 'var(--color-error-800)' }}>Error</h3>
+                <p className="text-sm mt-1" style={{ color: 'var(--color-error-700)' }}>{submitError}</p>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Basic Information */}
             <div className="space-y-6">
               {/* Personal Information */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+              <div 
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: 'var(--color-secondary-50)' }}
+              >
+                <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                   <UserIcon className="h-4 w-4 mr-2" />
                   Personal Information
                 </h4>
                 <div className="space-y-4">
                   {/* Name */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Full Name *
                     </label>
                     <input
                       type="text"
                       {...register('name')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--surface-color)',
+                        color: 'var(--text-primary)'
+                      }}
                       placeholder="John Doe"
                     />
                     {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.name.message}</p>
                     )}
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Email Address *
                     </label>
                     <div className="mt-1 relative">
                       <input
                         type="email"
                         {...register('email')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                         placeholder="john@company.com"
                       />
-                      <EnvelopeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <EnvelopeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                     {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.email.message}</p>
                     )}
                   </div>
 
                   {/* Job Title */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Job Title
                     </label>
                     <div className="mt-1 relative">
                       <input
                         type="text"
                         {...register('jobTitle')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                         placeholder="Senior Designer"
                       />
-                      <BriefcaseIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <BriefcaseIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                   </div>
 
                   {/* Department */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Department
                     </label>
                     <div className="mt-1 relative">
                       <input
                         type="text"
                         {...register('department')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                         placeholder="Design"
                       />
-                      <BuildingOfficeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <BuildingOfficeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                   </div>
 
                   {/* Start Date */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Start Date *
                     </label>
                     <div className="mt-1 relative">
                       <input
                         type="date"
                         {...register('startDate')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                       />
-                      <CalendarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <CalendarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                     {errors.startDate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.startDate.message}</p>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+              <div 
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: 'var(--color-secondary-50)' }}
+              >
+                <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                   <PhoneIcon className="h-4 w-4 mr-2" />
                   Contact Information
                 </h4>
                 <div className="space-y-4">
                   {/* Phone */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Phone Number
                     </label>
                     <div className="mt-1 relative">
                       <input
                         type="tel"
                         {...register('contactInfo.phone')}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                         placeholder="+1 (555) 123-4567"
                       />
-                      <PhoneIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <PhoneIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                   </div>
 
                   {/* Address */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Address
                     </label>
                     <div className="mt-1 relative">
                       <textarea
                         {...register('contactInfo.address')}
                         rows={2}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                         placeholder="123 Main St, City, State 12345"
                       />
-                      <MapPinIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+                      <MapPinIcon className="h-5 w-5 absolute left-3 top-3" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                   </div>
 
                   {/* Emergency Contact */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Emergency Contact
                     </label>
                     <input
                       type="text"
                       {...register('contactInfo.emergencyContact')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--surface-color)',
+                        color: 'var(--text-primary)'
+                      }}
                       placeholder="Jane Doe (Spouse) - +1 (555) 987-6543"
                     />
                   </div>
@@ -391,38 +459,51 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
             {/* Right Column - Role, Permissions & Preferences */}
             <div className="space-y-6">
               {/* Role & Team */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+              <div 
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: 'var(--color-secondary-50)' }}
+              >
+                <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                   <ShieldCheckIcon className="h-4 w-4 mr-2" />
                   Role & Team Assignment
                 </h4>
                 <div className="space-y-4">
                   {/* Role */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Role *
                     </label>
                     <select
                       {...register('role')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--surface-color)',
+                        color: 'var(--text-primary)'
+                      }}
                     >
                       <option value="employee">Employee</option>
                       <option value="manager">Manager</option>
                       <option value="admin">Administrator</option>
                     </select>
                     {errors.role && (
-                      <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.role.message}</p>
                     )}
                   </div>
 
                   {/* Team */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Team
                     </label>
                     <select
                       {...register('teamId')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--surface-color)',
+                        color: 'var(--text-primary)'
+                      }}
                     >
                       <option value="">No Team</option>
                       {state.teams.map(team => (
@@ -435,7 +516,7 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
 
                   {/* Hourly Rate */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Hourly Rate ($)
                     </label>
                     <div className="mt-1 relative">
@@ -444,13 +525,18 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
                         step="0.01"
                         min="0"
                         {...register('hourlyRate', { valueAsNumber: true })}
-                        className="block w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--surface-color)',
+                          color: 'var(--text-primary)'
+                        }}
                         placeholder="100.00"
                       />
-                      <CurrencyDollarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <CurrencyDollarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                     </div>
                     {errors.hourlyRate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.hourlyRate.message}</p>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.hourlyRate.message}</p>
                     )}
                   </div>
 
@@ -460,9 +546,13 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
                       type="checkbox"
                       id="isActive"
                       {...register('isActive')}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        color: 'var(--color-primary-600)',
+                        border: '1px solid var(--border-color)'
+                      }}
                     />
-                    <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="isActive" className="ml-2 block text-sm" style={{ color: 'var(--text-primary)' }}>
                       Active User
                     </label>
                   </div>
@@ -470,8 +560,11 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
               </div>
 
               {/* Permissions */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+              <div 
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: 'var(--color-secondary-50)' }}
+              >
+                <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                   <ShieldCheckIcon className="h-4 w-4 mr-2" />
                   Feature Permissions
                 </h4>
@@ -484,14 +577,18 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
                           id={`feature-${feature.id}`}
                           checked={watchedFeatures?.includes(feature.id) || false}
                           onChange={() => handleFeatureToggle(feature.id)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                          style={{
+                            color: 'var(--color-primary-600)',
+                            border: '1px solid var(--border-color)'
+                          }}
                         />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor={`feature-${feature.id}`} className="font-medium text-gray-700">
+                        <label htmlFor={`feature-${feature.id}`} className="font-medium" style={{ color: 'var(--text-primary)' }}>
                           {feature.name}
                         </label>
-                        <p className="text-gray-500">{feature.description}</p>
+                        <p style={{ color: 'var(--text-secondary)' }}>{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -499,20 +596,28 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
               </div>
 
               {/* Preferences */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+              <div 
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: 'var(--color-secondary-50)' }}
+              >
+                <h4 className="text-sm font-medium mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
                   <Cog6ToothIcon className="h-4 w-4 mr-2" />
                   User Preferences
                 </h4>
                 <div className="space-y-4">
                   {/* Theme */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Theme
                     </label>
                     <select
                       {...register('preferences.theme')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--surface-color)',
+                        color: 'var(--text-primary)'
+                      }}
                     >
                       <option value="light">Light</option>
                       <option value="dark">Dark</option>
@@ -521,12 +626,17 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
 
                   {/* Timezone */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       Timezone
                     </label>
                     <select
                       {...register('preferences.timezone')}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--surface-color)',
+                        color: 'var(--text-primary)'
+                      }}
                     >
                       {TIMEZONES.map(tz => (
                         <option key={tz} value={tz}>{tz}</option>
@@ -540,9 +650,13 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
                       type="checkbox"
                       id="notifications"
                       {...register('preferences.notifications')}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        color: 'var(--color-primary-600)',
+                        border: '1px solid var(--border-color)'
+                      }}
                     />
-                    <label htmlFor="notifications" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="notifications" className="ml-2 block text-sm" style={{ color: 'var(--text-primary)' }}>
                       Enable email notifications
                     </label>
                   </div>
@@ -556,14 +670,39 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+              style={{
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--surface-color)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+              style={{
+                color: 'var(--color-text-on-primary)',
+                backgroundColor: 'var(--color-primary-600)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }
+              }}
             >
               {isSubmitting ? (
                 <>

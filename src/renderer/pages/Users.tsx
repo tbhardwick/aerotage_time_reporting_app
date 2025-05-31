@@ -86,13 +86,10 @@ export const Users: React.FC = () => {
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => handleTabSwitch('users')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === 'users'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent'
-              }`}
+              className="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
               style={{
-                color: activeTab === 'users' ? '#2563eb' : 'var(--text-secondary)'
+                color: activeTab === 'users' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                borderColor: activeTab === 'users' ? 'var(--color-primary-600)' : 'transparent'
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== 'users') {
@@ -112,13 +109,10 @@ export const Users: React.FC = () => {
             </button>
             <button
               onClick={() => handleTabSwitch('invitations')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === 'invitations'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent'
-              }`}
+              className="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
               style={{
-                color: activeTab === 'invitations' ? '#2563eb' : 'var(--text-secondary)'
+                color: activeTab === 'invitations' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                borderColor: activeTab === 'invitations' ? 'var(--color-primary-600)' : 'transparent'
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== 'invitations') {
@@ -139,13 +133,10 @@ export const Users: React.FC = () => {
             {isAdminOrManager && (
               <button
                 onClick={() => handleTabSwitch('email-changes')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'email-changes'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent'
-                }`}
+                className="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
                 style={{
-                  color: activeTab === 'email-changes' ? '#2563eb' : 'var(--text-secondary)'
+                  color: activeTab === 'email-changes' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                  borderColor: activeTab === 'email-changes' ? 'var(--color-primary-600)' : 'transparent'
                 }}
                 onMouseEnter={(e) => {
                   if (activeTab !== 'email-changes') {
@@ -179,19 +170,31 @@ export const Users: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   onClick={handleInviteUser}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    backgroundColor: 'var(--color-primary-600)',
+                    color: 'var(--color-text-on-primary)',
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }}
                 >
                   <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                   Invite User
                 </button>
                 <button
                   onClick={handleCreateUser}
-                  className="inline-flex items-center px-4 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
                   style={{
                     border: '1px solid var(--border-color)',
                     color: 'var(--text-primary)',
-                    backgroundColor: 'var(--surface-color)'
-                  }}
+                    backgroundColor: 'var(--surface-color)',
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--border-color)';
                   }}
@@ -222,7 +225,18 @@ export const Users: React.FC = () => {
               </div>
               <button
                 onClick={handleInviteUser}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)',
+                  borderColor: 'var(--color-primary-600)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }}
               >
                 <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                 Send New Invitation
@@ -270,7 +284,10 @@ export const Users: React.FC = () => {
 
         {/* View User Modal - User Profile Display */}
         {viewingUserId && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div 
+            className="fixed inset-0 overflow-y-auto h-full w-full z-50"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          >
             <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {(() => {
                 const user = state.users.find((u: any) => u.id === viewingUserId);
@@ -312,16 +329,26 @@ export const Users: React.FC = () => {
                           <h3 className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>{user.name || 'No Name'}</h3>
                           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
                           <div className="flex items-center mt-1">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                              user.role === 'manager' ? 'bg-blue-100 text-blue-800' :
-                              'bg-green-100 text-green-800'
-                            }`}>
+                            <span 
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                              style={{
+                                backgroundColor: user.role === 'admin' ? 'var(--color-error-50)' :
+                                                user.role === 'manager' ? 'var(--color-primary-50)' :
+                                                'var(--color-success-50)',
+                                color: user.role === 'admin' ? 'var(--color-error-800)' :
+                                       user.role === 'manager' ? 'var(--color-primary-800)' :
+                                       'var(--color-success-800)'
+                              }}
+                            >
                               {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                             </span>
-                            <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                            }`}>
+                            <span 
+                              className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                              style={{
+                                backgroundColor: user.isActive ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                                color: user.isActive ? 'var(--color-success-800)' : 'var(--color-error-800)'
+                              }}
+                            >
                               {user.isActive ? 'Active' : 'Inactive'}
                             </span>
                           </div>
@@ -431,9 +458,13 @@ export const Users: React.FC = () => {
                             <div>
                               <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Status</label>
                               <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                }`}>
+                                <span 
+                                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor: user.isActive ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                                    color: user.isActive ? 'var(--color-success-800)' : 'var(--color-error-800)'
+                                  }}
+                                >
                                   {user.isActive ? 'Active' : 'Inactive'}
                                 </span>
                               </p>
@@ -452,7 +483,14 @@ export const Users: React.FC = () => {
                               <label className="block text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Features</label>
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {user.permissions?.features?.map((feature: string) => (
-                                  <span key={feature} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  <span 
+                                    key={feature} 
+                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                    style={{
+                                      backgroundColor: 'var(--color-primary-50)',
+                                      color: 'var(--color-primary-800)'
+                                    }}
+                                  >
                                     {feature}
                                   </span>
                                 )) || <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>No features assigned</span>}
@@ -523,7 +561,17 @@ export const Users: React.FC = () => {
                             handleCloseForm();
                             handleEditUser(user.id);
                           }}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+                          className="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                          style={{
+                            backgroundColor: 'var(--color-primary-600)',
+                            color: 'var(--color-text-on-primary)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                          }}
                         >
                           Edit User
                         </button>

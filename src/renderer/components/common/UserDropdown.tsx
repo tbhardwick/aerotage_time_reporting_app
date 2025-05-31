@@ -141,13 +141,25 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
   const getRoleBadgeColor = (role?: string) => {
     switch (role) {
       case 'admin':
-        return 'text-red-600 bg-red-50';
+        return {
+          color: 'var(--color-error-600)',
+          backgroundColor: 'var(--color-error-50)'
+        };
       case 'manager':
-        return 'text-blue-600 bg-blue-50';
+        return {
+          color: 'var(--color-primary-600)',
+          backgroundColor: 'var(--color-primary-50)'
+        };
       case 'employee':
-        return 'text-green-600 bg-green-50';
+        return {
+          color: 'var(--color-success-600)',
+          backgroundColor: 'var(--color-success-50)'
+        };
       default:
-        return 'text-gray-600 bg-gray-50';
+        return {
+          color: 'var(--text-secondary)',
+          backgroundColor: 'var(--surface-secondary)'
+        };
     }
   };
 
@@ -161,11 +173,12 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
       {/* User Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full"
+        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 w-full"
         style={{
           backgroundColor: 'transparent',
           color: 'var(--text-primary)',
-          '--ring-offset-color': 'var(--background-color)'
+          '--ring-offset-color': 'var(--background-color)',
+          '--tw-ring-color': 'var(--color-primary-500)'
         } as any}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = 'var(--border-color)';
@@ -217,12 +230,21 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
                   {user?.email}
                 </p>
                 <div className="flex items-center mt-1">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(user?.role)}`}>
+                  <span 
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                    style={getRoleBadgeColor(user?.role)}
+                  >
                     <ShieldCheckIcon className="h-3 w-3 mr-1" />
                     {formatRole(user?.role)}
                   </span>
                   {user?.isActive && (
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-green-600 bg-green-50">
+                    <span 
+                      className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={{
+                        color: 'var(--color-success-600)',
+                        backgroundColor: 'var(--color-success-50)'
+                      }}
+                    >
                       Active
                     </span>
                   )}
@@ -340,15 +362,19 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({
                 handleMenuItemClick();
                 handleLogout();
               }}
-              className="flex items-center w-full px-4 py-2 text-sm text-red-700 transition-colors duration-200"
+              className="flex items-center w-full px-4 py-2 text-sm transition-colors duration-200"
+              style={{ color: 'var(--color-error-600)' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#fef2f2'; // red-50
+                e.currentTarget.style.backgroundColor = 'var(--color-error-50)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <ArrowRightOnRectangleIcon className="h-4 w-4 mr-3 text-red-400" />
+              <ArrowRightOnRectangleIcon 
+                className="h-4 w-4 mr-3"
+                style={{ color: 'var(--color-error-600)' }}
+              />
               Sign Out
             </button>
           </div>

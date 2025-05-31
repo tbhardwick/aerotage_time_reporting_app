@@ -30,27 +30,35 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     switch (type) {
       case 'danger':
         return {
-          iconColor: 'text-red-600',
-          iconBg: 'bg-red-100',
-          confirmButton: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
+          iconColor: 'var(--color-error-600)',
+          iconBg: 'var(--color-error-50)',
+          confirmButtonBg: 'var(--color-error-600)',
+          confirmButtonHover: 'var(--color-error-hover)',
+          confirmButtonRing: 'var(--color-error-600)',
         };
       case 'warning':
         return {
-          iconColor: 'text-yellow-600',
-          iconBg: 'bg-yellow-100',
-          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+          iconColor: 'var(--color-warning-600)',
+          iconBg: 'var(--color-warning-50)',
+          confirmButtonBg: 'var(--color-warning-600)',
+          confirmButtonHover: 'var(--color-warning-700)',
+          confirmButtonRing: 'var(--color-warning-600)',
         };
       case 'info':
         return {
-          iconColor: 'text-blue-600',
-          iconBg: 'bg-blue-100',
-          confirmButton: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+          iconColor: 'var(--color-primary-600)',
+          iconBg: 'var(--color-primary-50)',
+          confirmButtonBg: 'var(--color-primary-600)',
+          confirmButtonHover: 'var(--color-primary-hover)',
+          confirmButtonRing: 'var(--color-primary-600)',
         };
       default:
         return {
-          iconColor: 'text-red-600',
-          iconBg: 'bg-red-100',
-          confirmButton: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
+          iconColor: 'var(--color-error-600)',
+          iconBg: 'var(--color-error-50)',
+          confirmButtonBg: 'var(--color-error-600)',
+          confirmButtonHover: 'var(--color-error-hover)',
+          confirmButtonRing: 'var(--color-error-600)',
         };
     }
   };
@@ -58,20 +66,50 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   const styles = getTypeStyles();
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div 
+      className="fixed inset-0 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+    >
+      <div 
+        className="relative rounded-lg max-w-md w-full mx-4"
+        style={{
+          backgroundColor: 'var(--surface-color)',
+          boxShadow: 'var(--shadow)'
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div 
+          className="flex items-center justify-between p-4 border-b"
+          style={{ borderColor: 'var(--border-color)' }}
+        >
           <div className="flex items-center">
-            <div className={`flex-shrink-0 w-10 h-10 rounded-full ${styles.iconBg} flex items-center justify-center`}>
-              <ExclamationTriangleIcon className={`w-6 h-6 ${styles.iconColor}`} />
+            <div 
+              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: styles.iconBg }}
+            >
+              <ExclamationTriangleIcon 
+                className="w-6 h-6"
+                style={{ color: styles.iconColor }}
+              />
             </div>
-            <h3 className="ml-3 text-lg font-medium text-gray-900">{title}</h3>
+            <h3 
+              className="ml-3 text-lg font-medium"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {title}
+            </h3>
           </div>
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            className="disabled:opacity-50 transition-colors"
+            style={{ color: 'var(--text-tertiary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-tertiary)';
+            }}
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -79,26 +117,60 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-sm text-gray-600">{message}</p>
+          <p 
+            className="text-sm"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {message}
+          </p>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end space-x-3 p-4 border-t border-gray-200">
+        <div 
+          className="flex items-center justify-end space-x-3 p-4 border-t"
+          style={{ borderColor: 'var(--border-color)' }}
+        >
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+            style={{
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--surface-color)',
+              borderColor: 'var(--border-color)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+            }}
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${styles.confirmButton}`}
+            className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+            style={{
+              backgroundColor: styles.confirmButtonBg,
+              color: 'var(--color-text-on-primary)',
+              '--tw-ring-color': styles.confirmButtonRing
+            } as React.CSSProperties}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = styles.confirmButtonHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = styles.confirmButtonBg;
+            }}
           >
             {isLoading ? (
               <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div 
+                  className="animate-spin rounded-full h-4 w-4 border-b-2 mr-2"
+                  style={{ borderColor: 'var(--color-text-on-primary)' }}
+                />
                 Processing...
               </div>
             ) : (

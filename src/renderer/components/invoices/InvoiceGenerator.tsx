@@ -232,7 +232,7 @@ const InvoiceGenerator: React.FC = () => {
               <li>3. Approve submitted entries (manager/admin)</li>
               <li>4. Return here to generate invoices</li>
             </ol>
-            <p className="mt-2 text-blue-600">
+                            <p className="mt-2" style={{ color: 'var(--color-primary-600)' }}>
               💡 Use Settings → Workflow Test to test the complete flow
             </p>
           </div>
@@ -249,12 +249,13 @@ const InvoiceGenerator: React.FC = () => {
               <select
                 value={selectedClientId}
                 onChange={(e) => setSelectedClientId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
                 style={{
                   border: '1px solid var(--border-color)',
                   backgroundColor: 'var(--background-color)',
-                  color: 'var(--text-primary)'
-                }}
+                  color: 'var(--text-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 <option value="">Choose a client...</option>
                 {Object.keys(timeEntriesByClient).map(clientId => (
@@ -273,7 +274,14 @@ const InvoiceGenerator: React.FC = () => {
                   </label>
                   <button
                     onClick={handleSelectAllForClient}
-                    className="text-sm text-blue-600 hover:text-blue-800"
+                    className="text-sm transition-colors duration-200"
+                    style={{ color: 'var(--color-primary-600)' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary-800)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary-600)';
+                    }}
                   >
                     Select All
                   </button>
@@ -288,17 +296,13 @@ const InvoiceGenerator: React.FC = () => {
                     return (
                       <div
                         key={entry.id}
-                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                          selectedTimeEntryIds.includes(entry.id)
-                            ? 'border-blue-500 bg-blue-50'
-                            : ''
-                        }`}
+                        className="p-3 rounded-lg border cursor-pointer transition-colors"
                         style={{
                           border: selectedTimeEntryIds.includes(entry.id) 
-                            ? '1px solid #3b82f6' 
+                            ? '1px solid var(--color-primary-500)' 
                             : '1px solid var(--border-color)',
                           backgroundColor: selectedTimeEntryIds.includes(entry.id) 
-                            ? 'rgba(59, 130, 246, 0.1)' 
+                            ? 'var(--color-primary-50)' 
                             : 'var(--surface-color)'
                         }}
                         onClick={() => handleTimeEntryToggle(entry.id)}
@@ -309,8 +313,12 @@ const InvoiceGenerator: React.FC = () => {
                               type="checkbox"
                               checked={selectedTimeEntryIds.includes(entry.id)}
                               onChange={() => handleTimeEntryToggle(entry.id)}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
-                              style={{ borderColor: 'var(--border-color)' }}
+                              className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                              style={{ 
+                                borderColor: 'var(--border-color)',
+                                color: 'var(--color-primary-600)',
+                                '--tw-ring-color': 'var(--color-primary-500)'
+                              } as React.CSSProperties}
                             />
                             <div>
                               <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
@@ -351,12 +359,13 @@ const InvoiceGenerator: React.FC = () => {
                   </label>
                   <input
                     type="date"
-                    className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
                     style={{
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--background-color)',
-                      color: 'var(--text-primary)'
-                    }}
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
                   />
@@ -367,12 +376,13 @@ const InvoiceGenerator: React.FC = () => {
                     Notes (Optional)
                   </label>
                   <textarea
-                    className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2"
                     style={{
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--background-color)',
-                      color: 'var(--text-primary)'
-                    }}
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                     rows={3}
                     placeholder="Additional notes for the invoice..."
                     value={notes}
@@ -422,7 +432,18 @@ const InvoiceGenerator: React.FC = () => {
               {/* Generate Button */}
               <button
                 onClick={handleGenerateInvoice}
-                className="w-full mt-6 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="w-full mt-6 px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }}
               >
                 <PlusIcon className="w-4 h-4 mr-2 inline" />
                 Generate Invoice

@@ -41,6 +41,18 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
     });
   };
 
+  const getClientStatusStyle = (isActive: boolean) => {
+    return isActive
+      ? {
+          backgroundColor: 'var(--color-success-50)',
+          color: 'var(--color-success-800)'
+        }
+      : {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)'
+        };
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -51,7 +63,18 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
         </div>
         <button
           onClick={onCreateClient}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+          style={{
+            backgroundColor: 'var(--color-primary-600)',
+            color: 'var(--color-text-on-primary)',
+            '--tw-ring-color': 'var(--color-primary-600)'
+          } as React.CSSProperties}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+          }}
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           Add Client
@@ -68,12 +91,13 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
           placeholder="Search clients..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full pl-10 pr-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+          className="block w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 text-sm"
           style={{
             border: '1px solid var(--border-color)',
             backgroundColor: 'var(--background-color)',
-            color: 'var(--text-primary)'
-          }}
+            color: 'var(--text-primary)',
+            '--tw-ring-color': 'var(--color-primary-600)'
+          } as React.CSSProperties}
         />
       </div>
 
@@ -89,7 +113,17 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
           {!searchTerm && (
             <button
               onClick={onCreateClient}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: 'var(--color-primary-600)',
+                color: 'var(--color-text-on-primary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }}
             >
               <PlusIcon className="w-4 h-4 mr-2" />
               Add Your First Client
@@ -118,11 +152,8 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                     </h3>
                     <div className="flex items-center space-x-2">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          client.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-neutral-100 text-neutral-800'
-                        }`}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={getClientStatusStyle(client.isActive)}
                       >
                         {client.isActive ? 'Active' : 'Inactive'}
                       </span>
@@ -139,8 +170,8 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: 'var(--text-secondary)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#2563eb';
-                        e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-primary-600)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-primary-50)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.color = 'var(--text-secondary)';
@@ -155,8 +186,8 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: 'var(--text-secondary)' }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#dc2626';
-                        e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-error-600)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-error-50)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.color = 'var(--text-secondary)';
@@ -199,7 +230,7 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                     onClick={() => toggleClientStatus(client.id, client.isActive)}
                     className="text-xs font-medium px-3 py-1 rounded-full transition-colors"
                     style={{
-                      color: client.isActive ? 'var(--text-secondary)' : '#16a34a',
+                      color: client.isActive ? 'var(--text-secondary)' : 'var(--color-success-600)',
                       backgroundColor: 'transparent'
                     }}
                     onMouseEnter={(e) => {
@@ -207,12 +238,12 @@ const ClientList: React.FC<ClientListProps> = ({ onEditClient, onCreateClient })
                         e.currentTarget.style.color = 'var(--text-primary)';
                         e.currentTarget.style.backgroundColor = 'var(--border-color)';
                       } else {
-                        e.currentTarget.style.color = '#15803d';
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-success-700)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-success-50)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = client.isActive ? 'var(--text-secondary)' : '#16a34a';
+                      e.currentTarget.style.color = client.isActive ? 'var(--text-secondary)' : 'var(--color-success-600)';
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >

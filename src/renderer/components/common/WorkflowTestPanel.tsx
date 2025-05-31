@@ -230,39 +230,60 @@ const WorkflowTestPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Workflow Test Panel</h3>
+    <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--surface-color)' }}>
+      <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Workflow Test Panel</h3>
       
       {/* User Info */}
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <h4 className="text-sm font-medium text-blue-900 mb-2">Current User Info</h4>
+      <div 
+        className="mb-6 p-4 rounded-lg"
+        style={{
+          backgroundColor: 'var(--color-primary-50)',
+          border: '1px solid var(--color-primary-200)'
+        }}
+      >
+        <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-primary-900)' }}>Current User Info</h4>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-blue-700 font-medium">Name:</span>
-            <p className="text-blue-900">{currentUser?.name || 'Unknown'}</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Name:</span>
+            <p style={{ color: 'var(--color-primary-900)' }}>{currentUser?.name || 'Unknown'}</p>
           </div>
           <div>
-            <span className="text-blue-700 font-medium">Role:</span>
-            <p className="text-blue-900 capitalize">{userRole}</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Role:</span>
+            <p className="capitalize" style={{ color: 'var(--color-primary-900)' }}>{userRole}</p>
           </div>
           <div>
-            <span className="text-blue-700 font-medium">Can Approve:</span>
-            <p className={`font-medium ${canApprove ? 'text-green-600' : 'text-orange-600'}`}>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Can Approve:</span>
+            <p 
+              className="font-medium"
+              style={{ color: canApprove ? 'var(--color-success-600)' : 'var(--color-warning-600)' }}
+            >
               {canApprove ? '✅ Yes' : '❌ No (Employee role)'}
             </p>
           </div>
           <div>
-            <span className="text-blue-700 font-medium">Email:</span>
-            <p className="text-blue-900">{currentUser?.email || 'Unknown'}</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Email:</span>
+            <p style={{ color: 'var(--color-primary-900)' }}>{currentUser?.email || 'Unknown'}</p>
           </div>
         </div>
         {!canApprove && (
-          <div className="mt-2 text-xs text-orange-700 bg-orange-100 p-2 rounded">
+          <div 
+            className="mt-2 text-xs p-2 rounded"
+            style={{
+              color: 'var(--color-warning-700)',
+              backgroundColor: 'var(--color-warning-100)'
+            }}
+          >
             💡 Note: Only managers and admins can approve time entries. Approval tests may fail for employee users.
           </div>
         )}
         {canApprove && (
-          <div className="mt-2 text-xs text-blue-700 bg-blue-100 p-2 rounded">
+          <div 
+            className="mt-2 text-xs p-2 rounded"
+            style={{
+              color: 'var(--color-primary-700)',
+              backgroundColor: 'var(--color-primary-100)'
+            }}
+          >
             💡 Business Rule: Users cannot approve their own time entries. To test approval, you need entries from other users.
           </div>
         )}
@@ -270,35 +291,61 @@ const WorkflowTestPanel: React.FC = () => {
 
       {/* Current State */}
       <div className="mb-6">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Current Time Entry Status</h4>
+        <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Current Time Entry Status</h4>
         <div className="grid grid-cols-4 gap-4 text-sm">
-          <div className="bg-gray-100 p-2 rounded text-center">
-            <div className="font-medium">{entryCounts.draft}</div>
-            <div className="text-gray-600">Draft</div>
+          <div 
+            className="p-2 rounded text-center"
+            style={{ backgroundColor: 'var(--color-secondary-100)' }}
+          >
+            <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{entryCounts.draft}</div>
+            <div style={{ color: 'var(--text-secondary)' }}>Draft</div>
           </div>
-          <div className="bg-yellow-100 p-2 rounded text-center">
-            <div className="font-medium">{entryCounts.submitted}</div>
-            <div className="text-gray-600">Submitted</div>
+          <div 
+            className="p-2 rounded text-center"
+            style={{ backgroundColor: 'var(--color-warning-100)' }}
+          >
+            <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{entryCounts.submitted}</div>
+            <div style={{ color: 'var(--text-secondary)' }}>Submitted</div>
           </div>
-          <div className="bg-green-100 p-2 rounded text-center">
-            <div className="font-medium">{entryCounts.approved}</div>
-            <div className="text-gray-600">Approved</div>
+          <div 
+            className="p-2 rounded text-center"
+            style={{ backgroundColor: 'var(--color-success-100)' }}
+          >
+            <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{entryCounts.approved}</div>
+            <div style={{ color: 'var(--text-secondary)' }}>Approved</div>
           </div>
-          <div className="bg-red-100 p-2 rounded text-center">
-            <div className="font-medium">{entryCounts.rejected}</div>
-            <div className="text-gray-600">Rejected</div>
+          <div 
+            className="p-2 rounded text-center"
+            style={{ backgroundColor: 'var(--color-error-100)' }}
+          >
+            <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{entryCounts.rejected}</div>
+            <div style={{ color: 'var(--text-secondary)' }}>Rejected</div>
           </div>
         </div>
       </div>
 
       {/* Test Actions */}
       <div className="mb-6">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Test Actions</h4>
+        <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Test Actions</h4>
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={createTestTimeEntry}
             disabled={isCreating}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-primary)',
+              backgroundColor: 'var(--color-primary-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isCreating) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isCreating) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
           >
             {isCreating ? 'Creating...' : 'Create Test Entry'}
           </button>
@@ -306,7 +353,21 @@ const WorkflowTestPanel: React.FC = () => {
           <button
             onClick={submitTestEntries}
             disabled={isSubmitting || entryCounts.draft === 0}
-            className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-md hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-warning)',
+              backgroundColor: 'var(--color-warning-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting && entryCounts.draft > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-warning-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting && entryCounts.draft > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-warning-600)';
+              }
+            }}
           >
             {isSubmitting ? 'Submitting...' : 'Submit Draft Entries'}
           </button>
@@ -314,7 +375,21 @@ const WorkflowTestPanel: React.FC = () => {
           <button
             onClick={approveTestEntries}
             disabled={isApproving || entryCounts.submitted === 0 || !canApprove}
-            className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-success)',
+              backgroundColor: 'var(--color-success-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isApproving && entryCounts.submitted > 0 && canApprove) {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isApproving && entryCounts.submitted > 0 && canApprove) {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+              }
+            }}
             title={!canApprove ? 'Approval requires manager or admin role' : ''}
           >
             {isApproving ? 'Approving...' : 'Approve Submitted'}
@@ -323,7 +398,21 @@ const WorkflowTestPanel: React.FC = () => {
           <button
             onClick={refreshData}
             disabled={isRefreshing}
-            className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-secondary)',
+              backgroundColor: 'var(--color-secondary-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isRefreshing) {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isRefreshing) {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+              }
+            }}
           >
             {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
           </button>
@@ -331,7 +420,21 @@ const WorkflowTestPanel: React.FC = () => {
           <button
             onClick={refreshCurrentUser}
             disabled={isRefreshingUser}
-            className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-secondary)',
+              backgroundColor: 'var(--color-secondary-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isRefreshingUser) {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isRefreshingUser) {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+              }
+            }}
           >
             {isRefreshingUser ? 'Refreshing...' : 'Refresh User Role'}
           </button>
@@ -341,14 +444,38 @@ const WorkflowTestPanel: React.FC = () => {
           <button
             onClick={runFullWorkflowTest}
             disabled={isCreating || isSubmitting || isApproving || isRefreshing}
-            className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-secondary)',
+              backgroundColor: 'var(--color-secondary-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!(isCreating || isSubmitting || isApproving || isRefreshing)) {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!(isCreating || isSubmitting || isApproving || isRefreshing)) {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+              }
+            }}
           >
             Run Full Workflow Test
           </button>
           
           <button
             onClick={clearResults}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
+            style={{
+              color: 'var(--text-secondary)',
+              backgroundColor: 'var(--color-secondary-200)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-secondary-300)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-secondary-200)';
+            }}
           >
             Clear Results
           </button>
@@ -358,10 +485,13 @@ const WorkflowTestPanel: React.FC = () => {
       {/* Test Results */}
       {testResults.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Test Results</h4>
-          <div className="bg-gray-50 rounded-md p-3 max-h-64 overflow-y-auto">
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Test Results</h4>
+          <div 
+            className="rounded-md p-3 max-h-64 overflow-y-auto"
+            style={{ backgroundColor: 'var(--color-secondary-50)' }}
+          >
             {testResults.map((result, index) => (
-              <div key={index} className="text-sm font-mono text-gray-800 mb-1">
+              <div key={index} className="text-sm font-mono mb-1" style={{ color: 'var(--text-primary)' }}>
                 {result}
               </div>
             ))}
@@ -371,12 +501,18 @@ const WorkflowTestPanel: React.FC = () => {
 
       {/* Manual Testing Guide for Non-Approvers */}
       {!canApprove && (
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h4 className="text-sm font-medium text-yellow-800 mb-2">📋 Manual Testing Guide</h4>
-          <p className="text-sm text-yellow-700 mb-3">
+        <div 
+          className="mt-6 p-4 rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-warning-50)',
+            border: '1px solid var(--color-warning-200)'
+          }}
+        >
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-warning-800)' }}>📋 Manual Testing Guide</h4>
+          <p className="text-sm mb-3" style={{ color: 'var(--color-warning-700)' }}>
             Since you don't have approval permissions, here's how to test the full workflow:
           </p>
-          <ol className="text-sm text-yellow-700 space-y-1 list-decimal list-inside">
+          <ol className="text-sm space-y-1 list-decimal list-inside" style={{ color: 'var(--color-warning-700)' }}>
             <li>Use the buttons above to create and submit time entries</li>
             <li>Ask a manager or admin to approve your submitted entries</li>
             <li>Once approved, go to <strong>Invoices → Generate</strong> to see them available for invoicing</li>

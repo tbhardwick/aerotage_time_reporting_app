@@ -173,15 +173,15 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
 
   if (submitSuccess) {
     return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+      <div className="fixed inset-0 overflow-y-auto h-full w-full z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="text-center">
-            <CheckCircleIcon className="mx-auto h-16 w-16 text-green-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Invitation Sent!</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <CheckCircleIcon className="mx-auto h-16 w-16 mb-4" style={{ color: 'var(--color-success-600)' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Invitation Sent!</h3>
+            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
               The user invitation has been sent successfully. They will receive an email with instructions to join the platform.
             </p>
-            <div className="animate-pulse text-sm text-gray-500">
+            <div className="animate-pulse text-sm" style={{ color: 'var(--text-secondary)' }}>
               Closing automatically...
             </div>
           </div>
@@ -191,14 +191,14 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div className="fixed inset-0 overflow-y-auto h-full w-full z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
       <div className="relative top-4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
             <div>
               <h3 className="text-lg font-medium flex items-center" style={{ color: 'var(--text-primary)' }}>
-                <PaperAirplaneIcon className="h-5 w-5 mr-2 text-blue-500" />
+                <PaperAirplaneIcon className="h-5 w-5 mr-2" style={{ color: 'var(--color-primary-600)' }} />
                 Send User Invitation
               </h3>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -224,18 +224,30 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
 
           {/* Error Message */}
           {submitError && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div 
+              className="border rounded-md p-4"
+              style={{
+                backgroundColor: 'var(--color-error-50)',
+                borderColor: 'var(--color-error-200)'
+              }}
+            >
               <div className="flex">
-                <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mt-0.5" />
+                <ExclamationTriangleIcon className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-error-400)' }} />
                 <div className="ml-3 flex-1">
-                  <h3 className="text-sm font-medium text-red-800">
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--color-error-800)' }}>
                     {submitError.includes('Backend API is not available') ? 'Backend Not Available' : 'Error Sending Invitation'}
                   </h3>
-                  <div className="mt-2 text-sm text-red-700">
+                  <div className="mt-2 text-sm" style={{ color: 'var(--color-error-700)' }}>
                     <p>{submitError}</p>
                     {submitError.includes('Backend API is not available') && (
-                      <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                        <div className="text-yellow-800">
+                      <div 
+                        className="mt-3 border rounded-md p-3"
+                        style={{
+                          backgroundColor: 'var(--color-warning-50)',
+                          borderColor: 'var(--color-warning-200)'
+                        }}
+                      >
+                        <div style={{ color: 'var(--color-warning-800)' }}>
                           <p className="font-medium">📋 Development Status:</p>
                           <ul className="mt-2 list-disc list-inside space-y-1 text-sm">
                             <li>Frontend invitation system: ✅ Complete</li>
@@ -244,7 +256,13 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                           </ul>
                           <p className="mt-3 text-sm">
                             <strong>Next steps:</strong> Contact the backend team to deploy the user invitation API endpoints.
-                            Reference: <code className="bg-yellow-100 px-1 rounded text-xs">USER_INVITATION_API_REQUIREMENTS.md</code>
+                            Reference: <code 
+                              className="px-1 rounded text-xs"
+                              style={{
+                                backgroundColor: 'var(--color-warning-100)',
+                                color: 'var(--color-warning-800)'
+                              }}
+                            >USER_INVITATION_API_REQUIREMENTS.md</code>
                           </p>
                         </div>
                       </div>
@@ -257,14 +275,20 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
 
           {/* Success Message */}
           {submitSuccess && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+            <div 
+              className="border rounded-md p-4"
+              style={{
+                backgroundColor: 'var(--color-success-50)',
+                borderColor: 'var(--color-success-200)'
+              }}
+            >
               <div className="flex">
-                <CheckCircleIcon className="h-5 w-5 text-green-400 mt-0.5" />
+                <CheckCircleIcon className="h-5 w-5 mt-0.5" style={{ color: 'var(--color-success-400)' }} />
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--color-success-800)' }}>
                     Invitation Sent Successfully!
                   </h3>
-                  <div className="mt-2 text-sm text-green-700">
+                  <div className="mt-2 text-sm" style={{ color: 'var(--color-success-700)' }}>
                     <p>The invitation has been sent and the user will receive an email with instructions to join.</p>
                   </div>
                 </div>
@@ -291,19 +315,20 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                     <input
                       type="email"
                       {...register('email')}
-                      className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="block w-full rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                       style={{
                         border: '1px solid var(--border-color)',
                         backgroundColor: 'var(--background-color)',
-                        color: 'var(--text-primary)'
-                      }}
+                        color: 'var(--text-primary)',
+                        '--tw-ring-color': 'var(--color-primary-500)'
+                      } as React.CSSProperties}
                       placeholder="user@company.com"
                       disabled={isSubmitting}
                     />
                     <EnvelopeIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                   </div>
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.email.message}</p>
                   )}
                 </div>
 
@@ -314,12 +339,13 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                   </label>
                   <select
                     {...register('role')}
-                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                     style={{
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--background-color)',
-                      color: 'var(--text-primary)'
-                    }}
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                     disabled={isSubmitting}
                   >
                     <option value="employee">Employee</option>
@@ -327,7 +353,7 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                     <option value="admin">Administrator</option>
                   </select>
                   {errors.role && (
-                    <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.role.message}</p>
                   )}
                 </div>
               </div>
@@ -349,17 +375,18 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                   <input
                     type="text"
                     {...register('jobTitle')}
-                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                     style={{
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--background-color)',
-                      color: 'var(--text-primary)'
-                    }}
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                     placeholder="e.g., Senior Developer"
                     disabled={isSubmitting}
                   />
                   {errors.jobTitle && (
-                    <p className="mt-1 text-sm text-red-600">{errors.jobTitle.message}</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.jobTitle.message}</p>
                   )}
                 </div>
 
@@ -371,17 +398,18 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                   <input
                     type="text"
                     {...register('department')}
-                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                     style={{
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--background-color)',
-                      color: 'var(--text-primary)'
-                    }}
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                     placeholder="e.g., Engineering"
                     disabled={isSubmitting}
                   />
                   {errors.department && (
-                    <p className="mt-1 text-sm text-red-600">{errors.department.message}</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.department.message}</p>
                   )}
                 </div>
 
@@ -392,12 +420,13 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                   </label>
                   <select
                     {...register('teamId')}
-                    className="mt-1 block w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                     style={{
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--background-color)',
-                      color: 'var(--text-primary)'
-                    }}
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                     disabled={isSubmitting}
                   >
                     <option value="">No Team</option>
@@ -408,7 +437,7 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                     ))}
                   </select>
                   {errors.teamId && (
-                    <p className="mt-1 text-sm text-red-600">{errors.teamId.message}</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.teamId.message}</p>
                   )}
                 </div>
 
@@ -423,19 +452,20 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                       step="0.01"
                       min="0"
                       {...register('hourlyRate', { valueAsNumber: true })}
-                      className="block w-full rounded-md pl-10 pr-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="block w-full rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                       style={{
                         border: '1px solid var(--border-color)',
                         backgroundColor: 'var(--background-color)',
-                        color: 'var(--text-primary)'
-                      }}
+                        color: 'var(--text-primary)',
+                        '--tw-ring-color': 'var(--color-primary-500)'
+                      } as React.CSSProperties}
                       placeholder="100.00"
                       disabled={isSubmitting}
                     />
                     <CurrencyDollarIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                   </div>
                   {errors.hourlyRate && (
-                    <p className="mt-1 text-sm text-red-600">{errors.hourlyRate.message}</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.hourlyRate.message}</p>
                   )}
                 </div>
               </div>
@@ -461,8 +491,11 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                           checked={watchedFeatures?.includes(feature.id) || false}
                           onChange={() => handleFeatureToggle(feature.id)}
                           disabled={isSubmitting}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
-                          style={{ borderColor: 'var(--border-color)' }}
+                          className="h-4 w-4 rounded"
+                          style={{ 
+                            borderColor: 'var(--border-color)',
+                            accentColor: 'var(--color-primary-600)'
+                          }}
                         />
                       </div>
                       <div className="ml-3 text-sm">
@@ -483,18 +516,19 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                 </label>
                 <textarea
                   {...register('personalMessage')}
-                  className="w-full rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 transition-colors"
                   style={{
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--background-color)',
-                    color: 'var(--text-primary)'
-                  }}
+                    color: 'var(--text-primary)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                   rows={4}
                   placeholder="Add a personal message to include in the invitation email..."
                   disabled={isSubmitting}
                 />
                 {errors.personalMessage && (
-                  <p className="mt-1 text-sm text-red-600">{errors.personalMessage.message}</p>
+                  <p className="mt-1 text-sm" style={{ color: 'var(--color-error-600)' }}>{errors.personalMessage.message}</p>
                 )}
               </div>
             </div>
@@ -532,12 +566,13 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="px-4 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
                 style={{
                   border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
-                  backgroundColor: 'var(--surface-color)'
-                }}
+                  backgroundColor: 'var(--surface-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'var(--border-color)';
                 }}
@@ -550,11 +585,26 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({ onClose, onSucce
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5" style={{ color: 'var(--color-text-on-primary)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>

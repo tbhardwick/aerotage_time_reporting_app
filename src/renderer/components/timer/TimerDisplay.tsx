@@ -71,9 +71,19 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+    <div 
+      className="rounded-lg shadow-lg p-6 border"
+      style={{
+        backgroundColor: 'var(--surface-color)',
+        borderColor: 'var(--border-color)',
+        boxShadow: 'var(--shadow)'
+      }}
+    >
       <div className="text-center">
-        <div className="text-6xl font-mono font-bold text-gray-800 mb-6">
+        <div 
+          className="text-6xl font-mono font-bold mb-6"
+          style={{ color: 'var(--text-primary)' }}
+        >
           {formatTime(displayTime)}
         </div>
         
@@ -81,7 +91,18 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
           {!timer.isRunning ? (
             <button
               onClick={displayTime > 0 ? handleResume : handleStart}
-              className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center px-6 py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{
+                backgroundColor: 'var(--color-success-600)',
+                color: 'var(--color-text-on-success)',
+                '--tw-ring-color': 'var(--color-success-600)'
+              } as React.CSSProperties}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+              }}
               disabled={!timer.currentProjectId}
             >
               <PlayIcon className="w-5 h-5 mr-2" />
@@ -90,7 +111,18 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
           ) : (
             <button
               onClick={handlePause}
-              className="flex items-center px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+              className="flex items-center px-6 py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{
+                backgroundColor: 'var(--color-warning-600)',
+                color: 'var(--color-text-on-primary)',
+                '--tw-ring-color': 'var(--color-warning-600)'
+              } as React.CSSProperties}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-warning-700)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-warning-600)';
+              }}
             >
               <PauseIcon className="w-5 h-5 mr-2" />
               Pause
@@ -100,7 +132,18 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
           {displayTime > 0 && (
             <button
               onClick={handleStop}
-              className="flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="flex items-center px-6 py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{
+                backgroundColor: 'var(--color-error-600)',
+                color: 'var(--color-text-on-error)',
+                '--tw-ring-color': 'var(--color-error-600)'
+              } as React.CSSProperties}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-error-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+              }}
             >
               <StopIcon className="w-5 h-5 mr-2" />
               Stop
@@ -109,7 +152,10 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ onTimeEntry }) => {
         </div>
         
         {!timer.currentProjectId && (
-          <p className="text-sm text-red-600 mt-4">
+          <p 
+            className="text-sm mt-4"
+            style={{ color: 'var(--color-error-600)' }}
+          >
             Please select a project to start tracking time
           </p>
         )}

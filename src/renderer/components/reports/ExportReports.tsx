@@ -108,7 +108,7 @@ const ExportReports: React.FC = () => {
       const project = projects.find(p => p.id === entry.projectId);
       const client = clients.find(c => c.id === project?.clientId);
       const hours = entry.duration / 60;
-      const amount = entry.isBillable ? hours * (project?.hourlyRate || 0) : 0;
+      const amount = entry.isBillable ? hours * (project?.defaultHourlyRate || 0) : 0;
 
       return {
         ...entry,
@@ -116,7 +116,7 @@ const ExportReports: React.FC = () => {
         client: client?.name || 'Unknown Client',
         hours,
         amount,
-        hourlyRate: project?.hourlyRate || 0,
+        hourlyRate: project?.defaultHourlyRate || 0,
       };
     });
 
@@ -385,24 +385,32 @@ const ExportReports: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-neutral-900">Export Reports</h2>
-        <p className="text-neutral-600">Export time reports in various formats</p>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Export Reports</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>Export time reports in various formats</p>
       </div>
 
       {/* Export Configuration */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Export Configuration</h3>
+      <div 
+        className="rounded-xl shadow-soft p-6"
+        style={{ backgroundColor: 'var(--surface-color)' }}
+      >
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Export Configuration</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Date Range */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Date Range
             </label>
             <select
               value={filters.dateRange}
               onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value as any }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--surface-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="month">This Month</option>
               <option value="custom">Custom Range</option>
@@ -413,25 +421,35 @@ const ExportReports: React.FC = () => {
           {filters.dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={filters.startDate || ''}
                   onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
-                  className="w-full rounded-lg border-neutral-300 text-sm"
+                  className="w-full rounded-lg text-sm"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   End Date
                 </label>
                 <input
                   type="date"
                   value={filters.endDate || ''}
                   onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
-                  className="w-full rounded-lg border-neutral-300 text-sm"
+                  className="w-full rounded-lg text-sm"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
               </div>
             </>
@@ -439,13 +457,18 @@ const ExportReports: React.FC = () => {
 
           {/* Project Filter */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Project
             </label>
             <select
               value={filters.projectId || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, projectId: e.target.value || undefined }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--surface-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="">All Projects</option>
               {projects.map(project => (
@@ -458,13 +481,18 @@ const ExportReports: React.FC = () => {
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Status
             </label>
             <select
               value={filters.status}
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--surface-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="all">All Statuses</option>
               <option value="approved">Approved Only</option>
@@ -476,13 +504,18 @@ const ExportReports: React.FC = () => {
 
           {/* Group By */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Group By
             </label>
             <select
               value={filters.groupBy}
               onChange={(e) => setFilters(prev => ({ ...prev, groupBy: e.target.value as any }))}
-              className="w-full rounded-lg border-neutral-300 text-sm"
+              className="w-full rounded-lg text-sm"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--surface-color)',
+                color: 'var(--text-primary)'
+              }}
             >
               <option value="none">No Grouping</option>
               <option value="project">Project</option>
@@ -497,61 +530,85 @@ const ExportReports: React.FC = () => {
               type="checkbox"
               checked={filters.includeDetails}
               onChange={(e) => setFilters(prev => ({ ...prev, includeDetails: e.target.checked }))}
-              className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+              className="rounded focus:ring-2 focus:ring-offset-2"
+              style={{
+                border: '1px solid var(--border-color)',
+                color: 'var(--color-primary-600)'
+              }}
             />
-            <span className="ml-2 text-sm text-neutral-700">Include detailed descriptions</span>
+            <span className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>Include detailed descriptions</span>
           </label>
         </div>
       </div>
 
       {/* Export Summary */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Export Preview</h3>
+      <div 
+        className="rounded-xl shadow-soft p-6"
+        style={{ backgroundColor: 'var(--surface-color)' }}
+      >
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Export Preview</h3>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-2xl font-bold text-blue-600">{summary.totalHours.toFixed(1)}</p>
-            <p className="text-sm text-neutral-600">Total Hours</p>
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-primary-600)' }}>{summary.totalHours.toFixed(1)}</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">{summary.billableHours.toFixed(1)}</p>
-            <p className="text-sm text-neutral-600">Billable Hours</p>
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-success-600)' }}>{summary.billableHours.toFixed(1)}</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-purple-600">${summary.totalAmount.toLocaleString()}</p>
-            <p className="text-sm text-neutral-600">Total Amount</p>
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-secondary-600)' }}>${summary.totalAmount.toLocaleString()}</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Amount</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-orange-600">{summary.entriesCount}</p>
-            <p className="text-sm text-neutral-600">Entries</p>
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-warning-600)' }}>{summary.entriesCount}</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Entries</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-neutral-50 rounded-lg">
-          <p className="text-sm text-neutral-600">
+        <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-secondary-50)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             <strong>Date Range:</strong> {format(parseISO(dateRange.start), 'MMM dd, yyyy')} - {format(parseISO(dateRange.end), 'MMM dd, yyyy')}
           </p>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             <strong>Grouping:</strong> {filters.groupBy === 'none' ? 'No grouping' : `Grouped by ${filters.groupBy}`}
           </p>
         </div>
       </div>
 
       {/* Export Buttons */}
-      <div className="bg-white rounded-xl shadow-soft p-6">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4">Export Options</h3>
+      <div 
+        className="rounded-xl shadow-soft p-6"
+        style={{ backgroundColor: 'var(--surface-color)' }}
+      >
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Export Options</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* PDF Export */}
           <button
             onClick={exportToPDF}
             disabled={isExporting || summary.entriesCount === 0}
-            className="flex items-center justify-center px-6 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center px-6 py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              backgroundColor: 'var(--color-error-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isExporting && summary.entriesCount > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-error-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isExporting && summary.entriesCount > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+              }
+            }}
           >
             <DocumentTextIcon className="h-6 w-6 mr-3" />
             <div className="text-left">
               <p className="font-semibold">Export PDF</p>
-              <p className="text-sm text-red-100">Professional report format</p>
+              <p className="text-sm" style={{ color: 'var(--color-error-100)' }}>Professional report format</p>
             </div>
           </button>
 
@@ -559,12 +616,26 @@ const ExportReports: React.FC = () => {
           <button
             onClick={exportToExcel}
             disabled={isExporting || summary.entriesCount === 0}
-            className="flex items-center justify-center px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center px-6 py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              backgroundColor: 'var(--color-success-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isExporting && summary.entriesCount > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isExporting && summary.entriesCount > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+              }
+            }}
           >
             <TableCellsIcon className="h-6 w-6 mr-3" />
             <div className="text-left">
               <p className="font-semibold">Export Excel</p>
-              <p className="text-sm text-green-100">Spreadsheet with multiple sheets</p>
+              <p className="text-sm" style={{ color: 'var(--color-success-100)' }}>Spreadsheet with multiple sheets</p>
             </div>
           </button>
 
@@ -572,20 +643,43 @@ const ExportReports: React.FC = () => {
           <button
             onClick={exportToCSV}
             disabled={isExporting || summary.entriesCount === 0}
-            className="flex items-center justify-center px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center px-6 py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isExporting && summary.entriesCount > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isExporting && summary.entriesCount > 0) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
           >
             <DocumentArrowDownIcon className="h-6 w-6 mr-3" />
             <div className="text-left">
               <p className="font-semibold">Export CSV</p>
-              <p className="text-sm text-blue-100">Simple data format</p>
+              <p className="text-sm" style={{ color: 'var(--color-primary-100)' }}>Simple data format</p>
             </div>
           </button>
         </div>
 
         {isExporting && (
           <div className="mt-4 text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800 mr-2"></div>
+            <div 
+              className="inline-flex items-center px-4 py-2 rounded-lg"
+              style={{
+                backgroundColor: 'var(--color-primary-50)',
+                color: 'var(--color-primary-800)'
+              }}
+            >
+              <div 
+                className="animate-spin rounded-full h-4 w-4 border-b-2 mr-2"
+                style={{ borderColor: 'var(--color-primary-800)' }}
+              ></div>
               Generating export...
             </div>
           </div>
@@ -593,7 +687,7 @@ const ExportReports: React.FC = () => {
 
         {summary.entriesCount === 0 && (
           <div className="mt-4 text-center">
-            <p className="text-neutral-600">No time entries found for the selected criteria.</p>
+            <p style={{ color: 'var(--text-secondary)' }}>No time entries found for the selected criteria.</p>
           </div>
         )}
       </div>

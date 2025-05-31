@@ -141,17 +141,33 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 flex items-center justify-center z-50"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+    >
+      <div 
+        className="rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+        style={{ backgroundColor: 'var(--surface-color)' }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+        <div 
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: 'var(--border-color)' }}
+        >
           <div className="flex items-center">
-            <ClockIcon className="w-6 h-6 text-blue-600 mr-2" />
-            <h2 className="text-lg font-semibold text-neutral-900">Quick Time Entry</h2>
+            <ClockIcon className="w-6 h-6 mr-2" style={{ color: 'var(--color-primary-600)' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Quick Time Entry</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-600 transition-colors"
+            className="transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -160,25 +176,37 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
+            <div 
+              className="p-3 border rounded-lg"
+              style={{
+                backgroundColor: 'var(--color-error-50)',
+                borderColor: 'var(--color-error-200)'
+              }}
+            >
+              <p className="text-sm" style={{ color: 'var(--color-error-600)' }}>{error}</p>
             </div>
           )}
 
           {/* Date Display */}
-          <div className="text-sm text-neutral-600">
+          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             <span className="font-medium">Date:</span> {new Date(date).toLocaleDateString()}
           </div>
 
           {/* Project Selection */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Project *
             </label>
             <select
               value={formData.projectId}
               onChange={(e) => setFormData(prev => ({ ...prev, projectId: e.target.value }))}
-              className="w-full rounded-lg border-neutral-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
               required
             >
               <option value="">Select a project...</option>
@@ -192,7 +220,7 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Description *
             </label>
             <input
@@ -200,7 +228,13 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="What did you work on?"
-              className="w-full rounded-lg border-neutral-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
               required
             />
             
@@ -211,7 +245,17 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
                   key={activity}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, description: activity }))}
-                  className="px-2 py-1 text-xs bg-neutral-100 text-neutral-700 rounded hover:bg-neutral-200 transition-colors"
+                  className="px-2 py-1 text-xs rounded transition-colors"
+                  style={{
+                    backgroundColor: 'var(--surface-secondary)',
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                  }}
                 >
                   {activity}
                 </button>
@@ -221,29 +265,34 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
 
           {/* Time Entry Mode Toggle */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Time Entry Method
             </label>
-            <div className="flex bg-neutral-100 rounded-lg p-1">
+            <div 
+              className="flex rounded-lg p-1"
+              style={{ backgroundColor: 'var(--surface-secondary)' }}
+            >
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, useDuration: true }))}
-                className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  formData.useDuration
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
+                className="flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                style={{
+                  backgroundColor: formData.useDuration ? 'var(--background-color)' : 'transparent',
+                  color: formData.useDuration ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                  boxShadow: formData.useDuration ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none'
+                }}
               >
                 Duration
               </button>
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, useDuration: false }))}
-                className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  !formData.useDuration
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
+                className="flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                style={{
+                  backgroundColor: !formData.useDuration ? 'var(--background-color)' : 'transparent',
+                  color: !formData.useDuration ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                  boxShadow: !formData.useDuration ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none'
+                }}
               >
                 Start/End Time
               </button>
@@ -253,7 +302,7 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
           {/* Duration Mode */}
           {formData.useDuration ? (
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                 Duration
               </label>
               <div className="space-y-3">
@@ -265,9 +314,17 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
                     onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
                     min="1"
                     max="480"
-                    className="w-20 rounded-lg border-neutral-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-20 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--text-primary)',
+                      '--tw-ring-color': 'var(--color-primary-600)'
+                    } as React.CSSProperties}
                   />
-                  <span className="text-sm text-neutral-600">minutes ({formatDuration(formData.duration)})</span>
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    minutes ({formatDuration(formData.duration)})
+                  </span>
                 </div>
                 
                 {/* Quick duration buttons */}
@@ -277,11 +334,25 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
                       key={duration}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, duration }))}
-                      className={`px-3 py-1 text-sm rounded transition-colors ${
-                        formData.duration === duration
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                      }`}
+                      className="px-3 py-1 text-sm rounded transition-colors"
+                      style={{
+                        backgroundColor: formData.duration === duration 
+                          ? 'var(--color-primary-600)' 
+                          : 'var(--surface-secondary)',
+                        color: formData.duration === duration 
+                          ? 'var(--color-text-on-primary)' 
+                          : 'var(--text-secondary)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (formData.duration !== duration) {
+                          e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (formData.duration !== duration) {
+                          e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                        }
+                      }}
                     >
                       {formatDuration(duration)}
                     </button>
@@ -293,25 +364,37 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
             /* Start/End Time Mode */
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   Start Time
                 </label>
                 <input
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                  className="w-full rounded-lg border-neutral-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)',
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   End Time
                 </label>
                 <input
                   type="time"
                   value={formData.endTime}
                   onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                  className="w-full rounded-lg border-neutral-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    color: 'var(--text-primary)',
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
                 />
               </div>
             </div>
@@ -319,7 +402,13 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
 
           {/* Calculated duration display */}
           {formData.duration > 0 && (
-            <div className="text-sm text-neutral-600 bg-neutral-50 p-3 rounded-lg">
+            <div 
+              className="text-sm p-3 rounded-lg"
+              style={{
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--surface-secondary)'
+              }}
+            >
               <span className="font-medium">Duration:</span> {formatDuration(formData.duration)} 
               {formData.startTime && formData.endTime && (
                 <span> ({formData.startTime} - {formData.endTime})</span>
@@ -328,32 +417,64 @@ const QuickTimeEntryModal: React.FC<QuickTimeEntryModalProps> = ({
           )}
 
           {/* Billable Toggle */}
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               id="billable"
               checked={formData.isBillable}
               onChange={(e) => setFormData(prev => ({ ...prev, isBillable: e.target.checked }))}
-              className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+              className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
             />
-            <label htmlFor="billable" className="ml-2 text-sm text-neutral-700">
+            <label htmlFor="billable" className="text-sm" style={{ color: 'var(--text-primary)' }}>
               Billable time
             </label>
           </div>
 
-          {/* Actions */}
+          {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--background-color)',
+                color: 'var(--text-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--background-color)';
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--color-primary-600)',
+                color: 'var(--color-text-on-primary)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }
+              }}
             >
               {isSubmitting ? 'Creating...' : 'Create Entry'}
             </button>

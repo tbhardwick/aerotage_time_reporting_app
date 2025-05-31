@@ -216,12 +216,13 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
                 value={formData.newEmail}
                 onChange={(e) => setFormData({ ...formData, newEmail: e.target.value })}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
                 style={{ 
                   border: `1px solid ${errors.newEmail ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
                   backgroundColor: 'var(--surface-color)', 
-                  color: 'var(--text-primary)' 
-                }}
+                  color: 'var(--text-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
                 placeholder="Enter your new email address"
               />
               {errors.newEmail && (
@@ -239,12 +240,13 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
                 value={formData.currentPassword}
                 onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
                 style={{ 
                   border: `1px solid ${errors.currentPassword ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
                   backgroundColor: 'var(--surface-color)', 
-                  color: 'var(--text-primary)' 
-                }}
+                  color: 'var(--text-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
                 placeholder="Enter your current password"
               />
               {errors.currentPassword && (
@@ -262,12 +264,13 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value as ChangeReason })}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
                 style={{ 
                   border: `1px solid ${errors.reason ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
                   backgroundColor: 'var(--surface-color)', 
-                  color: 'var(--text-primary)' 
-                }}
+                  color: 'var(--text-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 {reasonOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -296,12 +299,13 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, customReason: e.target.value })}
                   disabled={isSubmitting}
                   rows={3}
-                  className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
                   style={{ 
                     border: `1px solid ${errors.customReason ? 'var(--color-error-300)' : 'var(--border-color)'}`, 
                     backgroundColor: 'var(--surface-color)', 
-                    color: 'var(--text-primary)' 
-                  }}
+                    color: 'var(--text-primary)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                   placeholder="Please provide a detailed reason for the email change"
                 />
                 {errors.customReason && (
@@ -312,19 +316,37 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
 
             {/* Approval Information */}
             {formData.reason && (
-              <div className={`p-3 rounded-md border ${
-                approvalInfo.required 
-                  ? 'bg-yellow-50 border-yellow-200' 
-                  : 'bg-green-50 border-green-200'
-              }`}>
+              <div 
+                className="p-3 rounded-md border"
+                style={approvalInfo.required 
+                  ? {
+                      backgroundColor: 'var(--color-warning-50)',
+                      borderColor: 'var(--color-warning-200)'
+                    }
+                  : {
+                      backgroundColor: 'var(--color-success-50)',
+                      borderColor: 'var(--color-success-200)'
+                    }
+                }
+              >
                 <div className="flex">
-                  <InformationCircleIcon className={`h-5 w-5 ${
-                    approvalInfo.required ? 'text-yellow-600' : 'text-green-600'
-                  }`} />
+                  <InformationCircleIcon 
+                    className="h-5 w-5"
+                    style={{
+                      color: approvalInfo.required 
+                        ? 'var(--color-warning-600)' 
+                        : 'var(--color-success-600)'
+                    }}
+                  />
                   <div className="ml-2">
-                    <p className={`text-sm font-medium ${
-                      approvalInfo.required ? 'text-yellow-800' : 'text-green-800'
-                    }`}>
+                    <p 
+                      className="text-sm font-medium"
+                      style={{
+                        color: approvalInfo.required 
+                          ? 'var(--color-warning-800)' 
+                          : 'var(--color-success-800)'
+                      }}
+                    >
                       {approvalInfo.message}
                     </p>
                   </div>
@@ -333,14 +355,23 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
             )}
 
             {/* Security Warning */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+            <div 
+              className="border rounded-md p-3"
+              style={{
+                backgroundColor: 'var(--color-warning-50)',
+                borderColor: 'var(--color-warning-200)'
+              }}
+            >
               <div className="flex">
-                <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 flex-shrink-0" />
+                <ExclamationTriangleIcon 
+                  className="h-5 w-5 flex-shrink-0" 
+                  style={{ color: 'var(--color-warning-600)' }}
+                />
                 <div className="ml-3">
-                  <h4 className="text-sm font-medium text-yellow-800">
+                  <h4 className="text-sm font-medium" style={{ color: 'var(--color-warning-800)' }}>
                     Important Security Information
                   </h4>
-                  <div className="mt-2 text-sm text-yellow-700">
+                  <div className="mt-2 text-sm" style={{ color: 'var(--color-warning-700)' }}>
                     <ul className="list-disc list-inside space-y-1">
                       <li>You'll need to verify both your current and new email addresses</li>
                       <li>All your sessions will be logged out after the change</li>
@@ -371,11 +402,25 @@ export const EmailChangeModal: React.FC<EmailChangeModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || !formData.newEmail || !formData.currentPassword || !formData.reason || (formData.reason === 'other' && !formData.customReason)}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium border border-transparent rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {isSubmitting ? (
                   <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" style={{ color: 'var(--color-text-on-primary)' }} fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>

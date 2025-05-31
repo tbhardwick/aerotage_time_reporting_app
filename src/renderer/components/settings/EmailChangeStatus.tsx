@@ -29,49 +29,77 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
     switch (status) {
       case 'pending_verification':
         return {
-          color: 'text-yellow-600 bg-yellow-100 border-yellow-200',
+          style: {
+            color: 'var(--color-warning-800)',
+            backgroundColor: 'var(--color-warning-50)',
+            borderColor: 'var(--color-warning-200)'
+          },
           icon: EnvelopeIcon,
           text: 'Pending Email Verification',
           description: 'Please check your email addresses for verification links'
         };
       case 'pending_approval':
         return {
-          color: 'text-blue-600 bg-blue-100 border-blue-200',
+          style: {
+            color: 'var(--color-primary-800)',
+            backgroundColor: 'var(--color-primary-50)',
+            borderColor: 'var(--color-primary-200)'
+          },
           icon: ClockIcon,
           text: 'Pending Admin Approval',
           description: 'Your request is being reviewed by an administrator'
         };
       case 'approved':
         return {
-          color: 'text-green-600 bg-green-100 border-green-200',
+          style: {
+            color: 'var(--color-success-800)',
+            backgroundColor: 'var(--color-success-50)',
+            borderColor: 'var(--color-success-200)'
+          },
           icon: ShieldCheckIcon,
           text: 'Approved - Processing Change',
           description: 'Your email change has been approved and is being processed'
         };
       case 'rejected':
         return {
-          color: 'text-red-600 bg-red-100 border-red-200',
+          style: {
+            color: 'var(--color-error-800)',
+            backgroundColor: 'var(--color-error-50)',
+            borderColor: 'var(--color-error-200)'
+          },
           icon: XCircleIcon,
           text: 'Request Rejected',
           description: 'Your email change request was not approved'
         };
       case 'completed':
         return {
-          color: 'text-green-600 bg-green-100 border-green-200',
+          style: {
+            color: 'var(--color-success-800)',
+            backgroundColor: 'var(--color-success-50)',
+            borderColor: 'var(--color-success-200)'
+          },
           icon: CheckCircleIcon,
           text: 'Email Change Completed',
           description: 'Your email address has been successfully updated'
         };
       case 'cancelled':
         return {
-          color: 'text-gray-600 bg-gray-100 border-gray-200',
+          style: {
+            color: 'var(--text-secondary)',
+            backgroundColor: 'var(--surface-secondary)',
+            borderColor: 'var(--border-color)'
+          },
           icon: XCircleIcon,
           text: 'Request Cancelled',
           description: 'This email change request was cancelled'
         };
       default:
         return {
-          color: 'text-gray-600 bg-gray-100 border-gray-200',
+          style: {
+            color: 'var(--text-secondary)',
+            backgroundColor: 'var(--surface-secondary)',
+            borderColor: 'var(--border-color)'
+          },
           icon: ClockIcon,
           text: 'Unknown Status',
           description: 'Status information unavailable'
@@ -116,7 +144,10 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-full ${statusConfig.color}`}>
+          <div 
+            className="p-2 rounded-full border"
+            style={statusConfig.style}
+          >
             <StatusIcon className="h-5 w-5" />
           </div>
           <div>
@@ -130,13 +161,25 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <span className={`px-3 py-1 text-sm font-medium rounded-full border ${statusConfig.color}`}>
+          <span 
+            className="px-3 py-1 text-sm font-medium rounded-full border"
+            style={statusConfig.style}
+          >
             {statusConfig.text}
           </span>
           {onRefreshStatus && (
             <button
               onClick={onRefreshStatus}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors duration-200"
+              className="p-2 rounded-full transition-colors duration-200"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
               title="Refresh status"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,12 +220,21 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
           <h5 style={{ color: 'var(--text-primary)' }} className="text-sm font-medium">Email Verification Status</h5>
           
           {/* Email Service Notice */}
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div 
+            className="p-3 border rounded-lg"
+            style={{
+              backgroundColor: 'var(--color-primary-50)',
+              borderColor: 'var(--color-primary-200)'
+            }}
+          >
             <div className="flex items-start space-x-2">
-              <InformationCircleIcon className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <InformationCircleIcon 
+                className="h-5 w-5 flex-shrink-0 mt-0.5" 
+                style={{ color: 'var(--color-primary-600)' }}
+              />
               <div>
-                <p className="text-sm font-medium text-blue-900">Email Verification Help</p>
-                <div className="text-sm text-blue-800 mt-1">
+                <p className="text-sm font-medium" style={{ color: 'var(--color-primary-900)' }}>Email Verification Help</p>
+                <div className="text-sm mt-1" style={{ color: 'var(--color-primary-800)' }}>
                   <p>• Check your inbox and spam/junk folders for verification emails</p>
                   <p>• Verification emails may take a few minutes to arrive</p>
                   <p>• If you don't receive emails after 10 minutes, try the resend button</p>
@@ -198,16 +250,27 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
           <div className="space-y-2">
             <div style={{ backgroundColor: 'var(--background-color)', border: '1px solid var(--border-color)' }} className="flex items-center justify-between p-3 rounded-lg">
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  request.verificationStatus?.currentEmailVerified ? 'bg-green-500' : 'bg-yellow-500'
-                }`} />
+                <div 
+                  className="w-2 h-2 rounded-full"
+                  style={{
+                    backgroundColor: request.verificationStatus?.currentEmailVerified 
+                      ? 'var(--color-success-600)' 
+                      : 'var(--color-warning-600)'
+                  }}
+                />
                 <span style={{ color: 'var(--text-secondary)' }} className="text-sm">Current Email ({request.currentEmail})</span>
               </div>
               <div className="flex items-center space-x-2">
                 {request.verificationStatus?.currentEmailVerified ? (
-                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                  <CheckCircleIcon 
+                    className="h-4 w-4" 
+                    style={{ color: 'var(--color-success-600)' }}
+                  />
                 ) : (
-                  <ClockIcon className="h-4 w-4 text-yellow-600" />
+                  <ClockIcon 
+                    className="h-4 w-4" 
+                    style={{ color: 'var(--color-warning-600)' }}
+                  />
                 )}
                 <span style={{ color: 'var(--text-tertiary)' }} className="text-xs">
                   {request.verificationStatus?.currentEmailVerified ? 'Verified' : 'Pending'}
@@ -215,7 +278,14 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
                 {!request.verificationStatus?.currentEmailVerified && onResendVerification && (
                   <button
                     onClick={() => onResendVerification(request.id, 'current')}
-                    className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    className="text-xs underline transition-colors"
+                    style={{ color: 'var(--color-primary-600)' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary-800)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary-600)';
+                    }}
                   >
                     Resend
                   </button>
@@ -224,16 +294,27 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
             </div>
             <div style={{ backgroundColor: 'var(--background-color)', border: '1px solid var(--border-color)' }} className="flex items-center justify-between p-3 rounded-lg">
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  request.verificationStatus?.newEmailVerified ? 'bg-green-500' : 'bg-yellow-500'
-                }`} />
+                <div 
+                  className="w-2 h-2 rounded-full"
+                  style={{
+                    backgroundColor: request.verificationStatus?.newEmailVerified 
+                      ? 'var(--color-success-600)' 
+                      : 'var(--color-warning-600)'
+                  }}
+                />
                 <span style={{ color: 'var(--text-secondary)' }} className="text-sm">New Email ({request.newEmail})</span>
               </div>
               <div className="flex items-center space-x-2">
                 {request.verificationStatus?.newEmailVerified ? (
-                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                  <CheckCircleIcon 
+                    className="h-4 w-4" 
+                    style={{ color: 'var(--color-success-600)' }}
+                  />
                 ) : (
-                  <ClockIcon className="h-4 w-4 text-yellow-600" />
+                  <ClockIcon 
+                    className="h-4 w-4" 
+                    style={{ color: 'var(--color-warning-600)' }}
+                  />
                 )}
                 <span style={{ color: 'var(--text-tertiary)' }} className="text-xs">
                   {request.verificationStatus?.newEmailVerified ? 'Verified' : 'Pending'}
@@ -241,7 +322,14 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
                 {!request.verificationStatus?.newEmailVerified && onResendVerification && (
                   <button
                     onClick={() => onResendVerification(request.id, 'new')}
-                    className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    className="text-xs underline transition-colors"
+                    style={{ color: 'var(--color-primary-600)' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary-800)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary-600)';
+                    }}
                   >
                     Resend
                   </button>
@@ -255,36 +343,51 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
       {/* Timeline */}
       <div className="space-y-3">
         <h5 style={{ color: 'var(--text-primary)' }} className="text-sm font-medium">Request Timeline</h5>
-        <div className="space-y-2">
+                  <div className="space-y-2">
           <div className="flex items-center space-x-3 text-sm">
-            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+            <div 
+              className="w-2 h-2 rounded-full" 
+              style={{ backgroundColor: 'var(--color-primary-500)' }}
+            />
             <span style={{ color: 'var(--text-secondary)' }}>Request submitted:</span>
             <span style={{ color: 'var(--text-primary)' }}>{formatDate(request.requestedAt)}</span>
           </div>
           {request.verifiedAt && (
             <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <div 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: 'var(--color-success-500)' }}
+              />
               <span style={{ color: 'var(--text-secondary)' }}>Emails verified:</span>
               <span style={{ color: 'var(--text-primary)' }}>{formatDate(request.verifiedAt)}</span>
             </div>
           )}
           {request.approvedAt && (
             <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <div 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: 'var(--color-success-500)' }}
+              />
               <span style={{ color: 'var(--text-secondary)' }}>Admin approved:</span>
               <span style={{ color: 'var(--text-primary)' }}>{formatDate(request.approvedAt)}</span>
             </div>
           )}
           {request.rejectedAt && (
             <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-red-500 rounded-full" />
+              <div 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: 'var(--color-error-500)' }}
+              />
               <span style={{ color: 'var(--text-secondary)' }}>Request rejected:</span>
               <span style={{ color: 'var(--text-primary)' }}>{formatDate(request.rejectedAt)}</span>
             </div>
           )}
           {request.completedAt && (
             <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <div 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: 'var(--color-success-500)' }}
+              />
               <span style={{ color: 'var(--text-secondary)' }}>Change completed:</span>
               <span style={{ color: 'var(--text-primary)' }}>{formatDate(request.completedAt)}</span>
             </div>
@@ -294,23 +397,41 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
 
       {/* Estimated Completion */}
       {request.estimatedCompletionTime && request.status !== 'completed' && request.status !== 'rejected' && request.status !== 'cancelled' && (
-        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div 
+          className="p-3 border rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-primary-50)',
+            borderColor: 'var(--color-primary-200)'
+          }}
+        >
           <div className="flex items-center space-x-2">
-            <ClockIcon className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-900">Estimated Completion:</span>
-            <span className="text-sm text-blue-800">{formatDate(request.estimatedCompletionTime)}</span>
+            <ClockIcon 
+              className="h-4 w-4" 
+              style={{ color: 'var(--color-primary-600)' }}
+            />
+            <span className="text-sm font-medium" style={{ color: 'var(--color-primary-900)' }}>Estimated Completion:</span>
+            <span className="text-sm" style={{ color: 'var(--color-primary-800)' }}>{formatDate(request.estimatedCompletionTime)}</span>
           </div>
         </div>
       )}
 
       {/* Rejection Reason */}
       {request.status === 'rejected' && request.rejectionReason && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div 
+          className="p-4 border rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-error-50)',
+            borderColor: 'var(--color-error-200)'
+          }}
+        >
           <div className="flex items-start space-x-2">
-            <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <ExclamationTriangleIcon 
+              className="h-5 w-5 flex-shrink-0 mt-0.5" 
+              style={{ color: 'var(--color-error-600)' }}
+            />
             <div>
-              <p className="text-sm font-medium text-red-900">Rejection Reason:</p>
-              <p className="text-sm text-red-800 mt-1">{request.rejectionReason}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-error-900)' }}>Rejection Reason:</p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-error-800)' }}>{request.rejectionReason}</p>
             </div>
           </div>
         </div>
@@ -327,7 +448,18 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
                 onResendVerification(request.id, 'new');
               }
             }}
-            className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100"
+            className="px-3 py-2 text-sm font-medium border rounded-md transition-colors"
+            style={{
+              color: 'var(--color-primary-700)',
+              backgroundColor: 'var(--color-primary-50)',
+              borderColor: 'var(--color-primary-200)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-100)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-50)';
+            }}
           >
             Resend Verification
           </button>
@@ -335,7 +467,18 @@ export const EmailChangeStatus: React.FC<EmailChangeStatusProps> = ({
         {canCancelRequest() && onCancelRequest && (
           <button
             onClick={() => onCancelRequest(request.id)}
-            className="px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100"
+            className="px-3 py-2 text-sm font-medium border rounded-md transition-colors"
+            style={{
+              color: 'var(--color-error-700)',
+              backgroundColor: 'var(--color-error-50)',
+              borderColor: 'var(--color-error-200)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-error-100)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-error-50)';
+            }}
           >
             Cancel Request
           </button>

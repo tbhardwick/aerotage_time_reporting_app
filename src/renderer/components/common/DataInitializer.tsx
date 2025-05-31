@@ -164,14 +164,26 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
   if (user && loading.initialLoad) {
     console.log('🔄 Showing loading screen');
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: 'var(--background-color)' }}
+      >
         <div className="max-w-md w-full space-y-8 p-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <h2 className="mt-6 text-lg font-medium text-gray-900">
+            <div 
+              className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+              style={{ borderColor: 'var(--color-primary-600)' }}
+            ></div>
+            <h2 
+              className="mt-6 text-lg font-medium"
+              style={{ color: 'var(--text-primary)' }}
+            >
               Loading application data...
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p 
+              className="mt-2 text-sm"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               Please wait while we load your projects, time entries, and other data.
             </p>
           </div>
@@ -190,18 +202,36 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
                                errors.initialLoad.includes('explicit deny');
     
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: 'var(--background-color)' }}
+      >
         <div className="max-w-md w-full space-y-8 p-8">
           <div className="text-center">
-            <div className="rounded-full h-12 w-12 bg-red-100 mx-auto flex items-center justify-center">
-              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div 
+              className="rounded-full h-12 w-12 mx-auto flex items-center justify-center"
+              style={{ backgroundColor: 'var(--color-error-100)' }}
+            >
+              <svg 
+                className="h-6 w-6" 
+                style={{ color: 'var(--color-error-600)' }}
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="mt-6 text-lg font-medium text-gray-900">
+            <h2 
+              className="mt-6 text-lg font-medium"
+              style={{ color: 'var(--text-primary)' }}
+            >
               {isSessionTerminated ? 'Session Terminated' : 'Failed to load application data'}
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p 
+              className="mt-2 text-sm"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               {isSessionTerminated 
                 ? 'Your session has been terminated. This usually happens when sessions are terminated from another device or by an administrator.'
                 : errors.initialLoad
@@ -212,12 +242,25 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
               <div className="mt-4 space-y-3">
                 <button
                   onClick={handleBootstrapLogout}
-                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-error-600)',
+                    color: 'var(--color-text-on-error)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-error-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+                  }}
                 >
                   Sign Out and Return to Login
                 </button>
-                <p className="text-xs text-gray-500">
-                  Or open browser console and run: <code className="bg-gray-100 px-1 rounded">window.debugUtils.forceLogout()</code>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  Or open browser console and run: <code 
+                    className="px-1 rounded"
+                    style={{ backgroundColor: 'var(--border-color)' }}
+                  >window.debugUtils.forceLogout()</code>
                 </p>
               </div>
             ) : (
@@ -227,7 +270,17 @@ export const DataInitializer: React.FC<DataInitializerProps> = ({ children }) =>
                   hasLoadedRef.current = false; // Reset the flag
                   loadAllData();
                 }}
-                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }}
               >
                 Retry
               </button>

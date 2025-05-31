@@ -266,8 +266,12 @@ const TimeReports: React.FC = () => {
               type="checkbox"
               checked={filters.billableOnly}
               onChange={(e) => setFilters(prev => ({ ...prev, billableOnly: e.target.checked }))}
-              className="rounded text-blue-600 focus:ring-blue-500"
-              style={{ borderColor: 'var(--border-color)' }}
+              className="rounded focus:ring-2 focus:ring-offset-2"
+              style={{ 
+                borderColor: 'var(--border-color)',
+                color: 'var(--color-primary-600)',
+                backgroundColor: 'var(--surface-color)'
+              }}
             />
             <span className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>Show billable time only</span>
           </label>
@@ -278,7 +282,7 @@ const TimeReports: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ClockIcon className="h-8 w-8 text-blue-600" />
+            <ClockIcon className="h-8 w-8" style={{ color: 'var(--color-primary-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summary.totalHours.toFixed(1)}</p>
@@ -288,7 +292,7 @@ const TimeReports: React.FC = () => {
 
         <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <CurrencyDollarIcon className="h-8 w-8 text-green-600" />
+            <CurrencyDollarIcon className="h-8 w-8" style={{ color: 'var(--color-success-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summary.billableHours.toFixed(1)}</p>
@@ -298,7 +302,7 @@ const TimeReports: React.FC = () => {
 
         <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ChartBarIcon className="h-8 w-8 text-purple-600" />
+            <ChartBarIcon className="h-8 w-8" style={{ color: 'var(--color-secondary-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Amount</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>${summary.totalAmount.toLocaleString()}</p>
@@ -308,7 +312,7 @@ const TimeReports: React.FC = () => {
 
         <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--surface-color)', boxShadow: 'var(--shadow)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <CalendarIcon className="h-8 w-8 text-orange-600" />
+            <CalendarIcon className="h-8 w-8" style={{ color: 'var(--color-warning-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Entries</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summary.entriesCount}</p>
@@ -421,21 +425,34 @@ const TimeReports: React.FC = () => {
                       {formatHours(entry.duration)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        entry.isBillable 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span 
+                        className="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                        style={{
+                          backgroundColor: entry.isBillable 
+                            ? 'var(--color-success-50)' 
+                            : 'var(--color-secondary-50)',
+                          color: entry.isBillable 
+                            ? 'var(--color-success-800)' 
+                            : 'var(--color-secondary-800)'
+                        }}
+                      >
                         {entry.isBillable ? 'Billable' : 'Non-billable'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        entry.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        entry.status === 'submitted' ? 'bg-yellow-100 text-yellow-800' :
-                        entry.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span 
+                        className="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                        style={{
+                          backgroundColor: entry.status === 'approved' ? 'var(--color-success-50)' :
+                                          entry.status === 'submitted' ? 'var(--color-warning-50)' :
+                                          entry.status === 'rejected' ? 'var(--color-error-50)' :
+                                          'var(--surface-secondary)',
+                          color: entry.status === 'approved' ? 'var(--color-success-800)' :
+                                entry.status === 'submitted' ? 'var(--color-warning-800)' :
+                                entry.status === 'rejected' ? 'var(--color-error-800)' :
+                                'var(--text-secondary)'
+                        }}
+                      >
                         {entry.status}
                       </span>
                     </td>

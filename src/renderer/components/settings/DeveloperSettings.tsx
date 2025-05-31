@@ -229,7 +229,7 @@ const DeveloperSettings: React.FC = () => {
       {/* System Information */}
       <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         <div className="flex items-center space-x-2 mb-4">
-          <InformationCircleIcon className="h-5 w-5 text-blue-500" />
+          <InformationCircleIcon className="h-5 w-5" style={{ color: 'var(--color-primary-500)' }} />
           <h4 className="text-md font-medium" style={{ color: 'var(--text-primary)' }}>System Information</h4>
         </div>
         
@@ -268,13 +268,13 @@ const DeveloperSettings: React.FC = () => {
           </div>
           <div>
             <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Online:</span>
-            <span className={`ml-2 ${developerInfo.onLine ? 'text-green-600' : 'text-red-600'}`}>
+                            <span className="ml-2" style={{ color: developerInfo.onLine ? 'var(--color-success-600)' : 'var(--color-error-600)' }}>
               {developerInfo.onLine ? '✅ Connected' : '❌ Offline'}
             </span>
           </div>
           <div>
             <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Cookies:</span>
-            <span className={`ml-2 ${developerInfo.cookieEnabled ? 'text-green-600' : 'text-red-600'}`}>
+                            <span className="ml-2" style={{ color: developerInfo.cookieEnabled ? 'var(--color-success-600)' : 'var(--color-error-600)' }}>
               {developerInfo.cookieEnabled ? '✅ Enabled' : '❌ Disabled'}
             </span>
           </div>
@@ -289,13 +289,24 @@ const DeveloperSettings: React.FC = () => {
       <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <CodeBracketIcon className="h-5 w-5 text-green-500" />
+            <CodeBracketIcon className="h-5 w-5" style={{ color: 'var(--color-success-500)' }} />
             <h4 className="text-md font-medium" style={{ color: 'var(--text-primary)' }}>API Testing</h4>
           </div>
           <button
             onClick={testApiConnection}
             disabled={isTestingApi}
-            className="inline-flex items-center px-3 py-2 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                            className="inline-flex items-center px-3 py-2 shadow-sm text-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors duration-200"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }}
           >
             <ArrowPathIcon className={`h-4 w-4 mr-2 ${isTestingApi ? 'animate-spin' : ''}`} />
             {isTestingApi ? 'Testing...' : 'Test API'}
@@ -309,7 +320,17 @@ const DeveloperSettings: React.FC = () => {
             </pre>
             <button
               onClick={() => copyToClipboard(apiTestResult)}
-              className="mt-2 inline-flex items-center px-2 py-1 shadow-sm text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700"
+              className="mt-2 inline-flex items-center px-2 py-1 shadow-sm text-xs font-medium rounded transition-colors"
+              style={{
+                backgroundColor: 'var(--color-secondary-600)',
+                color: 'var(--color-text-on-secondary)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-700)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+              }}
             >
               <ClipboardDocumentIcon className="h-3 w-3 mr-1" />
               Copy

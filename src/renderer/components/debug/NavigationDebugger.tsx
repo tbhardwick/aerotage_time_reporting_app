@@ -71,20 +71,50 @@ export const NavigationDebugger: React.FC = () => {
   };
 
   return (
-    <div className="p-6 border border-orange-300 rounded-lg bg-orange-50">
-      <h3 className="text-lg font-semibold text-orange-800 mb-4">🧭 Navigation Debugger</h3>
+    <div 
+      className="p-6 rounded-lg"
+      style={{
+        border: '1px solid var(--color-warning-300)',
+        backgroundColor: 'var(--color-warning-50)'
+      }}
+    >
+      <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-warning-800)' }}>🧭 Navigation Debugger</h3>
       
       <div className="flex flex-wrap gap-2 mb-4">
         <button
           onClick={() => isMonitoring ? stopMonitoring() : startMonitoring()}
-          className={`px-4 py-2 rounded-md text-white ${isMonitoring ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+          className="px-4 py-2 rounded-md transition-colors"
+          style={{
+            backgroundColor: isMonitoring ? 'var(--color-error-600)' : 'var(--color-success-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = isMonitoring ? 'var(--color-error-hover)' : 'var(--color-success-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = isMonitoring ? 'var(--color-error-600)' : 'var(--color-success-600)';
+          }}
         >
           {isMonitoring ? 'Stop Monitoring' : 'Start Monitoring'}
         </button>
         
         <button
           onClick={() => checkAuthBeforeNavigation('/settings')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          className="px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+          style={{
+            backgroundColor: 'var(--color-primary-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            if (!e.currentTarget.disabled) {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!e.currentTarget.disabled) {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+            }
+          }}
           disabled={!isMonitoring}
         >
           Test Navigate to Settings
@@ -92,7 +122,21 @@ export const NavigationDebugger: React.FC = () => {
         
         <button
           onClick={() => checkAuthBeforeNavigation('/time-tracking')}
-          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          className="px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+          style={{
+            backgroundColor: 'var(--color-secondary-600)',
+            color: 'var(--color-text-on-secondary)'
+          }}
+          onMouseEnter={(e) => {
+            if (!e.currentTarget.disabled) {
+              e.currentTarget.style.backgroundColor = 'var(--color-secondary-hover)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!e.currentTarget.disabled) {
+              e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+            }
+          }}
           disabled={!isMonitoring}
         >
           Test Navigate to Time Tracking
@@ -100,14 +144,30 @@ export const NavigationDebugger: React.FC = () => {
         
         <button
           onClick={clearLogs}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+          className="px-4 py-2 rounded-md transition-colors"
+          style={{
+            backgroundColor: 'var(--color-secondary-600)',
+            color: 'var(--color-text-on-secondary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-secondary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+          }}
         >
           Clear Logs
         </button>
       </div>
 
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-        <p className="text-sm text-blue-800">
+      <div 
+        className="mb-4 p-3 rounded-md"
+        style={{
+          backgroundColor: 'var(--color-primary-50)',
+          border: '1px solid var(--color-primary-200)'
+        }}
+      >
+        <p className="text-sm" style={{ color: 'var(--color-primary-800)' }}>
           <strong>How to use:</strong><br/>
           1. Click "Start Monitoring" to begin tracking navigation<br/>
           2. Click "Test Navigate to Settings" to see what happens during navigation<br/>
@@ -117,8 +177,14 @@ export const NavigationDebugger: React.FC = () => {
 
       {logs.length > 0 && (
         <div className="mt-4">
-          <h4 className="font-semibold text-gray-800 mb-2">Navigation Logs:</h4>
-          <div className="bg-gray-900 text-green-400 p-4 rounded-md text-sm font-mono max-h-64 overflow-y-auto">
+          <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Navigation Logs:</h4>
+          <div 
+            className="p-4 rounded-md text-sm font-mono max-h-64 overflow-y-auto"
+            style={{
+              backgroundColor: 'var(--color-neutral-900)',
+              color: 'var(--color-success-400)'
+            }}
+          >
             {logs.map((log, index) => (
               <div key={index} className="mb-1">
                 {log}
@@ -128,8 +194,14 @@ export const NavigationDebugger: React.FC = () => {
         </div>
       )}
 
-      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-        <p className="text-sm text-yellow-800">
+      <div 
+        className="mt-4 p-3 rounded-md"
+        style={{
+          backgroundColor: 'var(--color-warning-50)',
+          border: '1px solid var(--color-warning-200)'
+        }}
+      >
+        <p className="text-sm" style={{ color: 'var(--color-warning-800)' }}>
           <strong>Current Status:</strong><br/>
           📍 Current Path: <code>{location.pathname}</code><br/>
           🔍 Monitoring: {isMonitoring ? '✅ Active' : '❌ Inactive'}<br/>

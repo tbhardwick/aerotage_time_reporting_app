@@ -15,6 +15,8 @@ This directory contains all project documentation organized for easy navigation 
 ### Feature Documentation
 - [`DAILY_WEEKLY_TIME_TRACKING_REQUIREMENTS.md`](./DAILY_WEEKLY_TIME_TRACKING_REQUIREMENTS.md) - Time tracking feature requirements
 - [`THEME_SYSTEM_DOCUMENTATION.md`](./THEME_SYSTEM_DOCUMENTATION.md) - Theme system implementation
+- [`STYLING_CONSISTENCY_IMPLEMENTATION.md`](./STYLING_CONSISTENCY_IMPLEMENTATION.md) - **🎨 Styling consistency project plan and progress tracker**
+- [`THEME_AWARE_DESIGN_SYSTEM.md`](./THEME_AWARE_DESIGN_SYSTEM.md) - **🎨 NEW: Comprehensive theme-aware design system documentation**
 - [`WEB_BROWSER_DEPLOYMENT_PLAN.md`](./WEB_BROWSER_DEPLOYMENT_PLAN.md) - Future web deployment strategy
 - [`REMEMBER_USERNAME_FEATURE.md`](./REMEMBER_USERNAME_FEATURE.md) - Username persistence feature
 - [`USER_DELETION_BUSINESS_LOGIC.md`](./USER_DELETION_BUSINESS_LOGIC.md) - User deletion workflows
@@ -28,6 +30,7 @@ API integration documentation and specifications:
 - Backend API improvement requests
 - Invoice and user management API integration guides
 - API team communications
+- **🎨 NEW: [`THEME_SYSTEM_TECHNICAL_REFERENCE.md`](./api-integration/THEME_SYSTEM_TECHNICAL_REFERENCE.md) - Complete CSS variables reference and technical implementation guide**
 
 ### [`implementation-guides/`](./implementation-guides/)
 Step-by-step implementation guides for major features:
@@ -36,6 +39,7 @@ Step-by-step implementation guides for major features:
 - User invitation system implementation
 - Session validation and bootstrap guides
 - Testing and end-to-end guides
+- **🎨 NEW: [`COMPONENT_MIGRATION_GUIDE.md`](./implementation-guides/COMPONENT_MIGRATION_GUIDE.md) - Step-by-step component migration to theme-aware styling**
 
 ### [`troubleshooting/`](./troubleshooting/)
 Debugging and troubleshooting documentation:
@@ -83,6 +87,7 @@ Completed implementations and resolved issues:
 1. Start with [`AEROTAGE_TIME_APP_PLAN.md`](./AEROTAGE_TIME_APP_PLAN.md) for project overview
 2. Review [`DEVELOPMENT.md`](./DEVELOPMENT.md) for setup instructions
 3. Check [`aerotage_Time_app_plan_progress.md`](./aerotage_Time_app_plan_progress.md) for current status
+4. **Review [`STYLING_CONSISTENCY_IMPLEMENTATION.md`](./STYLING_CONSISTENCY_IMPLEMENTATION.md) for styling standards**
 
 ### For Feature Development
 1. Check [`implementation-guides/`](./implementation-guides/) for relevant patterns

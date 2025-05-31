@@ -199,12 +199,13 @@ const NotificationSettings: React.FC = () => {
                 name="emailFrequency"
                 value={formData.emailFrequency}
                 onChange={handleInputChange}
-                className="w-full md:w-64 px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                style={{ 
+                className="w-full md:w-64 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                style={{
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 <option value="immediate">Immediate</option>
                 <option value="daily">Daily digest</option>
@@ -542,7 +543,21 @@ const NotificationSettings: React.FC = () => {
           <button
             type="submit"
             disabled={isSaving}
-            className="px-6 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors duration-200 disabled:opacity-50"
+            className="px-6 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSaving) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSaving) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
           >
             {isSaving ? 'Saving...' : 'Save Notification Settings'}
           </button>

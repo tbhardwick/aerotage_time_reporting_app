@@ -219,7 +219,7 @@ const DailyWeeklyView: React.FC = () => {
               }`}
               style={{
                 backgroundColor: viewMode === 'daily' ? 'var(--surface-color)' : 'transparent',
-                color: viewMode === 'daily' ? '#2563eb' : 'var(--text-secondary)'
+                color: viewMode === 'daily' ? 'var(--color-primary-600)' : 'var(--text-secondary)'
               }}
               onMouseEnter={(e) => {
                 if (viewMode !== 'daily') {
@@ -243,7 +243,7 @@ const DailyWeeklyView: React.FC = () => {
               }`}
               style={{
                 backgroundColor: viewMode === 'weekly' ? 'var(--surface-color)' : 'transparent',
-                color: viewMode === 'weekly' ? '#2563eb' : 'var(--text-secondary)'
+                color: viewMode === 'weekly' ? 'var(--color-primary-600)' : 'var(--text-secondary)'
               }}
               onMouseEnter={(e) => {
                 if (viewMode !== 'weekly') {
@@ -310,7 +310,17 @@ const DailyWeeklyView: React.FC = () => {
 
         <button
           onClick={goToToday}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+          style={{
+            backgroundColor: 'var(--color-primary-600)',
+            color: 'var(--color-text-on-primary)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+          }}
         >
           Today
         </button>
@@ -318,13 +328,16 @@ const DailyWeeklyView: React.FC = () => {
 
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div 
+            className="animate-spin rounded-full h-8 w-8 border-b-2"
+            style={{ borderColor: 'var(--color-primary-600)' }}
+          />
         </div>
       ) : viewMode === 'weekly' ? (
         weeklyOverviewData ? (
           <WeeklyViewContent summary={weeklyOverviewData} onOpenQuickEntry={openQuickEntry} />
         ) : (
-          <div className="text-center py-12 text-neutral-500">
+          <div className="text-center py-12" style={{ color: 'var(--text-secondary)' }}>
             No weekly data available. Please try again.
           </div>
         )
@@ -332,7 +345,7 @@ const DailyWeeklyView: React.FC = () => {
         dailySummaryData && dailySummaryData.summaries.length > 0 ? (
           <DailyViewContent summary={dailySummaryData.summaries[0]} onOpenQuickEntry={openQuickEntry} />
         ) : (
-          <div className="text-center py-12 text-neutral-500">
+          <div className="text-center py-12" style={{ color: 'var(--text-secondary)' }}>
             No daily data available. Please try again.
           </div>
         )
@@ -362,7 +375,7 @@ const WeeklyViewContent: React.FC<{
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ClockIcon className="h-8 w-8 text-blue-600" />
+            <ClockIcon className="h-8 w-8" style={{ color: 'var(--color-primary-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -374,7 +387,7 @@ const WeeklyViewContent: React.FC<{
 
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ChartBarIcon className="h-8 w-8 text-green-600" />
+            <ChartBarIcon className="h-8 w-8" style={{ color: 'var(--color-success-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -386,7 +399,7 @@ const WeeklyViewContent: React.FC<{
 
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <CalendarIcon className="h-8 w-8 text-purple-600" />
+            <CalendarIcon className="h-8 w-8" style={{ color: 'var(--color-warning-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Target Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -398,13 +411,21 @@ const WeeklyViewContent: React.FC<{
 
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              summary.weeklyTotals.completionPercentage >= 100 
-                ? 'bg-green-100 text-green-600' 
-                : summary.weeklyTotals.completionPercentage >= 80
-                ? 'bg-yellow-100 text-yellow-600'
-                : 'bg-red-100 text-red-600'
-            }`}>
+            <div 
+              className="h-8 w-8 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: summary.weeklyTotals.completionPercentage >= 100 
+                  ? 'var(--color-success-50)' 
+                  : summary.weeklyTotals.completionPercentage >= 80
+                  ? 'var(--color-warning-50)'
+                  : 'var(--color-error-50)',
+                color: summary.weeklyTotals.completionPercentage >= 100 
+                  ? 'var(--color-success-600)' 
+                  : summary.weeklyTotals.completionPercentage >= 80
+                  ? 'var(--color-warning-600)'
+                  : 'var(--color-error-600)'
+              }}
+            >
               <span className="text-sm font-bold">
                 {Math.round(summary.weeklyTotals.completionPercentage)}%
               </span>
@@ -443,7 +464,7 @@ const DailyViewContent: React.FC<{
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ClockIcon className="h-8 w-8 text-blue-600" />
+            <ClockIcon className="h-8 w-8" style={{ color: 'var(--color-primary-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -455,7 +476,7 @@ const DailyViewContent: React.FC<{
 
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ChartBarIcon className="h-8 w-8 text-green-600" />
+            <ChartBarIcon className="h-8 w-8" style={{ color: 'var(--color-success-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Billable Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -467,7 +488,7 @@ const DailyViewContent: React.FC<{
 
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <CalendarIcon className="h-8 w-8 text-purple-600" />
+            <CalendarIcon className="h-8 w-8" style={{ color: 'var(--color-warning-600)' }} />
             <div className="ml-4">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Target Hours</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -479,13 +500,21 @@ const DailyViewContent: React.FC<{
 
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              (summary.completionPercentage || 0) >= 100 
-                ? 'bg-green-100 text-green-600' 
-                : (summary.completionPercentage || 0) >= 80
-                ? 'bg-yellow-100 text-yellow-600'
-                : 'bg-red-100 text-red-600'
-            }`}>
+            <div 
+              className="h-8 w-8 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: (summary.completionPercentage || 0) >= 100 
+                  ? 'var(--color-success-50)' 
+                  : (summary.completionPercentage || 0) >= 80
+                  ? 'var(--color-warning-50)'
+                  : 'var(--color-error-50)',
+                color: (summary.completionPercentage || 0) >= 100 
+                  ? 'var(--color-success-600)' 
+                  : (summary.completionPercentage || 0) >= 80
+                  ? 'var(--color-warning-600)'
+                  : 'var(--color-error-600)'
+              }}
+            >
               <span className="text-sm font-bold">
                 {Math.round(summary.completionPercentage || 0)}%
               </span>
@@ -504,12 +533,19 @@ const DailyViewContent: React.FC<{
       {summary.timeGaps && summary.timeGaps.length > 0 && (
         <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center mb-4">
-            <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600 mr-2" />
+            <ExclamationTriangleIcon className="h-6 w-6 mr-2" style={{ color: 'var(--color-warning-600)' }} />
             <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Time Gaps Detected</h3>
           </div>
           <div className="space-y-3">
             {summary.timeGaps.map((gap, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div 
+                key={index} 
+                className="flex items-center justify-between p-3 rounded-lg border"
+                style={{
+                  backgroundColor: 'var(--color-warning-50)',
+                  borderColor: 'var(--color-warning-200)'
+                }}
+              >
                 <div>
                   <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     {gap.startTime} - {gap.endTime}
@@ -525,7 +561,17 @@ const DailyViewContent: React.FC<{
                     gap.endTime, 
                     (gap.duration || 0) * 60 // Convert hours to minutes
                   )}
-                  className="flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  className="flex items-center px-3 py-1 text-xs font-medium rounded-md transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-primary-600)',
+                    color: 'var(--color-text-on-primary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }}
                 >
                   <PlusIcon className="w-3 h-3 mr-1" />
                   Fill Gap
@@ -549,14 +595,10 @@ const DayCard: React.FC<{
   
   return (
     <div 
-      className={`p-4 rounded-lg border-2 transition-colors ${
-        isToday 
-          ? 'border-blue-500' 
-          : ''
-      }`}
+      className="p-4 rounded-lg border-2 transition-colors"
       style={{
-        backgroundColor: isToday ? 'rgba(59, 130, 246, 0.1)' : 'var(--surface-color)',
-        borderColor: isToday ? '#3b82f6' : 'var(--border-color)'
+        backgroundColor: isToday ? 'var(--color-primary-50)' : 'var(--surface-color)',
+        borderColor: isToday ? 'var(--color-primary-500)' : 'var(--border-color)'
       }}
       onMouseEnter={(e) => {
         if (!isToday) {
@@ -590,14 +632,15 @@ const DayCard: React.FC<{
           {/* Progress bar */}
           <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--border-color)' }}>
             <div 
-              className={`h-2 rounded-full transition-all ${
-                (summary.completionPercentage || 0) >= 100 
-                  ? 'bg-green-500' 
+              className="h-2 rounded-full transition-all"
+              style={{ 
+                width: `${Math.min(summary.completionPercentage || 0, 100)}%`,
+                backgroundColor: (summary.completionPercentage || 0) >= 100 
+                  ? 'var(--color-success-500)' 
                   : (summary.completionPercentage || 0) >= 80
-                  ? 'bg-yellow-500'
-                  : 'bg-red-500'
-              }`}
-              style={{ width: `${Math.min(summary.completionPercentage || 0, 100)}%` }}
+                  ? 'var(--color-warning-500)'
+                  : 'var(--color-error-500)'
+              }}
             />
           </div>
           
@@ -605,7 +648,14 @@ const DayCard: React.FC<{
             <div className="flex items-center justify-center">
               <button
                 onClick={() => onOpenQuickEntry(summary.date)}
-                className="flex items-center text-xs text-yellow-600 hover:text-yellow-800 transition-colors"
+                className="flex items-center text-xs transition-colors"
+                style={{ color: 'var(--color-warning-600)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--color-warning-800)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--color-warning-600)';
+                }}
               >
                 <ExclamationTriangleIcon className="w-3 h-3" />
                 <span className="ml-1">
@@ -619,7 +669,14 @@ const DayCard: React.FC<{
           {!hasGaps && (summary.completionPercentage || 0) < 80 && (
             <button
               onClick={() => onOpenQuickEntry(summary.date)}
-              className="flex items-center justify-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
+              className="flex items-center justify-center text-xs transition-colors"
+              style={{ color: 'var(--color-primary-600)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-primary-800)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-primary-600)';
+              }}
             >
               <PlusIcon className="w-3 h-3 mr-1" />
               Add Time

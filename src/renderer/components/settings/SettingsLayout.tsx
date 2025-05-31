@@ -57,12 +57,12 @@ const SettingsLayoutContent: React.FC<SettingsLayoutContentProps> = ({
               className={`
                 flex items-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-3 lg:px-4 text-xs sm:text-sm font-medium border-b-2 transition-colors duration-200 mb-2
                 ${activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-[var(--color-primary-600)] text-[var(--color-primary-600)]'
                   : 'border-transparent'
                 }
               `}
               style={{
-                color: activeTab === tab.id ? '#2563eb' : 'var(--text-secondary)'
+                color: activeTab === tab.id ? 'var(--color-primary-600)' : 'var(--text-secondary)'
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== tab.id) {

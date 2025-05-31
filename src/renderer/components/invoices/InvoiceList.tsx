@@ -112,21 +112,21 @@ const InvoiceList: React.FC = () => {
     
     switch (status) {
       case 'draft':
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-secondary-50)', color: 'var(--color-secondary-800)' };
       case 'sent':
-        return `${baseClasses} bg-blue-100 text-blue-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-primary-50)', color: 'var(--color-primary-800)' };
       case 'viewed':
-        return `${baseClasses} bg-purple-100 text-purple-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-primary-100)', color: 'var(--color-primary-900)' };
       case 'paid':
-        return `${baseClasses} bg-green-100 text-green-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-success-50)', color: 'var(--color-success-800)' };
       case 'overdue':
-        return `${baseClasses} bg-red-100 text-red-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-error-50)', color: 'var(--color-error-800)' };
       case 'cancelled':
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-secondary-50)', color: 'var(--color-secondary-800)' };
       case 'refunded':
-        return `${baseClasses} bg-orange-100 text-orange-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-warning-50)', color: 'var(--color-warning-800)' };
       default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+        return { className: baseClasses, backgroundColor: 'var(--color-secondary-50)', color: 'var(--color-secondary-800)' };
     }
   };
 
@@ -156,23 +156,25 @@ const InvoiceList: React.FC = () => {
           <input
             type="text"
             placeholder="Search invoices..."
-            className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:outline-none transition-colors"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-500)'
+            } as React.CSSProperties}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <select
-          className="px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-3 py-2 rounded-lg focus:ring-2 focus:outline-none transition-colors"
           style={{
             border: '1px solid var(--border-color)',
             backgroundColor: 'var(--background-color)',
-            color: 'var(--text-primary)'
-          }}
+            color: 'var(--text-primary)',
+            '--tw-ring-color': 'var(--color-primary-500)'
+          } as React.CSSProperties}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as Invoice['status'] | 'all')}
         >
@@ -218,7 +220,13 @@ const InvoiceList: React.FC = () => {
                     {invoice.clientName || getClientName(invoice.clientId)}
                   </p>
                 </div>
-                <span className={getStatusBadge(invoice.status)}>
+                <span 
+                  className={getStatusBadge(invoice.status).className}
+                  style={{
+                    backgroundColor: getStatusBadge(invoice.status).backgroundColor,
+                    color: getStatusBadge(invoice.status).color
+                  }}
+                >
                   {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                 </span>
               </div>
@@ -275,7 +283,17 @@ const InvoiceList: React.FC = () => {
                   <>
                     <button
                       onClick={() => handleSendInvoice(invoice.id)}
-                      className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                      className="px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                      style={{
+                        backgroundColor: 'var(--color-primary-600)',
+                        color: 'var(--color-text-on-primary)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                      }}
                       title="Send Invoice"
                     >
                       <PaperAirplaneIcon className="w-4 h-4" />
@@ -302,7 +320,17 @@ const InvoiceList: React.FC = () => {
                 {invoice.status === 'sent' && (
                   <button
                     onClick={() => handleMarkPaid(invoice.id)}
-                    className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                    className="px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                    style={{
+                      backgroundColor: 'var(--color-success-600)',
+                      color: 'var(--color-text-on-success)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-success-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+                    }}
                     title="Mark as Paid"
                   >
                     <CheckCircleIcon className="w-4 h-4" />
@@ -311,7 +339,17 @@ const InvoiceList: React.FC = () => {
 
                 <button
                   onClick={() => handleDeleteInvoice(invoice.id)}
-                  className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                  className="px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--color-error-600)',
+                    color: 'var(--color-text-on-error)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-error-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+                  }}
                   title="Delete Invoice"
                 >
                   <TrashIcon className="w-4 h-4" />

@@ -74,20 +74,46 @@ export const SimpleAuthCheck: React.FC = () => {
   };
 
   return (
-    <div className="p-6 border border-gray-300 rounded-lg bg-gray-50">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">🔍 Authentication Check</h3>
+    <div 
+      className="p-6 border rounded-lg"
+      style={{
+        backgroundColor: 'var(--color-secondary-50)',
+        borderColor: 'var(--border-color)'
+      }}
+    >
+      <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>🔍 Authentication Check</h3>
       
       <button
         onClick={checkAuth}
         disabled={loading}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 mb-4"
+        className="px-4 py-2 rounded-md disabled:opacity-50 mb-4 transition-colors"
+        style={{
+          backgroundColor: 'var(--color-primary-600)',
+          color: 'var(--color-text-on-primary)'
+        }}
+        onMouseEnter={(e) => {
+          if (!loading) {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!loading) {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+          }
+        }}
       >
         {loading ? 'Checking...' : 'Check Authentication State'}
       </button>
 
       {authState && (
-        <div className="mt-4 p-4 bg-white border rounded-md">
-          <h4 className="font-semibold text-gray-800 mb-2">Results:</h4>
+        <div 
+          className="mt-4 p-4 border rounded-md"
+          style={{
+            backgroundColor: 'var(--surface-color)',
+            borderColor: 'var(--border-color)'
+          }}
+        >
+          <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Results:</h4>
           <div className="space-y-2 text-sm">
             <div><strong>Time:</strong> {authState.timestamp}</div>
             <div><strong>Recommendation:</strong> {authState.recommendation}</div>
@@ -95,39 +121,45 @@ export const SimpleAuthCheck: React.FC = () => {
             {authState.user && (
               <div>
                 <strong>getCurrentUser():</strong> 
-                <span className={authState.user.success ? 'text-green-600' : 'text-red-600'}>
+                <span style={{ color: authState.user.success ? 'var(--color-success-600)' : 'var(--color-error-600)' }}>
                   {authState.user.success ? ' ✅ Success' : ' ❌ Failed'}
                 </span>
-                {authState.user.error && <div className="text-red-600 ml-4">Error: {authState.user.error}</div>}
+                {authState.user.error && <div className="ml-4" style={{ color: 'var(--color-error-600)' }}>Error: {authState.user.error}</div>}
               </div>
             )}
             
             {authState.session && (
               <div>
                 <strong>fetchAuthSession():</strong>
-                <span className={authState.session.success ? 'text-green-600' : 'text-red-600'}>
+                <span style={{ color: authState.session.success ? 'var(--color-success-600)' : 'var(--color-error-600)' }}>
                   {authState.session.success ? ' ✅ Success' : ' ❌ Failed'}
                 </span>
                 {authState.session.success && (
-                  <div className="ml-4 text-gray-600">
+                  <div className="ml-4" style={{ color: 'var(--text-secondary)' }}>
                     <div>Has Tokens: {authState.session.hasTokens ? '✅' : '❌'}</div>
                     <div>Has Access Token: {authState.session.hasAccessToken ? '✅' : '❌'}</div>
                     <div>Has ID Token: {authState.session.hasIdToken ? '✅' : '❌'}</div>
                   </div>
                 )}
-                {authState.session.error && <div className="text-red-600 ml-4">Error: {authState.session.error}</div>}
+                {authState.session.error && <div className="ml-4" style={{ color: 'var(--color-error-600)' }}>Error: {authState.session.error}</div>}
               </div>
             )}
 
             {authState.error && (
-              <div className="text-red-600">
+              <div style={{ color: 'var(--color-error-600)' }}>
                 <strong>General Error:</strong> {authState.error}
               </div>
             )}
           </div>
 
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-sm text-yellow-800">
+          <div 
+            className="mt-4 p-3 border rounded-md"
+            style={{
+              backgroundColor: 'var(--color-warning-50)',
+              borderColor: 'var(--color-warning-200)'
+            }}
+          >
+            <p className="text-sm" style={{ color: 'var(--color-warning-800)' }}>
               <strong>What this means:</strong><br/>
               {authState.user?.success 
                 ? "✅ You are logged in and authentication is working. If Settings was failing, it might be a different issue."

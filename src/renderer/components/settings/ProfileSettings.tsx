@@ -375,13 +375,16 @@ const ProfileSettings: React.FC = () => {
                   });
                   setIsEditing(true);
                 }}
-                style={{ backgroundColor: '#3b82f6' }}
-                className="px-4 py-2 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                className="px-4 py-2 rounded-lg transition-colors duration-200"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)'
+                }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#2563eb';
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
                 }}
               >
                 Create My Profile
@@ -424,12 +427,13 @@ const ProfileSettings: React.FC = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      style={{ 
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                      style={{
                         border: '1px solid var(--border-color)', 
                         backgroundColor: 'var(--surface-color)', 
-                        color: 'var(--text-primary)' 
-                      }}
-                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        color: 'var(--text-primary)',
+                        '--tw-ring-color': 'var(--color-primary-500)'
+                      } as React.CSSProperties}
                     />
                   </div>
 
@@ -462,12 +466,13 @@ const ProfileSettings: React.FC = () => {
                       name="jobTitle"
                       value={formData.jobTitle}
                       onChange={handleInputChange}
-                      style={{ 
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                      style={{
                         border: '1px solid var(--border-color)', 
                         backgroundColor: 'var(--surface-color)', 
-                        color: 'var(--text-primary)' 
-                      }}
-                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        color: 'var(--text-primary)',
+                        '--tw-ring-color': 'var(--color-primary-500)'
+                      } as React.CSSProperties}
                     />
                   </div>
 
@@ -481,12 +486,13 @@ const ProfileSettings: React.FC = () => {
                       name="department"
                       value={formData.department}
                       onChange={handleInputChange}
-                      style={{ 
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
+                      style={{
                         border: '1px solid var(--border-color)', 
                         backgroundColor: 'var(--surface-color)', 
-                        color: 'var(--text-primary)' 
-                      }}
-                      className="w-full px-3 py-2 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        color: 'var(--text-primary)',
+                        '--tw-ring-color': 'var(--color-primary-500)'
+                      } as React.CSSProperties}
                     />
                   </div>
                 </div>
@@ -515,13 +521,20 @@ const ProfileSettings: React.FC = () => {
                   <button
                     type="submit"
                     disabled={updating}
-                    style={{ backgroundColor: '#3b82f6' }}
-                    className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200 disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50"
+                    style={{
+                      backgroundColor: 'var(--color-primary-600)',
+                      color: 'var(--color-text-on-primary)'
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#2563eb';
+                      if (!updating) {
+                        e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#3b82f6';
+                      if (!updating) {
+                        e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                      }
                     }}
                   >
                     {updating ? 'Creating Profile...' : 'Create Profile'}
@@ -542,13 +555,16 @@ const ProfileSettings: React.FC = () => {
           <p style={{ color: 'var(--color-error-600)' }} className="text-sm mb-4">{profileError}</p>
           <button
             onClick={refetch}
-            style={{ backgroundColor: '#dc2626' }}
-            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200"
+            className="px-4 py-2 rounded-lg transition-colors duration-200"
+            style={{
+              backgroundColor: 'var(--color-error-600)',
+              color: 'var(--color-text-on-error)'
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#b91c1c';
+              e.currentTarget.style.backgroundColor = 'var(--color-error-700)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#dc2626';
+              e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
             }}
           >
             Try Again
@@ -578,13 +594,16 @@ const ProfileSettings: React.FC = () => {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            style={{ backgroundColor: '#3b82f6' }}
-            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200"
+            className="px-4 py-2 rounded-lg transition-colors duration-200"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#2563eb';
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#3b82f6';
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
             }}
           >
             Edit Profile
@@ -627,7 +646,7 @@ const ProfileSettings: React.FC = () => {
       {/* Loading indicator for email request */}
       {loadingEmailRequest && (
         <div style={{ backgroundColor: 'var(--surface-color)' }} className="flex items-center justify-center p-4 rounded-lg">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 mr-2" style={{ borderColor: 'var(--color-primary-600)' }}></div>
           <span style={{ color: 'var(--text-secondary)' }} className="text-sm">Checking email change status...</span>
         </div>
       )}
@@ -642,9 +661,7 @@ const ProfileSettings: React.FC = () => {
 
       {/* Email Change Message */}
       {emailChangeMessage && (
-        <div className={`p-4 rounded-lg ${
-          emailChangeMessage.type === 'success' ? 'border border-green-200' : emailChangeMessage.type === 'error' ? 'border border-red-200' : 'border border-yellow-200'
-        }`}
+        <div className="p-4 rounded-lg border"
         style={{
           backgroundColor: emailChangeMessage.type === 'success' ? 'var(--color-success-50)' : emailChangeMessage.type === 'error' ? 'var(--color-error-50)' : 'var(--color-warning-50)',
           color: emailChangeMessage.type === 'success' ? 'var(--color-success-800)' : emailChangeMessage.type === 'error' ? 'var(--color-error-800)' : 'var(--color-warning-800)',
@@ -678,16 +695,17 @@ const ProfileSettings: React.FC = () => {
                 onChange={handleInputChange}
                 disabled={!isEditing}
                 required
-                style={{ 
-                  border: '1px solid var(--border-color)', 
-                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                  color: 'var(--text-primary)' 
-                }}
                 className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    ? 'focus:ring-2 focus:ring-offset-2' 
                     : ''
                 }`}
+                style={{
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+                } as React.CSSProperties}
               />
             </div>
 
@@ -724,16 +742,17 @@ const ProfileSettings: React.FC = () => {
                 value={formData.jobTitle}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                style={{ 
-                  border: '1px solid var(--border-color)', 
-                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                  color: 'var(--text-primary)' 
-                }}
                 className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    ? 'focus:ring-2 focus:ring-offset-2' 
                     : ''
                 }`}
+                style={{
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+                } as React.CSSProperties}
               />
             </div>
 
@@ -748,16 +767,17 @@ const ProfileSettings: React.FC = () => {
                 value={formData.department}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                style={{ 
-                  border: '1px solid var(--border-color)', 
-                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                  color: 'var(--text-primary)' 
-                }}
                 className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    ? 'focus:ring-2 focus:ring-offset-2' 
                     : ''
                 }`}
+                style={{
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -776,16 +796,17 @@ const ProfileSettings: React.FC = () => {
                 disabled={!isEditing}
                 min="0"
                 step="0.01"
-                style={{ 
-                  border: '1px solid var(--border-color)', 
-                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                  color: 'var(--text-primary)' 
-                }}
                 className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    ? 'focus:ring-2 focus:ring-offset-2' 
                     : ''
                 }`}
+                style={{
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+                } as React.CSSProperties}
               />
             </div>
 
@@ -827,16 +848,17 @@ const ProfileSettings: React.FC = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                style={{ 
-                  border: '1px solid var(--border-color)', 
-                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                  color: 'var(--text-primary)' 
-                }}
                 className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    ? 'focus:ring-2 focus:ring-offset-2' 
                     : ''
                 }`}
+                style={{
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+                } as React.CSSProperties}
               />
             </div>
 
@@ -851,16 +873,17 @@ const ProfileSettings: React.FC = () => {
                 value={formData.emergencyContact}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                style={{ 
-                  border: '1px solid var(--border-color)', 
-                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                  color: 'var(--text-primary)' 
-                }}
                 className={`w-full px-3 py-2 rounded-lg text-sm ${
                   isEditing 
-                    ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                    ? 'focus:ring-2 focus:ring-offset-2' 
                     : ''
                 }`}
+                style={{
+                  border: '1px solid var(--border-color)', 
+                  backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                  color: 'var(--text-primary)',
+                  ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -876,16 +899,17 @@ const ProfileSettings: React.FC = () => {
               onChange={handleInputChange}
               disabled={!isEditing}
               rows={3}
-              style={{ 
-                border: '1px solid var(--border-color)', 
-                backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
-                color: 'var(--text-primary)' 
-              }}
               className={`w-full px-3 py-2 rounded-lg text-sm ${
                 isEditing 
-                  ? 'focus:ring-1 focus:ring-blue-500 focus:border-blue-500' 
+                  ? 'focus:ring-2 focus:ring-offset-2' 
                   : ''
               }`}
+              style={{
+                border: '1px solid var(--border-color)', 
+                backgroundColor: isEditing ? 'var(--surface-color)' : 'var(--surface-secondary)', 
+                color: 'var(--text-primary)',
+                ...(isEditing ? { '--tw-ring-color': 'var(--color-primary-500)' } : {})
+              } as React.CSSProperties}
             />
           </div>
         </div>
@@ -915,13 +939,20 @@ const ProfileSettings: React.FC = () => {
             <button
               type="submit"
               disabled={updating}
-              style={{ backgroundColor: '#3b82f6' }}
-              className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors duration-200 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--color-primary-600)',
+                color: 'var(--color-text-on-primary)'
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#2563eb';
+                if (!updating) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#3b82f6';
+                if (!updating) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }
               }}
             >
               {updating ? 'Saving...' : 'Save Changes'}

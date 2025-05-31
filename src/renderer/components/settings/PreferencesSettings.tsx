@@ -252,11 +252,21 @@ const PreferencesSettings: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Messages */}
             {message && (
-              <div className={`p-4 rounded-lg ${
-                message.type === 'success' 
-                  ? 'bg-green-50 text-green-800 border border-green-200' 
-                  : 'bg-red-50 text-red-800 border border-red-200'
-              }`}>
+              <div 
+                className="p-4 rounded-lg border"
+                style={message.type === 'success' 
+                  ? {
+                      backgroundColor: 'var(--color-success-50)',
+                      color: 'var(--color-success-800)',
+                      borderColor: 'var(--color-success-200)'
+                    }
+                  : {
+                      backgroundColor: 'var(--color-error-50)',
+                      color: 'var(--color-error-800)',
+                      borderColor: 'var(--color-error-200)'
+                    }
+                }
+              >
                 {message.text}
               </div>
             )}
@@ -277,12 +287,13 @@ const PreferencesSettings: React.FC = () => {
                     name="theme"
                     value={formData.theme}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                     style={{ 
                       backgroundColor: 'var(--background-color)', 
                       color: 'var(--text-primary)', 
-                      border: '1px solid var(--border-color)' 
-                    }}
+                      border: '1px solid var(--border-color)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                   >
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>
@@ -299,12 +310,13 @@ const PreferencesSettings: React.FC = () => {
                     name="timezone"
                     value={formData.timezone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                     style={{ 
                       backgroundColor: 'var(--background-color)', 
                       color: 'var(--text-primary)', 
-                      border: '1px solid var(--border-color)' 
-                    }}
+                      border: '1px solid var(--border-color)',
+                      '--tw-ring-color': 'var(--color-primary-500)'
+                    } as React.CSSProperties}
                   >
                     {timezones.map(tz => (
                       <option key={tz} value={tz}>{tz}</option>
@@ -320,8 +332,11 @@ const PreferencesSettings: React.FC = () => {
                   name="notifications"
                   checked={formData.notifications}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                  style={{ borderColor: 'var(--border-color)' }}
+                  className="h-4 w-4 rounded"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    accentColor: 'var(--color-primary-600)'
+                  }}
                 />
                 <label htmlFor="notifications" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                   Enable notifications
@@ -334,7 +349,21 @@ const PreferencesSettings: React.FC = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+                className="px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!updating) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!updating) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {updating ? 'Saving Preferences...' : 'Save My Preferences'}
               </button>
@@ -352,7 +381,17 @@ const PreferencesSettings: React.FC = () => {
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{preferencesError}</p>
           <button
             onClick={refetch}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+            className="px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            style={{
+              backgroundColor: 'var(--color-error-600)',
+              color: 'var(--color-text-on-error)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-error-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+            }}
           >
             Try Again
           </button>
@@ -380,11 +419,21 @@ const PreferencesSettings: React.FC = () => {
 
       {/* Messages */}
       {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div 
+          className="p-4 rounded-lg border"
+          style={message.type === 'success' 
+            ? {
+                backgroundColor: 'var(--color-success-50)',
+                color: 'var(--color-success-800)',
+                borderColor: 'var(--color-success-200)'
+              }
+            : {
+                backgroundColor: 'var(--color-error-50)',
+                color: 'var(--color-error-800)',
+                borderColor: 'var(--color-error-200)'
+              }
+          }
+        >
           {message.text}
         </div>
       )}
@@ -407,12 +456,13 @@ const PreferencesSettings: React.FC = () => {
                 name="theme"
                 value={formData.theme}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -429,12 +479,13 @@ const PreferencesSettings: React.FC = () => {
                 name="dateFormat"
                 value={formData.dateFormat}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 {dateFormats.map(format => (
                   <option key={format} value={format}>{format}</option>
@@ -453,12 +504,13 @@ const PreferencesSettings: React.FC = () => {
                 name="timeFormat"
                 value={formData.timeFormat}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 <option value="12h">12 Hour (AM/PM)</option>
                 <option value="24h">24 Hour</option>
@@ -474,12 +526,13 @@ const PreferencesSettings: React.FC = () => {
                 name="currency"
                 value={formData.currency}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 {currencies.map(currency => (
                   <option key={currency} value={currency}>{currency}</option>
@@ -508,12 +561,13 @@ const PreferencesSettings: React.FC = () => {
                 onChange={handleInputChange}
                 min="1"
                 max="480"
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               />
             </div>
 
@@ -526,12 +580,13 @@ const PreferencesSettings: React.FC = () => {
                 name="reminderInterval"
                 value={formData.reminderInterval}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 <option value={0}>No reminders</option>
                 <option value={15}>Every 15 minutes</option>
@@ -550,8 +605,11 @@ const PreferencesSettings: React.FC = () => {
                 name="autoStartTimer"
                 checked={formData.autoStartTimer}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                style={{ borderColor: 'var(--border-color)' }}
+                className="h-4 w-4 rounded"
+                style={{ 
+                  borderColor: 'var(--border-color)',
+                  accentColor: 'var(--color-primary-600)'
+                }}
               />
               <label htmlFor="autoStartTimer" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Auto-start timer when opening the application
@@ -565,8 +623,11 @@ const PreferencesSettings: React.FC = () => {
                 name="showTimerInMenuBar"
                 checked={formData.showTimerInMenuBar}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                style={{ borderColor: 'var(--border-color)' }}
+                className="h-4 w-4 rounded"
+                style={{ 
+                  borderColor: 'var(--border-color)',
+                  accentColor: 'var(--color-primary-600)'
+                }}
               />
               <label htmlFor="showTimerInMenuBar" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Show timer in menu bar
@@ -580,8 +641,11 @@ const PreferencesSettings: React.FC = () => {
                 name="defaultBillableStatus"
                 checked={formData.defaultBillableStatus}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                style={{ borderColor: 'var(--border-color)' }}
+                className="h-4 w-4 rounded"
+                style={{ 
+                  borderColor: 'var(--border-color)',
+                  accentColor: 'var(--color-primary-600)'
+                }}
               />
               <label htmlFor="defaultBillableStatus" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Mark new time entries as billable by default
@@ -607,12 +671,13 @@ const PreferencesSettings: React.FC = () => {
                 name="workingHoursStart"
                 value={formData.workingHoursStart}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               />
             </div>
 
@@ -626,12 +691,13 @@ const PreferencesSettings: React.FC = () => {
                 name="workingHoursEnd"
                 value={formData.workingHoursEnd}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -653,12 +719,13 @@ const PreferencesSettings: React.FC = () => {
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               >
                 {timezones.map(tz => (
                   <option key={tz} value={tz}>{tz}</option>
@@ -673,8 +740,11 @@ const PreferencesSettings: React.FC = () => {
                 name="notifications"
                 checked={formData.notifications}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                style={{ borderColor: 'var(--border-color)' }}
+                className="h-4 w-4 rounded"
+                style={{ 
+                  borderColor: 'var(--border-color)',
+                  accentColor: 'var(--color-primary-600)'
+                }}
               />
               <label htmlFor="notifications" className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>
                 Enable notifications
@@ -688,7 +758,21 @@ const PreferencesSettings: React.FC = () => {
           <button
             type="submit"
             disabled={updating}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+            className="px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!updating) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!updating) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
           >
             {updating ? 'Saving...' : 'Save Preferences'}
           </button>

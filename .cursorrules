@@ -1,8 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: true
----
 # Aerotage Time Reporting App - Frontend Development Rules
 
 ## 🏗️ Project Context
@@ -213,5 +208,4 @@ class MyComponent extends React.Component {}
 // ✅ src/renderer/components/MyComponent.tsx
 ```
 
-Remember: This is a professional business application requiring production-quality code with reliability, security, user-friendliness, and **consistent styling** as top priorities. The styling consistency implementation is **COMPLETE** with 20+ components migrated to theme-aware patterns.
-
+Remember: This is a professional business application requiring production-quality code with reliability, security, user-friendliness, and **consistent styling** as top priorities. The styling consistency implementation is **COMPLETE** with 20+ components migrated to theme-aware patterns. 

@@ -463,12 +463,13 @@ const SecuritySettings: React.FC = () => {
               value={passwordData.currentPassword}
               onChange={handlePasswordInputChange}
               required
-              className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
               style={{ 
                 backgroundColor: 'var(--background-color)', 
                 color: 'var(--text-primary)', 
-                border: '1px solid var(--border-color)' 
-              }}
+                border: '1px solid var(--border-color)',
+                '--tw-ring-color': 'var(--color-primary-500)'
+              } as React.CSSProperties}
             />
           </div>
 
@@ -485,12 +486,13 @@ const SecuritySettings: React.FC = () => {
                 onChange={handlePasswordInputChange}
                 required
                 minLength={8}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               />
             </div>
 
@@ -506,12 +508,13 @@ const SecuritySettings: React.FC = () => {
                 onChange={handlePasswordInputChange}
                 required
                 minLength={8}
-                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
                 style={{ 
                   backgroundColor: 'var(--background-color)', 
                   color: 'var(--text-primary)', 
-                  border: '1px solid var(--border-color)' 
-                }}
+                  border: '1px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-primary-500)'
+                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -524,7 +527,21 @@ const SecuritySettings: React.FC = () => {
             <button
               type="submit"
               disabled={isChangingPassword}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--color-primary-600)',
+                color: 'var(--color-text-on-primary)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isChangingPassword) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isChangingPassword) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }
+              }}
             >
               {isChangingPassword ? 'Changing...' : 'Change Password'}
             </button>
@@ -552,12 +569,13 @@ const SecuritySettings: React.FC = () => {
                   name="sessionTimeout"
                   value={securitySettings.sessionTimeout}
                   onChange={handleSecurityInputChange}
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
                   style={{ 
                     backgroundColor: 'var(--background-color)', 
                     color: 'var(--text-primary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                    border: '1px solid var(--border-color)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                 >
                   <option value={15}>15 minutes</option>
                   <option value={30}>30 minutes</option>
@@ -580,12 +598,13 @@ const SecuritySettings: React.FC = () => {
                   name="requirePasswordChangeEvery"
                   value={securitySettings.securitySettings.requirePasswordChangeEvery}
                   onChange={handleSecurityInputChange}
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-offset-2"
                   style={{ 
                     backgroundColor: 'var(--background-color)', 
                     color: 'var(--text-primary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                    border: '1px solid var(--border-color)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                 >
                   <option value={0}>Never</option>
                   <option value={30}>Every 30 days</option>
@@ -625,7 +644,21 @@ const SecuritySettings: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSavingSecurity}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
+                className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-primary-600)',
+                  color: 'var(--color-text-on-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSavingSecurity) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSavingSecurity) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {isSavingSecurity ? 'Saving...' : 'Save Security Settings'}
               </button>

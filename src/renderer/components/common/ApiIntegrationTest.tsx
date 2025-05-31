@@ -100,27 +100,47 @@ const ApiIntegrationTest: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold mb-4">API Integration Test</h3>
+    <div 
+      className="p-6 rounded-lg shadow-md"
+      style={{ backgroundColor: 'var(--surface-color)' }}
+    >
+      <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>API Integration Test</h3>
       
       <div className="mb-4">
         <button
           onClick={runApiTests}
           disabled={isRunning}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isRunning) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isRunning) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
         >
           {isRunning ? 'Running Tests...' : 'Run API Tests'}
         </button>
       </div>
       
       <div className="space-y-2">
-        <h4 className="font-medium">Test Results:</h4>
-        <div className="bg-gray-50 p-3 rounded-lg max-h-64 overflow-y-auto">
+        <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>Test Results:</h4>
+        <div 
+          className="p-3 rounded-lg max-h-64 overflow-y-auto"
+          style={{ backgroundColor: 'var(--color-secondary-50)' }}
+        >
           {testResults.length === 0 ? (
-            <p className="text-gray-500">No tests run yet</p>
+            <p style={{ color: 'var(--text-secondary)' }}>No tests run yet</p>
           ) : (
             testResults.map((result, index) => (
-              <div key={index} className="text-sm font-mono">
+              <div key={index} className="text-sm font-mono" style={{ color: 'var(--text-primary)' }}>
                 {result}
               </div>
             ))
@@ -128,7 +148,7 @@ const ApiIntegrationTest: React.FC = () => {
         </div>
       </div>
       
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
         <p><strong>Current State:</strong></p>
         <ul className="list-disc list-inside">
           <li>Clients: {state.clients.length}</li>

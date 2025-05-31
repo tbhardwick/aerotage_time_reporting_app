@@ -118,13 +118,33 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
     return `${hours}h ${mins}m`;
   };
 
-  // Get status badge color
-  const getStatusColor = (status: TimeEntry['status']) => {
+  // Get status badge style
+  const getStatusStyle = (status: TimeEntry['status']) => {
     switch (status) {
-      case 'submitted': return 'bg-yellow-100 text-yellow-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'submitted': 
+        return {
+          backgroundColor: 'var(--color-warning-50)',
+          color: 'var(--color-warning-800)',
+          borderColor: 'var(--color-warning-200)'
+        };
+      case 'approved': 
+        return {
+          backgroundColor: 'var(--color-success-50)',
+          color: 'var(--color-success-800)',
+          borderColor: 'var(--color-success-200)'
+        };
+      case 'rejected': 
+        return {
+          backgroundColor: 'var(--color-error-50)',
+          color: 'var(--color-error-800)',
+          borderColor: 'var(--color-error-200)'
+        };
+      default: 
+        return {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)',
+          borderColor: 'var(--border-color)'
+        };
     }
   };
 
@@ -146,7 +166,7 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as 'all' | 'submitted')}
-            className="rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="rounded-md text-sm"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
@@ -170,7 +190,22 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
               <button
                 onClick={() => setShowCommentModal('approve')}
                 disabled={isProcessing}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: 'var(--color-success-600)',
+                  color: 'var(--color-text-on-success)',
+                  '--tw-ring-color': 'var(--color-success-500)'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  if (!isProcessing) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-success-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isProcessing) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+                  }
+                }}
               >
                 <CheckIcon className="h-4 w-4 mr-1" />
                 Approve
@@ -178,7 +213,22 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
               <button
                 onClick={() => setShowCommentModal('reject')}
                 disabled={isProcessing}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: 'var(--color-error-600)',
+                  color: 'var(--color-text-on-error)',
+                  '--tw-ring-color': 'var(--color-error-500)'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  if (!isProcessing) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-error-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isProcessing) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-error-600)';
+                  }
+                }}
               >
                 <XMarkIcon className="h-4 w-4 mr-1" />
                 Reject
@@ -207,8 +257,12 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                   type="checkbox"
                   checked={selectedEntries.length === pendingEntries.filter(entry => entry.status === 'submitted').length && submittedCount > 0}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
-                  style={{ borderColor: 'var(--border-color)' }}
+                  className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--color-primary-600)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                 />
                 <label className="ml-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Select all pending entries
@@ -240,8 +294,12 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                         checked={selectedEntries.includes(entry.id)}
                         onChange={() => handleSelectEntry(entry.id)}
                         disabled={!canSelect}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded disabled:opacity-50"
-                        style={{ borderColor: 'var(--border-color)' }}
+                        className="h-4 w-4 rounded disabled:opacity-50 focus:ring-2 focus:ring-offset-2"
+                        style={{
+                          borderColor: 'var(--border-color)',
+                          color: 'var(--color-primary-600)',
+                          '--tw-ring-color': 'var(--color-primary-500)'
+                        } as React.CSSProperties}
                       />
 
                       {/* Entry Details */}
@@ -263,7 +321,10 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                           </div>
                           
                           <div className="flex items-center space-x-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entry.status)}`}>
+                                                          <span 
+                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                                style={getStatusStyle(entry.status)}
+                              >
                               {entry.status}
                             </span>
                           </div>
@@ -279,7 +340,14 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                             {formatDuration(entry.duration)}
                           </div>
                           {entry.isBillable && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span 
+                              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border"
+                              style={{
+                                backgroundColor: 'var(--color-primary-50)',
+                                color: 'var(--color-primary-800)',
+                                borderColor: 'var(--color-primary-200)'
+                              }}
+                            >
                               Billable
                             </span>
                           )}
@@ -323,7 +391,7 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
 
       {/* Comment Modal */}
       {showCommentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div className="fixed inset-0 overflow-y-auto h-full w-full z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="mt-3">
               <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
@@ -338,12 +406,13 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
-                  className="w-full rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors"
                   style={{
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--background-color)',
-                    color: 'var(--text-primary)'
-                  }}
+                    color: 'var(--text-primary)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                   placeholder={showCommentModal === 'reject' ? 'Please provide a reason for rejection...' : 'Add a comment...'}
                 />
               </div>
@@ -354,12 +423,13 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                     setShowCommentModal(null);
                     setComment('');
                   }}
-                  className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 transition-colors"
                   style={{
                     color: 'var(--text-primary)',
                     backgroundColor: 'var(--border-color)',
-                    border: '1px solid var(--border-color)'
-                  }}
+                    border: '1px solid var(--border-color)',
+                    '--tw-ring-color': 'var(--color-primary-500)'
+                  } as React.CSSProperties}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
                   }}
@@ -372,11 +442,33 @@ export function ApprovalQueue({ managerId }: ApprovalQueueProps) {
                 <button
                   onClick={showCommentModal === 'approve' ? handleApprove : handleReject}
                   disabled={isProcessing || (showCommentModal === 'reject' && !comment.trim())}
-                  className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    showCommentModal === 'approve'
-                      ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
-                      : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
-                  }`}
+                  className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  style={showCommentModal === 'approve' 
+                    ? {
+                        backgroundColor: 'var(--color-success-600)',
+                        color: 'var(--color-text-on-success)',
+                        '--tw-ring-color': 'var(--color-success-500)'
+                      } as React.CSSProperties
+                    : {
+                        backgroundColor: 'var(--color-error-600)',
+                        color: 'var(--color-text-on-error)',
+                        '--tw-ring-color': 'var(--color-error-500)'
+                      } as React.CSSProperties
+                  }
+                  onMouseEnter={(e) => {
+                    if (!isProcessing && !(showCommentModal === 'reject' && !comment.trim())) {
+                      e.currentTarget.style.backgroundColor = showCommentModal === 'approve' 
+                        ? 'var(--color-success-hover)' 
+                        : 'var(--color-error-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isProcessing && !(showCommentModal === 'reject' && !comment.trim())) {
+                      e.currentTarget.style.backgroundColor = showCommentModal === 'approve' 
+                        ? 'var(--color-success-600)' 
+                        : 'var(--color-error-600)';
+                    }
+                  }}
                 >
                   {isProcessing 
                     ? (showCommentModal === 'approve' ? 'Approving...' : 'Rejecting...')

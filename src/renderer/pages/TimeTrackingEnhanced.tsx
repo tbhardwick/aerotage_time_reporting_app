@@ -21,22 +21,21 @@ const TimeTrackingEnhanced: React.FC = () => {
         <div className="flex space-x-8">
           <button
             onClick={() => setActiveTab('timer')}
-            className={`flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'timer'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent hover:border-gray-300'
-            }`}
+            className="flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors"
             style={{
-              color: activeTab === 'timer' ? '#2563eb' : 'var(--text-secondary)'
+              color: activeTab === 'timer' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+              borderColor: activeTab === 'timer' ? 'var(--color-primary-600)' : 'transparent'
             }}
             onMouseEnter={(e) => {
               if (activeTab !== 'timer') {
                 e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
               }
             }}
             onMouseLeave={(e) => {
               if (activeTab !== 'timer') {
                 e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.borderColor = 'transparent';
               }
             }}
           >
@@ -45,22 +44,21 @@ const TimeTrackingEnhanced: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('calendar')}
-            className={`flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'calendar'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent hover:border-gray-300'
-            }`}
+            className="flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors"
             style={{
-              color: activeTab === 'calendar' ? '#2563eb' : 'var(--text-secondary)'
+              color: activeTab === 'calendar' ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+              borderColor: activeTab === 'calendar' ? 'var(--color-primary-600)' : 'transparent'
             }}
             onMouseEnter={(e) => {
               if (activeTab !== 'calendar') {
                 e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
               }
             }}
             onMouseLeave={(e) => {
               if (activeTab !== 'calendar') {
                 e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.borderColor = 'transparent';
               }
             }}
           >

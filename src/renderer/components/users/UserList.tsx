@@ -175,17 +175,28 @@ export const UserList: React.FC<UserListProps> = ({
   };
 
   // Get role badge styling
-  const getRoleBadge = (role: string) => {
-    const baseClasses = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
+  const getRoleBadgeStyle = (role: string) => {
     switch (role) {
       case 'admin':
-        return `${baseClasses} bg-red-100 text-red-800`;
+        return {
+          backgroundColor: 'var(--color-error-50)',
+          color: 'var(--color-error-800)'
+        };
       case 'manager':
-        return `${baseClasses} bg-blue-100 text-blue-800`;
+        return {
+          backgroundColor: 'var(--color-primary-50)',
+          color: 'var(--color-primary-800)'
+        };
       case 'employee':
-        return `${baseClasses} bg-green-100 text-green-800`;
+        return {
+          backgroundColor: 'var(--color-success-50)',
+          color: 'var(--color-success-800)'
+        };
       default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+        return {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)'
+        };
     }
   };
 
@@ -205,13 +216,33 @@ export const UserList: React.FC<UserListProps> = ({
               </span>
               <button
                 onClick={() => handleBulkStatusUpdate(true)}
-                className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200"
+                className="px-3 py-1 text-sm rounded-md transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-success-50)',
+                  color: 'var(--color-success-800)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-success-100)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-success-50)';
+                }}
               >
                 Activate
               </button>
               <button
                 onClick={() => handleBulkStatusUpdate(false)}
-                className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200"
+                className="px-3 py-1 text-sm rounded-md transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-error-50)',
+                  color: 'var(--color-error-800)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-error-100)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-error-50)';
+                }}
               >
                 Deactivate
               </button>
@@ -230,12 +261,13 @@ export const UserList: React.FC<UserListProps> = ({
             placeholder="Search users by name, email, job title, or department..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 rounded-md focus:ring-2 focus:outline-none transition-colors"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-500)'
+            } as React.CSSProperties}
           />
         </div>
 
@@ -244,12 +276,13 @@ export const UserList: React.FC<UserListProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="appearance-none rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="appearance-none rounded-md px-4 py-2 pr-8 focus:ring-2 focus:outline-none transition-colors"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-500)'
+            } as React.CSSProperties}
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -263,12 +296,13 @@ export const UserList: React.FC<UserListProps> = ({
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as any)}
-            className="appearance-none rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="appearance-none rounded-md px-4 py-2 pr-8 focus:ring-2 focus:outline-none transition-colors"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-500)'
+            } as React.CSSProperties}
           >
             <option value="all">All Roles</option>
             <option value="admin">Admin</option>
@@ -283,7 +317,7 @@ export const UserList: React.FC<UserListProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <UserGroupIcon className="h-8 w-8 text-blue-600" />
+            <UserGroupIcon className="h-8 w-8" style={{ color: 'var(--color-primary-600)' }} />
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Total Users</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{state.users.length}</p>
@@ -292,7 +326,7 @@ export const UserList: React.FC<UserListProps> = ({
         </div>
         <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <CheckCircleIcon className="h-8 w-8 text-green-600" />
+            <CheckCircleIcon className="h-8 w-8" style={{ color: 'var(--color-success-600)' }} />
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Active Users</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -303,7 +337,7 @@ export const UserList: React.FC<UserListProps> = ({
         </div>
         <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <ShieldCheckIcon className="h-8 w-8 text-purple-600" />
+            <ShieldCheckIcon className="h-8 w-8" style={{ color: 'var(--color-secondary-600)' }} />
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Admins</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -314,7 +348,7 @@ export const UserList: React.FC<UserListProps> = ({
         </div>
         <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
           <div className="flex items-center">
-            <CogIcon className="h-8 w-8 text-orange-600" />
+            <CogIcon className="h-8 w-8" style={{ color: 'var(--color-warning-600)' }} />
             <div className="ml-3">
               <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Managers</p>
               <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -342,8 +376,12 @@ export const UserList: React.FC<UserListProps> = ({
                         setSelectedUsers([]);
                       }
                     }}
-                    className="rounded text-blue-600 focus:ring-blue-500"
-                    style={{ borderColor: 'var(--border-color)' }}
+                    className="rounded focus:ring-2 focus:ring-offset-2 transition-colors"
+                    style={{
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--color-primary-600)',
+                      '--tw-ring-color': 'var(--color-primary-600)'
+                    } as React.CSSProperties}
                   />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
@@ -367,7 +405,10 @@ export const UserList: React.FC<UserListProps> = ({
               {filteredUsers.map((user) => (
                 <tr
                   key={user.id}
-                  className={`transition-colors ${selectedUsers.includes(user.id) ? 'bg-blue-50' : ''}`}
+                  className="transition-colors"
+                  style={{
+                    backgroundColor: selectedUsers.includes(user.id) ? 'var(--color-primary-50)' : 'transparent'
+                  }}
                   onMouseEnter={(e) => {
                     if (!selectedUsers.includes(user.id)) {
                       e.currentTarget.style.backgroundColor = 'var(--border-color)';
@@ -390,8 +431,12 @@ export const UserList: React.FC<UserListProps> = ({
                           setSelectedUsers(selectedUsers.filter(id => id !== user.id));
                         }
                       }}
-                      className="rounded text-blue-600 focus:ring-blue-500"
-                      style={{ borderColor: 'var(--border-color)' }}
+                      className="rounded focus:ring-2 focus:ring-offset-2 transition-colors"
+                      style={{
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--color-primary-600)',
+                        '--tw-ring-color': 'var(--color-primary-600)'
+                      } as React.CSSProperties}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -414,7 +459,10 @@ export const UserList: React.FC<UserListProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
-                      <span className={getRoleBadge(user.role)}>
+                      <span 
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={getRoleBadgeStyle(user.role)}
+                      >
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                       <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -429,11 +477,11 @@ export const UserList: React.FC<UserListProps> = ({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleToggleUserStatus(user.id)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors"
+                        style={{
+                          backgroundColor: user.isActive ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                          color: user.isActive ? 'var(--color-success-800)' : 'var(--color-error-800)'
+                        }}
                       >
                         {user.isActive ? (
                           <>
@@ -459,14 +507,28 @@ export const UserList: React.FC<UserListProps> = ({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => onViewUser && onViewUser(user.id)}
-                        className="text-blue-600 hover:text-blue-900 p-1 rounded"
+                        className="p-1 rounded transition-colors"
+                        style={{ color: 'var(--color-primary-600)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--color-primary-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'var(--color-primary-600)';
+                        }}
                         title="View User"
                       >
                         <EyeIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => onEditUser && onEditUser(user.id)}
-                        className="text-indigo-600 hover:text-indigo-900 p-1 rounded"
+                        className="p-1 rounded transition-colors"
+                        style={{ color: 'var(--color-primary-600)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--color-primary-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'var(--color-primary-600)';
+                        }}
                         title="Edit User"
                       >
                         <PencilIcon className="h-4 w-4" />

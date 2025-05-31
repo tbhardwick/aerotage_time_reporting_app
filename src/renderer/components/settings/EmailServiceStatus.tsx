@@ -65,28 +65,44 @@ export const EmailServiceStatus: React.FC<EmailServiceStatusProps> = ({
     switch (status) {
       case 'operational':
         return {
-          color: 'text-green-600 bg-green-50 border-green-200',
+          style: {
+            color: 'var(--color-success-800)',
+            backgroundColor: 'var(--color-success-50)',
+            borderColor: 'var(--color-success-200)'
+          },
           icon: CheckCircleIcon,
           text: 'Email Service Operational',
           description: 'All email services are working normally'
         };
       case 'degraded':
         return {
-          color: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+          style: {
+            color: 'var(--color-warning-800)',
+            backgroundColor: 'var(--color-warning-50)',
+            borderColor: 'var(--color-warning-200)'
+          },
           icon: ExclamationTriangleIcon,
           text: 'Email Service Issues',
           description: 'Email service is experiencing some issues. Emails may be delayed.'
         };
       case 'outage':
         return {
-          color: 'text-red-600 bg-red-50 border-red-200',
+          style: {
+            color: 'var(--color-error-800)',
+            backgroundColor: 'var(--color-error-50)',
+            borderColor: 'var(--color-error-200)'
+          },
           icon: ExclamationTriangleIcon,
           text: 'Email Service Outage',
           description: 'Email service is currently unavailable. Please try again later.'
         };
       default:
         return {
-          color: 'text-gray-600 bg-gray-50 border-gray-200',
+          style: {
+            color: 'var(--text-secondary)',
+            backgroundColor: 'var(--surface-secondary)',
+            borderColor: 'var(--border-color)'
+          },
           icon: ClockIcon,
           text: 'Email Service Status Unknown',
           description: 'Unable to determine email service status'
@@ -102,11 +118,14 @@ export const EmailServiceStatus: React.FC<EmailServiceStatusProps> = ({
   const statusConfig = getStatusConfig(status);
   const StatusIcon = statusConfig.icon;
 
-  return (
-    <div className={`${className}`}>
-      <div className={`p-3 rounded-lg border ${statusConfig.color}`}>
-        <div className="flex items-start space-x-2">
-          <StatusIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+      return (
+      <div className={`${className}`}>
+        <div 
+          className="p-3 rounded-lg border"
+          style={statusConfig.style}
+        >
+          <div className="flex items-start space-x-2">
+            <StatusIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium">{statusConfig.text}</p>
             {showDetails && (

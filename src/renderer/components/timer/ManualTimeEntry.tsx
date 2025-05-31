@@ -67,16 +67,29 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+    <div 
+      className="rounded-lg shadow-lg p-6"
+      style={{
+        backgroundColor: 'var(--surface-color)',
+        border: '1px solid var(--border-color)'
+      }}
+    >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+        <h3 className="text-lg font-semibold flex items-center" style={{ color: 'var(--text-primary)' }}>
           <ClockIcon className="w-5 h-5 mr-2" />
           Add Time Entry
         </h3>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="text-gray-500 hover:text-gray-700"
+            className="transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             ✕
           </button>
@@ -86,12 +99,17 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
         {/* Project Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
             Project *
           </label>
           <select
             {...register('projectId')}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-offset-2"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--surface-color)',
+              color: 'var(--text-primary)'
+            }}
           >
             <option value="">Select a project...</option>
             {projects.map((project) => (
@@ -101,25 +119,30 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
             ))}
           </select>
           {errors.projectId && (
-            <p className="text-red-600 text-sm mt-1">{errors.projectId.message}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-error-600)' }}>{errors.projectId.message}</p>
           )}
         </div>
 
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
             Date *
           </label>
           <div className="relative">
             <input
               type="date"
               {...register('date')}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-offset-2"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--surface-color)',
+                color: 'var(--text-primary)'
+              }}
             />
-            <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" style={{ color: 'var(--text-secondary)' }} />
           </div>
           {errors.date && (
-            <p className="text-red-600 text-sm mt-1">{errors.date.message}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-error-600)' }}>{errors.date.message}</p>
           )}
         </div>
 
@@ -131,8 +154,12 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
               checked={!useTimeRange}
               onChange={() => setUseTimeRange(false)}
               className="mr-2"
+              style={{
+                color: 'var(--color-primary-600)',
+                border: '1px solid var(--border-color)'
+              }}
             />
-            Duration
+            <span style={{ color: 'var(--text-primary)' }}>Duration</span>
           </label>
           <label className="flex items-center">
             <input
@@ -140,8 +167,12 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
               checked={useTimeRange}
               onChange={() => setUseTimeRange(true)}
               className="mr-2"
+              style={{
+                color: 'var(--color-primary-600)',
+                border: '1px solid var(--border-color)'
+              }}
             />
-            Time Range
+            <span style={{ color: 'var(--text-primary)' }}>Time Range</span>
           </label>
         </div>
 
@@ -149,29 +180,39 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
         {useTimeRange ? (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                 Start Time
               </label>
               <input
                 type="time"
                 {...register('startTime')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-offset-2"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--surface-color)',
+                  color: 'var(--text-primary)'
+                }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                 End Time
               </label>
               <input
                 type="time"
                 {...register('endTime')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-offset-2"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--surface-color)',
+                  color: 'var(--text-primary)'
+                }}
               />
             </div>
           </div>
         ) : (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               Duration (minutes) *
             </label>
             <input
@@ -179,32 +220,42 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
               min="1"
               step="1"
               {...register('duration', { valueAsNumber: true })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-offset-2"
+              style={{
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--surface-color)',
+                color: 'var(--text-primary)'
+              }}
             />
             {watch('duration') && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
                 {formatDuration(watch('duration') || 0)}
               </p>
             )}
             {errors.duration && (
-              <p className="text-red-600 text-sm mt-1">{errors.duration.message}</p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-error-600)' }}>{errors.duration.message}</p>
             )}
           </div>
         )}
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
             Description *
           </label>
           <textarea
             {...register('description')}
             placeholder="What did you work on?"
             rows={3}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+            className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-offset-2 resize-none"
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--surface-color)',
+              color: 'var(--text-primary)'
+            }}
           />
           {errors.description && (
-            <p className="text-red-600 text-sm mt-1">{errors.description.message}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-error-600)' }}>{errors.description.message}</p>
           )}
         </div>
 
@@ -213,9 +264,13 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
           <input
             type="checkbox"
             {...register('isBillable')}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="w-4 h-4 rounded focus:ring-2 focus:ring-offset-2"
+            style={{
+              color: 'var(--color-primary-600)',
+              border: '1px solid var(--border-color)'
+            }}
           />
-          <label className="ml-2 text-sm font-medium text-gray-700">
+          <label className="ml-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
             Billable time
           </label>
         </div>
@@ -226,7 +281,17 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 rounded-lg transition-colors"
+              style={{
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--color-secondary-100)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-200)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-secondary-100)';
+              }}
             >
               Cancel
             </button>
@@ -234,7 +299,21 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting) {
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+              }
+            }}
           >
             {isSubmitting ? 'Adding...' : 'Add Time Entry'}
           </button>

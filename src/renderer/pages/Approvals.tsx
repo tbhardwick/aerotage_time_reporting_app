@@ -74,7 +74,7 @@ export function Approvals() {
       {/* Page Header */}
       <div>
           <div className="flex items-center space-x-3">
-            <CheckCircleIcon className="h-8 w-8 text-indigo-600" />
+            <CheckCircleIcon className="h-8 w-8" style={{ color: 'var(--color-primary-600)' }} />
             <div>
               <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Time Entry Approvals</h1>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -89,11 +89,17 @@ export function Approvals() {
               <UserIcon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
               <span style={{ color: 'var(--text-secondary)' }}>Logged in as:</span>
               <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{currentUser?.name}</span>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                currentUser?.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                currentUser?.role === 'manager' ? 'bg-blue-100 text-blue-800' :
-                'bg-green-100 text-green-800'
-              }`}>
+              <span 
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                style={{
+                  backgroundColor: currentUser?.role === 'admin' ? 'var(--color-secondary-50)' :
+                                   currentUser?.role === 'manager' ? 'var(--color-primary-50)' :
+                                   'var(--color-success-50)',
+                  color: currentUser?.role === 'admin' ? 'var(--color-secondary-800)' :
+                         currentUser?.role === 'manager' ? 'var(--color-primary-800)' :
+                         'var(--color-success-800)'
+                }}
+              >
                 {currentUser?.role}
               </span>
             </div>
@@ -111,7 +117,7 @@ export function Approvals() {
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5 transition-all',
                     'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
                     selected
-                      ? 'text-blue-700 shadow'
+                      ? 'shadow'
                       : 'hover:opacity-80'
                   )
                 }
@@ -125,13 +131,19 @@ export function Approvals() {
                     className="flex items-center justify-center space-x-2"
                     style={{
                       backgroundColor: selected ? 'var(--surface-color)' : 'transparent',
-                      color: selected ? '#1d4ed8' : 'var(--text-secondary)'
+                      color: selected ? 'var(--color-primary-600)' : 'var(--text-secondary)'
                     }}
                   >
                     <tab.icon className="h-5 w-5" />
                     <span>{tab.name}</span>
                     {tab.badge && (
-                      <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                      <span 
+                        className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-error-600)',
+                          color: 'var(--color-text-on-primary)'
+                        }}
+                      >
                         {tab.badge}
                       </span>
                     )}
@@ -153,7 +165,7 @@ export function Approvals() {
               >
                 {/* Tab Description */}
                 <div className="mb-6">
-                  <p className="text-sm text-gray-600">{tab.description}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{tab.description}</p>
                 </div>
 
                 {/* Tab Content */}
@@ -164,7 +176,13 @@ export function Approvals() {
         </Tab.Group>
 
         {/* Help Guide */}
-        <div className="mt-8 border rounded-lg p-4" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)' }}>
+        <div 
+          className="mt-8 border rounded-lg p-4" 
+          style={{ 
+            backgroundColor: 'var(--color-primary-50)', 
+            borderColor: 'var(--color-primary-200)' 
+          }}
+        >
           <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Quick Guide</h3>
           <div className="text-sm space-y-1" style={{ color: 'var(--text-primary)' }}>
             {currentUser?.role === 'employee' && (

@@ -175,49 +175,67 @@ const AdminBootstrap: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Admin Bootstrap & User Management Fix</h3>
+    <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--surface-color)' }}>
+      <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Admin Bootstrap & User Management Fix</h3>
       
       {/* Current State Overview */}
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <h4 className="text-sm font-medium text-blue-900 mb-2">Current State</h4>
+      <div 
+        className="mb-6 p-4 rounded-lg"
+        style={{
+          backgroundColor: 'var(--color-primary-50)',
+          border: '1px solid var(--color-primary-200)'
+        }}
+      >
+        <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-primary-900)' }}>Current State</h4>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-blue-700 font-medium">Current User:</span>
-            <p className="text-blue-900">{currentUser?.name || 'Not authenticated'}</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Current User:</span>
+            <p style={{ color: 'var(--color-primary-900)' }}>{currentUser?.name || 'Not authenticated'}</p>
           </div>
           <div>
-            <span className="text-blue-700 font-medium">Current Role:</span>
-            <p className="text-blue-900 capitalize">{currentUser?.role || 'Unknown'}</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Current Role:</span>
+            <p className="capitalize" style={{ color: 'var(--color-primary-900)' }}>{currentUser?.role || 'Unknown'}</p>
           </div>
           <div>
-            <span className="text-blue-700 font-medium">Users Loaded:</span>
-            <p className="text-blue-900">{usersCount} users</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>Users Loaded:</span>
+            <p style={{ color: 'var(--color-primary-900)' }}>{usersCount} users</p>
           </div>
           <div>
-            <span className="text-blue-700 font-medium">In Users List:</span>
-            <p className="text-blue-900">{currentUserInList ? 'Yes' : 'No'}</p>
+            <span className="font-medium" style={{ color: 'var(--color-primary-700)' }}>In Users List:</span>
+            <p style={{ color: 'var(--color-primary-900)' }}>{currentUserInList ? 'Yes' : 'No'}</p>
           </div>
         </div>
       </div>
 
       {/* Issue Detection */}
       {usersCount === 0 && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div 
+          className="mb-6 p-4 rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-error-50)',
+            border: '1px solid var(--color-error-200)'
+          }}
+        >
           <div className="flex items-start">
-            <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mt-0.5 mr-3" />
+            <ExclamationTriangleIcon className="h-5 w-5 mt-0.5 mr-3" style={{ color: 'var(--color-error-400)' }} />
             <div>
-              <h4 className="text-sm font-medium text-red-800">No Users Loaded</h4>
-              <p className="text-sm text-red-700 mt-1">
+              <h4 className="text-sm font-medium" style={{ color: 'var(--color-error-800)' }}>No Users Loaded</h4>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-error-700)' }}>
                 The real user management API is now deployed, but no users are being loaded. This could be due to:
               </p>
-              <ul className="text-sm text-red-700 mt-2 list-disc list-inside">
+              <ul className="text-sm mt-2 list-disc list-inside" style={{ color: 'var(--color-error-700)' }}>
                 <li>Authentication token issues (should use AccessToken, not IdToken)</li>
                 <li>User role permissions (only Admin/Manager can list users)</li>
                 <li>API response format changes</li>
                 <li>Network connectivity issues</li>
               </ul>
-              <div className="mt-3 p-2 bg-red-100 rounded text-xs text-red-800">
+              <div 
+                className="mt-3 p-2 rounded text-xs"
+                style={{
+                  backgroundColor: 'var(--color-error-100)',
+                  color: 'var(--color-error-800)'
+                }}
+              >
                 <strong>API Endpoint:</strong> GET {awsConfig.apiGatewayUrl}/users
               </div>
             </div>
@@ -226,15 +244,21 @@ const AdminBootstrap: React.FC = () => {
       )}
 
       {currentUser?.role !== 'admin' && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div 
+          className="mb-6 p-4 rounded-lg"
+          style={{
+            backgroundColor: 'var(--color-warning-50)',
+            border: '1px solid var(--color-warning-200)'
+          }}
+        >
           <div className="flex items-start">
-            <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400 mt-0.5 mr-3" />
+            <ExclamationTriangleIcon className="h-5 w-5 mt-0.5 mr-3" style={{ color: 'var(--color-warning-400)' }} />
             <div>
-              <h4 className="text-sm font-medium text-yellow-800">Role Issue Detected</h4>
-              <p className="text-sm text-yellow-700 mt-1">
+              <h4 className="text-sm font-medium" style={{ color: 'var(--color-warning-800)' }}>Role Issue Detected</h4>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-warning-700)' }}>
                 Your account ({currentUser?.email}) has role "{currentUser?.role}" but should be "admin" to manage users.
               </p>
-              <p className="text-sm text-yellow-700 mt-2">
+              <p className="text-sm mt-2" style={{ color: 'var(--color-warning-700)' }}>
                 <strong>Note:</strong> The real API now enforces role-based access control. Only Admin and Manager roles can list users.
               </p>
             </div>
@@ -246,7 +270,17 @@ const AdminBootstrap: React.FC = () => {
       <div className="flex flex-wrap gap-3 mb-6">
         <button
           onClick={diagnoseUserState}
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200"
+          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors"
+          style={{
+            color: 'var(--color-primary-700)',
+            backgroundColor: 'var(--color-primary-100)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-200)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-100)';
+          }}
         >
           <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
           Diagnose Issues
@@ -255,7 +289,21 @@ const AdminBootstrap: React.FC = () => {
         <button
           onClick={refreshUserData}
           disabled={isRefreshing}
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          style={{
+            color: 'var(--color-text-on-primary)',
+            backgroundColor: 'var(--color-primary-600)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isRefreshing) {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isRefreshing) {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+            }
+          }}
         >
           <ArrowPathIcon className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
           {isRefreshing ? 'Refreshing...' : 'Refresh User Data'}
@@ -263,7 +311,17 @@ const AdminBootstrap: React.FC = () => {
 
         <button
           onClick={testCurrentUserAPI}
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700"
+          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors"
+          style={{
+            color: 'var(--color-text-on-secondary)',
+            backgroundColor: 'var(--color-secondary-600)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-secondary-700)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-secondary-600)';
+          }}
         >
           <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
           Test Current User API
@@ -273,7 +331,21 @@ const AdminBootstrap: React.FC = () => {
           <button
             onClick={fixCurrentUserRole}
             disabled={isFixing}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              color: 'var(--color-text-on-success)',
+              backgroundColor: 'var(--color-success-600)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isFixing) {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isFixing) {
+                e.currentTarget.style.backgroundColor = 'var(--color-success-600)';
+              }
+            }}
           >
             <ShieldCheckIcon className="h-4 w-4 mr-2" />
             {isFixing ? 'Fixing...' : 'Fix My Role to Admin'}
@@ -284,17 +356,27 @@ const AdminBootstrap: React.FC = () => {
       {/* Results */}
       {bootstrapResults.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Diagnostic Results</h4>
-          <div className="bg-gray-50 rounded-md p-3 max-h-64 overflow-y-auto">
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Diagnostic Results</h4>
+          <div 
+            className="rounded-md p-3 max-h-64 overflow-y-auto"
+            style={{ backgroundColor: 'var(--color-secondary-50)' }}
+          >
             {bootstrapResults.map((result, index) => (
-              <div key={index} className="text-sm font-mono text-gray-800 mb-1">
+              <div key={index} className="text-sm font-mono mb-1" style={{ color: 'var(--text-primary)' }}>
                 {result}
               </div>
             ))}
           </div>
           <button
             onClick={() => setBootstrapResults([])}
-            className="mt-2 text-sm text-gray-500 hover:text-gray-700"
+            className="mt-2 text-sm transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             Clear Results
           </button>
@@ -302,20 +384,41 @@ const AdminBootstrap: React.FC = () => {
       )}
 
       {/* Backend Investigation Guide */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Real API Troubleshooting Steps</h4>
-        <div className="text-sm text-gray-600 space-y-2">
-          <div className="p-2 bg-green-100 rounded text-green-800">
+      <div 
+        className="mt-6 p-4 rounded-lg"
+        style={{ backgroundColor: 'var(--color-secondary-50)' }}
+      >
+        <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Real API Troubleshooting Steps</h4>
+        <div className="text-sm space-y-2" style={{ color: 'var(--text-secondary)' }}>
+          <div 
+            className="p-2 rounded"
+            style={{
+              backgroundColor: 'var(--color-success-100)',
+              color: 'var(--color-success-800)'
+            }}
+          >
             <strong>✅ API Status:</strong> User Management API is deployed and operational
           </div>
           <ol className="list-decimal list-inside space-y-1">
             <li>Verify authentication token type (should use AccessToken, not IdToken)</li>
             <li>Check user role in Cognito (Admin/Manager required for user list)</li>
-            <li>Test API endpoint directly: <code className="bg-gray-200 px-1 rounded">GET /users</code></li>
+            <li>Test API endpoint directly: <code 
+              className="px-1 rounded"
+              style={{
+                backgroundColor: 'var(--color-secondary-200)',
+                color: 'var(--text-primary)'
+              }}
+            >GET /users</code></li>
             <li>Check browser network tab for API response details</li>
             <li>Verify JWT token contains correct user ID and permissions</li>
           </ol>
-          <div className="mt-3 p-2 bg-blue-100 rounded text-blue-800 text-xs">
+          <div 
+            className="mt-3 p-2 rounded text-xs"
+            style={{
+              backgroundColor: 'var(--color-primary-100)',
+              color: 'var(--color-primary-800)'
+            }}
+          >
             <strong>API Base URL:</strong> {awsConfig.apiGatewayUrl}<br/>
             <strong>Auth Method:</strong> Bearer AccessToken (not IdToken)<br/>
             <strong>Response Format:</strong> {`{ success: true, data: { users: [...] } }`}

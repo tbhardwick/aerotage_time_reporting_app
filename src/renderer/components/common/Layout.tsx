@@ -3,11 +3,23 @@ import { Outlet } from 'react-router-dom';
 
 const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div 
+      className="min-h-screen"
+      style={{ backgroundColor: 'var(--background-color)' }}
+    >
       {/* Header */}
-      <header className="bg-white shadow-soft border-b border-neutral-200">
+      <header 
+        className="shadow-soft border-b"
+        style={{ 
+          backgroundColor: 'var(--surface-color)',
+          borderColor: 'var(--border-color)'
+        }}
+      >
         <div className="px-6 py-4">
-          <h1 className="text-xl font-semibold text-neutral-900">
+          <h1 
+            className="text-xl font-semibold"
+            style={{ color: 'var(--text-primary)' }}
+          >
             Aerotage Time Reporting
           </h1>
         </div>

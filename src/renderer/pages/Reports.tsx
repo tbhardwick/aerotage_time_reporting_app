@@ -51,16 +51,10 @@ const Reports: React.FC = () => {
               {tabs.map((tab, index) => (
                 <Tab
                   key={tab.name}
-                  className={({ selected }) =>
-                    classNames(
-                      'py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 focus:outline-none transition-colors',
-                      selected
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent'
-                    )
-                  }
+                  className="py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 focus:outline-none transition-colors"
                   style={{
-                    color: 'var(--text-secondary)'
+                    color: selectedTab === index ? 'var(--color-primary-600)' : 'var(--text-secondary)',
+                    borderColor: selectedTab === index ? 'var(--color-primary-600)' : 'transparent'
                   }}
                   onMouseEnter={(e) => {
                     if (selectedTab !== index) {
@@ -75,17 +69,10 @@ const Reports: React.FC = () => {
                     }
                   }}
                 >
-                  {({ selected }) => (
-                    <div 
-                      className="flex items-center gap-2"
-                      style={{
-                        color: selected ? '#2563eb' : 'var(--text-secondary)'
-                      }}
-                    >
-                      <tab.icon className="w-5 h-5" />
-                      {tab.name}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <tab.icon className="w-5 h-5" />
+                    {tab.name}
+                  </div>
                 </Tab>
               ))}
             </Tab.List>
@@ -108,7 +95,13 @@ const Reports: React.FC = () => {
       </div>
 
       {/* Quick Help */}
-      <div className="rounded-xl p-6" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+      <div 
+        className="rounded-xl p-6" 
+        style={{ 
+          backgroundColor: 'var(--color-primary-50)', 
+          border: '1px solid var(--color-primary-200)' 
+        }}
+      >
         <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Reporting Features</h3>
         <div className="grid md:grid-cols-3 gap-4 text-sm" style={{ color: 'var(--text-primary)' }}>
           <div>

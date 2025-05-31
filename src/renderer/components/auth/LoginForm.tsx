@@ -338,20 +338,26 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   if (requireNewPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+      <div 
+        className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" 
+        style={{ 
+          WebkitAppRegion: 'drag',
+          backgroundColor: 'var(--color-secondary-50)'
+        } as any}
+      >
         <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
               Set New Password
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-2 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
               Please set a new password for your account
             </p>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleNewPassword}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="new-password" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   New Password
                 </label>
                 <input
@@ -365,12 +371,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                     setNewPassword(e.target.value);
                     if (error) setError(''); // Clear error when user starts typing
                   }}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                   placeholder="Enter new password"
                 />
               </div>
               <div>
-                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirm-password" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Confirm Password
                 </label>
                 <input
@@ -383,15 +394,26 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                     setConfirmPassword(e.target.value);
                     if (error) setError(''); // Clear error when user starts typing
                   }}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                   placeholder="Confirm new password"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-700">{error}</div>
+              <div 
+                className="rounded-md p-4"
+                style={{
+                  backgroundColor: 'var(--color-error-50)',
+                  border: '1px solid var(--color-error-200)'
+                }}
+              >
+                <div className="text-sm" style={{ color: 'var(--color-error-700)' }}>{error}</div>
               </div>
             )}
 
@@ -399,7 +421,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                style={{
+                  color: 'var(--color-text-on-primary)',
+                  backgroundColor: 'var(--color-primary-600)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {loading ? 'Setting Password...' : 'Set New Password'}
               </button>
@@ -413,17 +449,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   // Forgot Password Form
   if (showForgotPassword && !showResetCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+      <div 
+        className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" 
+        style={{ 
+          WebkitAppRegion: 'drag',
+          backgroundColor: 'var(--color-secondary-50)'
+        } as any}
+      >
         <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
               Reset Your Password
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-2 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
               Enter your email address and we'll send you a 6-digit reset code
             </p>
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-sm text-blue-800">
+            <div 
+              className="mt-4 p-4 rounded-md"
+              style={{
+                backgroundColor: 'var(--color-primary-50)',
+                border: '1px solid var(--color-primary-200)'
+              }}
+            >
+              <p className="text-sm" style={{ color: 'var(--color-primary-800)' }}>
                 <strong>Note:</strong> Check your spam folder if you don't receive the email within 5 minutes.
                 The reset code expires in 15 minutes.
               </p>
@@ -431,7 +479,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleForgotPassword}>
             <div>
-              <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="reset-email" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                 Email address
               </label>
               <input
@@ -443,14 +491,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 required
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--surface-color)',
+                  color: 'var(--text-primary)'
+                }}
                 placeholder="Enter your email"
               />
             </div>
 
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-700">{error}</div>
+              <div 
+                className="rounded-md p-4"
+                style={{
+                  backgroundColor: 'var(--color-error-50)',
+                  border: '1px solid var(--color-error-200)'
+                }}
+              >
+                <div className="text-sm" style={{ color: 'var(--color-error-700)' }}>{error}</div>
               </div>
             )}
 
@@ -458,7 +517,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                style={{
+                  color: 'var(--color-text-on-primary)',
+                  backgroundColor: 'var(--color-primary-600)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {loading ? 'Sending...' : 'Send Reset Code'}
               </button>
@@ -469,7 +542,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   setError('');
                   setResetEmail('');
                 }}
-                className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--surface-color)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                }}
               >
                 Back to Sign In
               </button>
@@ -483,17 +567,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   // Reset Password Confirmation Form
   if (showResetCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+      <div 
+        className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" 
+        style={{ 
+          WebkitAppRegion: 'drag',
+          backgroundColor: 'var(--color-secondary-50)'
+        } as any}
+      >
         <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
               Enter Reset Code
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-2 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
               Check your email for a 6-digit code and enter your new password
             </p>
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-sm text-green-800">
+            <div 
+              className="mt-4 p-4 rounded-md"
+              style={{
+                backgroundColor: 'var(--color-success-50)',
+                border: '1px solid var(--color-success-200)'
+              }}
+            >
+              <p className="text-sm" style={{ color: 'var(--color-success-800)' }}>
                 <strong>Reset code sent to:</strong> {resetEmail}
               </p>
             </div>
@@ -501,7 +597,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           <form className="mt-8 space-y-6" onSubmit={handleResetPassword}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="reset-code" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="reset-code" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Reset Code
                 </label>
                 <input
@@ -512,18 +608,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   required
                   value={resetCode}
                   onChange={(e) => setResetCode(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-center text-lg font-mono"
+                  className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 text-center text-lg font-mono"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                   placeholder="000000"
                   maxLength={6}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
                   Enter the 6-digit code from your email
                 </p>
               </div>
               
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Password Requirements:</h4>
-                <ul className="text-xs text-gray-600 space-y-1">
+              <div 
+                className="p-4 rounded-md"
+                style={{
+                  backgroundColor: 'var(--color-secondary-50)',
+                  border: '1px solid var(--border-color)'
+                }}
+              >
+                <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Password Requirements:</h4>
+                <ul className="text-xs space-y-1" style={{ color: 'var(--text-secondary)' }}>
                   <li>• At least 8 characters long</li>
                   <li>• Contains uppercase letter (A-Z)</li>
                   <li>• Contains lowercase letter (a-z)</li>
@@ -532,7 +639,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               </div>
               
               <div>
-                <label htmlFor="new-password-reset" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="new-password-reset" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   New Password
                 </label>
                 <input
@@ -542,12 +649,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                   placeholder="Enter new password"
                 />
               </div>
               <div>
-                <label htmlFor="confirm-password-reset" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirm-password-reset" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Confirm Password
                 </label>
                 <input
@@ -557,21 +669,38 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--text-primary)'
+                  }}
                   placeholder="Confirm new password"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-700 whitespace-pre-line">{error}</div>
+              <div 
+                className="rounded-md p-4"
+                style={{
+                  backgroundColor: 'var(--color-error-50)',
+                  border: '1px solid var(--color-error-200)'
+                }}
+              >
+                <div className="text-sm whitespace-pre-line" style={{ color: 'var(--color-error-700)' }}>{error}</div>
               </div>
             )}
 
             {error && error.includes('Password reset successful') && (
-              <div className="rounded-md bg-green-50 p-4">
-                <div className="text-sm text-green-700">{error}</div>
+              <div 
+                className="rounded-md p-4"
+                style={{
+                  backgroundColor: 'var(--color-success-50)',
+                  border: '1px solid var(--color-success-200)'
+                }}
+              >
+                <div className="text-sm" style={{ color: 'var(--color-success-700)' }}>{error}</div>
               </div>
             )}
 
@@ -579,7 +708,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                style={{
+                  color: 'var(--color-text-on-primary)',
+                  backgroundColor: 'var(--color-primary-600)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                  }
+                }}
               >
                 {loading ? 'Resetting...' : 'Reset Password'}
               </button>
@@ -593,7 +736,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   setConfirmPassword('');
                   setError('');
                 }}
-                className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--surface-color)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                }}
               >
                 Request New Code
               </button>
@@ -608,7 +762,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   setConfirmPassword('');
                   setError('');
                 }}
-                className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--surface-color)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                }}
               >
                 Back to Sign In
               </button>
@@ -620,20 +785,26 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ WebkitAppRegion: 'drag' } as any}>
+    <div 
+      className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" 
+      style={{ 
+        WebkitAppRegion: 'drag',
+        backgroundColor: 'var(--color-secondary-50)'
+      } as any}
+    >
       <div className="max-w-md w-full space-y-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
             Sign in to Aerotage Time
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
             Track your time and manage your projects
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                 Email address
               </label>
               <input
@@ -644,12 +815,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--surface-color)',
+                  color: 'var(--text-primary)'
+                }}
                 placeholder="Enter your email"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                 Password
               </label>
               <input
@@ -660,7 +836,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--surface-color)',
+                  color: 'var(--text-primary)'
+                }}
                 placeholder="Enter your password"
               />
             </div>
@@ -673,23 +854,39 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 type="checkbox"
                 checked={rememberUsername}
                 onChange={(e) => setRememberUsername(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                style={{
+                  color: 'var(--color-primary-600)',
+                  border: '1px solid var(--border-color)'
+                }}
               />
-              <label htmlFor="remember-username" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="remember-username" className="ml-2 block text-sm" style={{ color: 'var(--text-primary)' }}>
                 Remember my email address
               </label>
             </div>
           </div>
 
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
+            <div 
+              className="rounded-md p-4"
+              style={{
+                backgroundColor: 'var(--color-error-50)',
+                border: '1px solid var(--color-error-200)'
+              }}
+            >
+              <div className="text-sm" style={{ color: 'var(--color-error-700)' }}>{error}</div>
             </div>
           )}
 
           {error && error.includes('Password reset successful') && (
-            <div className="rounded-md bg-green-50 p-4">
-              <div className="text-sm text-green-700">{error}</div>
+            <div 
+              className="rounded-md p-4"
+              style={{
+                backgroundColor: 'var(--color-success-50)',
+                border: '1px solid var(--color-success-200)'
+              }}
+            >
+              <div className="text-sm" style={{ color: 'var(--color-success-700)' }}>{error}</div>
             </div>
           )}
 
@@ -697,7 +894,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+              style={{
+                color: 'var(--color-text-on-primary)',
+                backgroundColor: 'var(--color-primary-600)'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-700)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                }
+              }}
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -705,7 +916,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         </form>
 
         <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Don't have an account? Contact your administrator.
           </p>
           <button
@@ -714,7 +925,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               setShowForgotPassword(true);
               setError(''); // Clear any existing errors
             }}
-            className="mt-2 text-sm text-blue-600 hover:text-blue-500 font-medium"
+            className="mt-2 text-sm font-medium transition-colors"
+            style={{ color: 'var(--color-primary-600)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-primary-500)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-primary-600)';
+            }}
           >
             Forgot your password?
           </button>

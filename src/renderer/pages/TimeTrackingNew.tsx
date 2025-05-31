@@ -158,7 +158,7 @@ const TimeTrackingNew: React.FC = () => {
               fontFamily: 'monospace', 
               fontWeight: 'bold', 
               marginBottom: '1rem',
-              color: state.timer.isRunning ? '#16a34a' : 'var(--text-secondary)'
+              color: state.timer.isRunning ? 'var(--color-success-600)' : 'var(--text-secondary)'
             }}>
               {formatTime(state.timer.elapsedTime)}
             </div>
@@ -166,8 +166,8 @@ const TimeTrackingNew: React.FC = () => {
               <button 
                 onClick={handleStopTimer}
                 style={{
-                  backgroundColor: '#dc2626',
-                  color: 'white',
+                  backgroundColor: 'var(--color-error-600)',
+                  color: 'var(--color-text-on-primary)',
                   padding: '0.75rem 1.5rem',
                   borderRadius: '0.5rem',
                   border: 'none',
@@ -182,8 +182,8 @@ const TimeTrackingNew: React.FC = () => {
                 onClick={handleStartTimer}
                 disabled={!selectedProjectId}
                 style={{
-                  backgroundColor: selectedProjectId ? '#16a34a' : '#9ca3af',
-                  color: 'white',
+                  backgroundColor: selectedProjectId ? 'var(--color-success-600)' : 'var(--color-neutral-400)',
+                  color: 'var(--color-text-on-primary)',
                   padding: '0.75rem 1.5rem',
                   borderRadius: '0.5rem',
                   border: 'none',
@@ -200,7 +200,7 @@ const TimeTrackingNew: React.FC = () => {
               backgroundColor: state.timer.isRunning ? 'rgba(34, 197, 94, 0.1)' : 'var(--border-color)', 
               padding: '0.75rem', 
               borderRadius: '0.5rem',
-              border: '1px solid #16a34a',
+              border: '1px solid var(--color-success-600)',
               fontSize: '0.875rem',
               color: 'var(--text-primary)'
             }}>
@@ -318,7 +318,7 @@ const TimeTrackingNew: React.FC = () => {
               </div>
               <div>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Billable</p>
-                <p style={{ fontSize: '1.125rem', fontWeight: '600', color: '#16a34a' }}>{formatDuration(billableTime)}</p>
+                <p style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--color-success-600)' }}>{formatDuration(billableTime)}</p>
               </div>
               <div>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Non-billable</p>
@@ -351,14 +351,14 @@ const TimeTrackingNew: React.FC = () => {
                         <span style={{ 
                           backgroundColor: 
                             entry.status === 'draft' ? 'var(--border-color)' : 
-                            entry.status === 'submitted' ? '#fef3c7' :
-                            entry.status === 'approved' ? '#dcfce7' : 
-                            entry.status === 'rejected' ? '#fee2e2' : 'var(--border-color)', 
+                            entry.status === 'submitted' ? 'var(--color-warning-100)' :
+                            entry.status === 'approved' ? 'var(--color-success-100)' : 
+                            entry.status === 'rejected' ? 'var(--color-error-100)' : 'var(--border-color)', 
                           color: 
                             entry.status === 'draft' ? 'var(--text-primary)' : 
-                            entry.status === 'submitted' ? '#92400e' :
-                            entry.status === 'approved' ? '#166534' : 
-                            entry.status === 'rejected' ? '#dc2626' : 'var(--text-primary)', 
+                            entry.status === 'submitted' ? 'var(--color-warning-800)' :
+                            entry.status === 'approved' ? 'var(--color-success-800)' : 
+                            entry.status === 'rejected' ? 'var(--color-error-600)' : 'var(--text-primary)', 
                           padding: '0.25rem 0.5rem', 
                           borderRadius: '9999px', 
                           fontSize: '0.75rem',
@@ -368,8 +368,8 @@ const TimeTrackingNew: React.FC = () => {
                           {entry.status}
                         </span>
                         <span style={{ 
-                          backgroundColor: entry.isBillable ? '#dcfce7' : '#fef3c7', 
-                          color: entry.isBillable ? '#166534' : '#92400e', 
+                          backgroundColor: entry.isBillable ? 'var(--color-success-100)' : 'var(--color-warning-100)', 
+                          color: entry.isBillable ? 'var(--color-success-800)' : 'var(--color-warning-800)', 
                           padding: '0.25rem 0.5rem', 
                           borderRadius: '9999px', 
                           fontSize: '0.75rem'
@@ -391,8 +391,8 @@ const TimeTrackingNew: React.FC = () => {
                             <button 
                               onClick={() => handleSubmitEntry(entry.id)}
                               style={{
-                                backgroundColor: '#2563eb',
-                                color: 'white',
+                                backgroundColor: 'var(--color-primary-600)',
+                                color: 'var(--color-text-on-primary)',
                                 padding: '0.25rem 0.75rem',
                                 borderRadius: '0.25rem',
                                 border: 'none',
@@ -406,8 +406,8 @@ const TimeTrackingNew: React.FC = () => {
                             <button 
                               onClick={() => handleDeleteEntry(entry.id)}
                               style={{
-                                backgroundColor: '#dc2626',
-                                color: 'white',
+                                backgroundColor: 'var(--color-error-600)',
+                                color: 'var(--color-text-on-primary)',
                                 padding: '0.25rem 0.75rem',
                                 borderRadius: '0.25rem',
                                 border: 'none',
@@ -430,7 +430,7 @@ const TimeTrackingNew: React.FC = () => {
                         )}
                         {entry.status === 'approved' && (
                           <span style={{
-                            color: '#16a34a',
+                            color: 'var(--color-success-600)',
                             fontSize: '0.875rem',
                             fontWeight: '500'
                           }}>
@@ -439,7 +439,7 @@ const TimeTrackingNew: React.FC = () => {
                         )}
                         {entry.status === 'rejected' && (
                           <span style={{
-                            color: '#dc2626',
+                            color: 'var(--color-error-600)',
                             fontSize: '0.875rem',
                             fontWeight: '500'
                           }}>

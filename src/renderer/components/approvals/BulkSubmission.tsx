@@ -119,7 +119,18 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
         {selectedEntries.length > 0 && (
           <button
             onClick={() => setShowConfirmModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'var(--color-text-on-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+            }}
           >
             <PaperAirplaneIcon className="h-4 w-4 mr-2" />
             Submit {selectedEntries.length} {selectedEntries.length === 1 ? 'Entry' : 'Entries'}
@@ -129,7 +140,13 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
 
       {/* Selection Summary */}
       {selectedEntries.length > 0 && (
-        <div className="border rounded-lg p-4" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
+        <div 
+          className="border rounded-lg p-4" 
+          style={{ 
+            backgroundColor: 'var(--color-primary-50)', 
+            borderColor: 'var(--color-primary-200)' 
+          }}
+        >
           <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Submission Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
@@ -154,7 +171,10 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
 
       {/* Main Content */}
       {draftEntries.length === 0 ? (
-        <div className="shadow rounded-lg p-6 text-center" style={{ backgroundColor: 'var(--surface-color)' }}>
+        <div 
+          className="shadow rounded-lg p-6 text-center" 
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
           <ClockIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
           <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No draft entries</h3>
           <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -162,17 +182,30 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
           </p>
         </div>
       ) : (
-        <div className="shadow overflow-hidden sm:rounded-md" style={{ backgroundColor: 'var(--surface-color)' }}>
+        <div 
+          className="shadow overflow-hidden sm:rounded-md" 
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
           {/* Select All Header */}
-          <div className="px-4 py-3" style={{ backgroundColor: 'var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
+          <div 
+            className="px-4 py-3" 
+            style={{ 
+              backgroundColor: 'var(--surface-secondary)', 
+              borderBottom: '1px solid var(--border-color)' 
+            }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   checked={selectedEntries.length === draftEntries.length && draftEntries.length > 0}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
-                  style={{ borderColor: 'var(--border-color)' }}
+                  className="h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
                 />
                 <label className="ml-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Select all draft entries
@@ -201,74 +234,80 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
                         day: 'numeric'
                       })}
                     </h4>
-                    <span className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      ({entries.length} {entries.length === 1 ? 'entry' : 'entries'})
-                    </span>
                   </div>
 
                   {/* Entries for this date */}
-                  <div className="space-y-3 ml-7">
+                  <div className="space-y-2">
                     {entries.map((entry) => {
                       const project = getProjectDetails(entry);
-                      
-                      return (
-                        <div 
-                          key={entry.id} 
-                          className="flex items-center space-x-3 p-3 rounded-lg transition-colors"
-                          style={{ border: '1px solid var(--border-color)' }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'var(--border-color)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                          }}
-                        >
-                          {/* Checkbox */}
-                          <input
-                            type="checkbox"
-                            checked={selectedEntries.includes(entry.id)}
-                            onChange={() => handleSelectEntry(entry.id)}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
-                            style={{ borderColor: 'var(--border-color)' }}
-                          />
+                      const isSelected = selectedEntries.includes(entry.id);
 
-                          {/* Entry Details */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                                  {project?.name || 'Unknown Project'}
-                                </p>
-                                {project?.client && (
-                                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                                    {project.client.name}
-                                  </p>
-                                )}
+                      return (
+                        <div
+                          key={entry.id}
+                          className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                            isSelected ? 'ring-2 ring-offset-2' : ''
+                          }`}
+                          style={{
+                            backgroundColor: isSelected ? 'var(--color-primary-50)' : 'var(--background-color)',
+                            borderColor: isSelected ? 'var(--color-primary-200)' : 'var(--border-color)',
+                            '--tw-ring-color': 'var(--color-primary-600)'
+                          } as React.CSSProperties}
+                          onClick={() => handleSelectEntry(entry.id)}
+                        >
+                          <div className="flex items-start space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleSelectEntry(entry.id)}
+                              className="mt-1 h-4 w-4 rounded focus:ring-2 focus:ring-offset-2"
+                              style={{ 
+                                borderColor: 'var(--border-color)',
+                                backgroundColor: 'var(--background-color)',
+                                '--tw-ring-color': 'var(--color-primary-600)'
+                              } as React.CSSProperties}
+                            />
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h5 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                                    {project?.name || 'Unknown Project'}
+                                  </h5>
+                                  {project?.client && (
+                                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                      {project.client.name}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                                    {formatDuration(entry.duration)}
+                                  </span>
+                                  {entry.isBillable && (
+                                    <span 
+                                      className="px-2 py-1 rounded-full text-xs font-medium"
+                                      style={{
+                                        backgroundColor: 'var(--color-success-50)',
+                                        color: 'var(--color-success-800)'
+                                      }}
+                                    >
+                                      Billable
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               
-                              <div className="flex items-center space-x-3">
-                                <div className="flex items-center text-sm" style={{ color: 'var(--text-secondary)' }}>
-                                  <ClockIcon className="h-4 w-4 mr-1" />
-                                  {formatDuration(entry.duration)}
-                                </div>
-                                {entry.isBillable && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Billable
-                                  </span>
-                                )}
-                                {!entry.isBillable && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Non-billable
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {entry.description && (
                               <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                                 {entry.description}
                               </p>
-                            )}
+                              
+                              {entry.startTime && entry.endTime && (
+                                <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                  {entry.startTime} - {entry.endTime}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -282,59 +321,42 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
-            <div className="mt-3">
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+        >
+          <div 
+            className="rounded-lg shadow-xl max-w-md w-full mx-4"
+            style={{ backgroundColor: 'var(--surface-color)' }}
+          >
+            <div className="p-6">
               <div className="flex items-center mb-4">
-                <div className="flex-shrink-0">
-                  <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
-                    Confirm Submission
-                  </h3>
-                </div>
+                <ExclamationTriangleIcon className="h-6 w-6 mr-3" style={{ color: 'var(--color-warning-600)' }} />
+                <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
+                  Confirm Submission
+                </h3>
               </div>
               
-              <div className="mb-4">
-                <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
-                  You are about to submit {selectedEntries.length} time {selectedEntries.length === 1 ? 'entry' : 'entries'} for approval:
-                </p>
-                
-                <div className="rounded-md p-3 text-sm" style={{ backgroundColor: 'var(--border-color)' }}>
-                  <div className="flex justify-between mb-1">
-                    <span style={{ color: 'var(--text-secondary)' }}>Total entries:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedTotals.totalEntries}</span>
-                  </div>
-                  <div className="flex justify-between mb-1">
-                    <span style={{ color: 'var(--text-secondary)' }}>Total time:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedTotals.totalHours}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span style={{ color: 'var(--text-secondary)' }}>Billable time:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedTotals.billableHours}</span>
-                  </div>
-                </div>
-                
-                <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>
-                  Once submitted, these entries cannot be edited until they are approved or rejected.
-                </p>
-              </div>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                Are you sure you want to submit {selectedEntries.length} time {selectedEntries.length === 1 ? 'entry' : 'entries'} for approval?
+                Once submitted, you won't be able to edit them until they are approved or rejected.
+              </p>
               
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-4 py-2 text-sm font-medium rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
                   style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--background-color)',
                     color: 'var(--text-primary)',
-                    backgroundColor: 'var(--border-color)',
-                    border: '1px solid var(--border-color)'
-                  }}
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--text-secondary)';
+                    e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                    e.currentTarget.style.backgroundColor = 'var(--background-color)';
                   }}
                 >
                   Cancel
@@ -342,9 +364,24 @@ export function BulkSubmission({ userId }: BulkSubmissionProps) {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+                  style={{
+                    backgroundColor: 'var(--color-primary-600)',
+                    color: 'var(--color-text-on-primary)',
+                    '--tw-ring-color': 'var(--color-primary-600)'
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    if (!isSubmitting) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSubmitting) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
+                    }
+                  }}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
                 </button>
               </div>
             </div>

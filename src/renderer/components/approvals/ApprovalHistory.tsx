@@ -84,23 +84,43 @@ export function ApprovalHistory({ userId }: ApprovalHistoryProps) {
   const getStatusIcon = (status: TimeEntry['status']) => {
     switch (status) {
       case 'submitted':
-        return <ClockIcon className="h-5 w-5 text-yellow-500" />;
+        return <ClockIcon className="h-5 w-5" style={{ color: 'var(--color-warning-600)' }} />;
       case 'approved':
-        return <CheckIcon className="h-5 w-5 text-green-500" />;
+        return <CheckIcon className="h-5 w-5" style={{ color: 'var(--color-success-600)' }} />;
       case 'rejected':
-        return <XMarkIcon className="h-5 w-5 text-red-500" />;
+        return <XMarkIcon className="h-5 w-5" style={{ color: 'var(--color-error-600)' }} />;
       default:
         return <ClockIcon className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />;
     }
   };
 
   // Get status color
-  const getStatusColor = (status: TimeEntry['status']) => {
+  const getStatusStyle = (status: TimeEntry['status']) => {
     switch (status) {
-      case 'submitted': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'submitted': 
+        return {
+          backgroundColor: 'var(--color-warning-50)',
+          color: 'var(--color-warning-800)',
+          borderColor: 'var(--color-warning-200)'
+        };
+      case 'approved': 
+        return {
+          backgroundColor: 'var(--color-success-50)',
+          color: 'var(--color-success-800)',
+          borderColor: 'var(--color-success-200)'
+        };
+      case 'rejected': 
+        return {
+          backgroundColor: 'var(--color-error-50)',
+          color: 'var(--color-error-800)',
+          borderColor: 'var(--color-error-200)'
+        };
+      default: 
+        return {
+          backgroundColor: 'var(--surface-secondary)',
+          color: 'var(--text-secondary)',
+          borderColor: 'var(--border-color)'
+        };
     }
   };
 
@@ -146,7 +166,13 @@ export function ApprovalHistory({ userId }: ApprovalHistoryProps) {
       </div>
 
       {/* Filters */}
-      <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+      <div 
+        className="p-4 rounded-lg shadow" 
+        style={{ 
+          backgroundColor: 'var(--surface-color)', 
+          border: '1px solid var(--border-color)' 
+        }}
+      >
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center space-x-2">
             <FunnelIcon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
@@ -157,12 +183,13 @@ export function ApprovalHistory({ userId }: ApprovalHistoryProps) {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as any)}
-            className="rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="rounded-md text-sm focus:ring-2 focus:ring-offset-2"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
           >
             <option value="all">All Statuses</option>
             <option value="submitted">Pending</option>
@@ -174,12 +201,13 @@ export function ApprovalHistory({ userId }: ApprovalHistoryProps) {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value as any)}
-            className="rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="rounded-md text-sm focus:ring-2 focus:ring-offset-2"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
           >
             <option value="week">Last Week</option>
             <option value="month">Last Month</option>
@@ -193,161 +221,168 @@ export function ApprovalHistory({ userId }: ApprovalHistoryProps) {
             placeholder="Search entries..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500 min-w-[200px]"
+            className="rounded-md text-sm focus:ring-2 focus:ring-offset-2 flex-1 min-w-0"
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--background-color)',
-              color: 'var(--text-primary)'
-            }}
+              color: 'var(--text-primary)',
+              '--tw-ring-color': 'var(--color-primary-600)'
+            } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
-          <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summaryStats.total}</div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Entries</div>
+      {historyEntries.length > 0 && (
+        <div 
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-lg"
+          style={{ 
+            backgroundColor: 'var(--surface-color)', 
+            border: '1px solid var(--border-color)' 
+          }}
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+              {summaryStats.total}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Entries</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-success-600)' }}>
+              {summaryStats.approved}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Approved</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-error-600)' }}>
+              {summaryStats.rejected}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Rejected</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-warning-600)' }}>
+              {summaryStats.pending}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Pending</div>
+          </div>
         </div>
-        <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
-          <div className="text-2xl font-bold text-green-600">{summaryStats.approved}</div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Approved</div>
-        </div>
-        <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
-          <div className="text-2xl font-bold text-red-600">{summaryStats.rejected}</div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Rejected</div>
-        </div>
-        <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
-          <div className="text-2xl font-bold text-yellow-600">{summaryStats.pending}</div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Pending</div>
-        </div>
-        <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
-          <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{summaryStats.totalHours}</div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Time</div>
-        </div>
-        <div className="p-4 rounded-lg shadow" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
-          <div className="text-2xl font-bold text-indigo-600">{summaryStats.approvalRate}%</div>
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Approval Rate</div>
-        </div>
-      </div>
+      )}
 
       {/* History List */}
-      <div className="shadow overflow-hidden sm:rounded-md" style={{ backgroundColor: 'var(--surface-color)' }}>
-        {historyEntries.length === 0 ? (
-          <div className="p-6 text-center">
-            <ClockIcon className="mx-auto h-12 w-12" style={{ color: 'var(--text-secondary)' }} />
-            <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>No history found</h3>
-            <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              No time entries match your current filters.
-            </p>
-          </div>
-        ) : (
-          <ul style={{ borderColor: 'var(--border-color)' }} className="divide-y">
-            {historyEntries.map((entry) => {
-              const { user, project, approver } = getEntryDetails(entry);
-              const actionDate = getActionDate(entry);
-              
-              return (
-                <li 
-                  key={entry.id} 
-                  className="px-4 py-4 transition-colors"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <div className="flex items-center space-x-4">
-                    {/* Status Icon */}
-                    <div className="flex-shrink-0">
+      {historyEntries.length === 0 ? (
+        <div 
+          className="text-center py-12 rounded-lg"
+          style={{ backgroundColor: 'var(--surface-color)' }}
+        >
+          <ClockIcon className="mx-auto h-12 w-12 mb-4" style={{ color: 'var(--text-secondary)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            No approval history found
+          </h3>
+          <p style={{ color: 'var(--text-secondary)' }}>
+            {filter === 'all' 
+              ? 'No time entries have been submitted for approval yet.'
+              : `No ${filter} entries found for the selected time period.`
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {historyEntries.map((entry) => {
+            const { user, project, approver } = getEntryDetails(entry);
+            const actionDate = getActionDate(entry);
+            const statusStyle = getStatusStyle(entry.status);
+
+            return (
+              <div
+                key={entry.id}
+                className="p-4 rounded-lg shadow-sm border"
+                style={{ 
+                  backgroundColor: 'var(--surface-color)',
+                  borderColor: 'var(--border-color)'
+                }}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    {/* Entry Header */}
+                    <div className="flex items-center space-x-3 mb-2">
                       {getStatusIcon(entry.status)}
+                      <span
+                        className="px-2 py-1 rounded-full text-xs font-medium border"
+                        style={statusStyle}
+                      >
+                        {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                      </span>
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                        {formatDuration(entry.duration)}
+                      </span>
+                    </div>
+
+                    {/* Project and Description */}
+                    <div className="mb-2">
+                      <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                        {project?.name || 'Unknown Project'}
+                      </h4>
+                      {project?.client && (
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {project.client.name}
+                        </p>
+                      )}
+                      <p className="text-sm mt-1" style={{ color: 'var(--text-primary)' }}>
+                        {entry.description}
+                      </p>
                     </div>
 
                     {/* Entry Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div>
-                            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                              {project?.name || 'Unknown Project'}
-                            </p>
-                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                              {user?.name || 'Unknown User'}
-                              {project?.client && ` • ${project.client.name}`}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-3">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(entry.status)}`}>
-                            {entry.status}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <CalendarIcon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {new Date(entry.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <UserIcon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {user?.name || 'Unknown User'}
+                        </span>
+                      </div>
+                      {approver && (
+                        <div className="flex items-center space-x-2">
+                          <CheckIcon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
+                          <span style={{ color: 'var(--text-secondary)' }}>
+                            {approver.name}
                           </span>
                         </div>
-                      </div>
-
-                      <div className="mt-2 flex items-center space-x-6 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        <div className="flex items-center">
-                          <CalendarIcon className="h-4 w-4 mr-1" />
-                          {entry.date}
-                        </div>
-                        <div className="flex items-center">
-                          <ClockIcon className="h-4 w-4 mr-1" />
-                          {formatDuration(entry.duration)}
-                        </div>
-                        {entry.isBillable && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Billable
-                          </span>
-                        )}
-                      </div>
-
-                      {entry.description && (
-                        <p className="mt-1 text-sm" style={{ color: 'var(--text-primary)' }}>
-                          {entry.description}
-                        </p>
                       )}
-
-                      {/* Approval/Rejection Details */}
-                      <div className="mt-2 space-y-1">
-                        {entry.submittedAt && (
-                          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                            <span className="font-medium">Submitted:</span> {new Date(entry.submittedAt).toLocaleString()}
-                          </div>
-                        )}
-                        
-                        {entry.approvedAt && approver && (
-                          <div className="text-xs text-green-600">
-                            <span className="font-medium">Approved by {approver.name}:</span> {new Date(entry.approvedAt).toLocaleString()}
-                          </div>
-                        )}
-                        
-                        {entry.rejectedAt && approver && (
-                          <div className="text-xs text-red-600">
-                            <span className="font-medium">Rejected by {approver.name}:</span> {new Date(entry.rejectedAt).toLocaleString()}
-                          </div>
-                        )}
-                        
-                        {entry.comment && (
-                          <div className="mt-2 p-2 rounded-md" style={{ backgroundColor: 'var(--border-color)' }}>
-                            <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
-                              <span className="font-medium">
-                                {entry.status === 'rejected' ? 'Rejection reason:' : 'Comment:'}
-                              </span> {entry.comment}
-                            </p>
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
 
-      {/* Pagination could be added here for large datasets */}
+                    {/* Comments */}
+                    {entry.comment && (
+                      <div 
+                        className="mt-3 p-3 rounded border-l-4"
+                        style={{ 
+                          backgroundColor: 'var(--surface-secondary)',
+                          borderLeftColor: 'var(--color-primary-600)'
+                        }}
+                      >
+                        <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                          <span className="font-medium">Comment:</span> {entry.comment}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Date */}
+                  <div className="text-right text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <div>{actionDate.toLocaleDateString()}</div>
+                    <div>{actionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 } 

@@ -37,25 +37,23 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }
   return (
     <Link 
       to={to}
-      className={`
-        flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
-        ${isActive 
-      ? 'bg-blue-600 text-white' 
-      : ''
-    }
-      `}
+      className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
       style={{
-        color: isActive ? 'white' : 'var(--text-primary)',
-        backgroundColor: isActive ? '#2563eb' : 'transparent'
+        color: isActive ? 'var(--color-text-on-primary)' : 'var(--text-primary)',
+        backgroundColor: isActive ? 'var(--color-primary-600)' : 'transparent'
       }}
       onMouseEnter={(e) => {
         if (!isActive) {
-          e.currentTarget.style.backgroundColor = 'var(--border-color)';
+          e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+        } else {
+          e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
           e.currentTarget.style.backgroundColor = 'transparent';
+        } else {
+          e.currentTarget.style.backgroundColor = 'var(--color-primary-600)';
         }
       }}
       aria-current={isActive ? 'page' : undefined}
@@ -141,7 +139,18 @@ const Navigation: React.FC = () => {
             <div className="lg:hidden" style={{ WebkitAppRegion: 'no-drag' } as any}>
               <button
                 onClick={toggleMobileMenu}
-                className="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                className="p-2 rounded-md transition-colors"
+                style={{
+                  color: 'var(--text-secondary)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
                 aria-label="Toggle mobile menu"
               >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,7 +173,8 @@ const Navigation: React.FC = () => {
       {/* Subtle backdrop when menu is open - starts below nav */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed top-16 left-0 right-0 bottom-0 bg-black bg-opacity-10 backdrop-blur-sm -z-10"
+          className="fixed top-16 left-0 right-0 bottom-0 backdrop-blur-sm -z-10"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

@@ -2,31 +2,49 @@ import React from 'react';
 
 export const SettingsPageTest: React.FC = () => {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">🧪 Minimal Settings Test Page</h1>
-      
-      <div className="p-4 bg-green-50 border border-green-200 rounded-md mb-4">
-        <h3 className="font-semibold text-green-800 mb-2">✅ Success!</h3>
-        <p className="text-green-700">
-          If you can see this page, it means navigation to Settings works fine. 
-          The issue is likely with the ProfileSettings component making API calls.
+    <div className="space-y-4">
+      <div 
+        className="p-4 border rounded-md mb-4"
+        style={{
+          backgroundColor: 'var(--color-success-50)',
+          borderColor: 'var(--color-success-200)'
+        }}
+      >
+        <h3 className="font-semibold mb-2" style={{ color: 'var(--color-success-800)' }}>✅ Success!</h3>
+        <p style={{ color: 'var(--color-success-700)' }}>
+          The Settings page is loading correctly! This means your authentication, 
+          routing, and component rendering are all working properly.
         </p>
       </div>
 
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-md mb-4">
-        <h3 className="font-semibold text-blue-800 mb-2">🔍 What this tells us:</h3>
-        <ul className="text-blue-700 text-sm space-y-1">
-          <li>• Navigation to /settings works</li>
-          <li>• ProtectedRoute is not the issue</li>
-          <li>• The problem is in ProfileSettings component</li>
-          <li>• Specifically, it's the useUserProfile hook calling profileApi.getUserProfile()</li>
+      <div 
+        className="p-4 border rounded-md mb-4"
+        style={{
+          backgroundColor: 'var(--color-primary-50)',
+          borderColor: 'var(--color-primary-200)'
+        }}
+      >
+        <h3 className="font-semibold mb-2" style={{ color: 'var(--color-primary-800)' }}>🔍 What this tells us:</h3>
+        <ul className="text-sm space-y-1" style={{ color: 'var(--color-primary-700)' }}>
+          <li>• Authentication is working (you're logged in)</li>
+          <li>• React Router navigation is functional</li>
+          <li>• The Settings component can render without errors</li>
+          <li>• Your app context and state management are operational</li>
+          <li>• No critical JavaScript errors are blocking the page</li>
         </ul>
       </div>
 
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-        <h3 className="font-semibold text-yellow-800 mb-2">🛠️ Next Steps:</h3>
-        <p className="text-yellow-700 text-sm">
-          We need to check why the debug flag isn't working or if there's another logout trigger.
+      <div 
+        className="p-4 border rounded-md"
+        style={{
+          backgroundColor: 'var(--color-warning-50)',
+          borderColor: 'var(--color-warning-200)'
+        }}
+      >
+        <h3 className="font-semibold mb-2" style={{ color: 'var(--color-warning-800)' }}>🛠️ Next Steps:</h3>
+        <p className="text-sm" style={{ color: 'var(--color-warning-700)' }}>
+          You can now safely remove this test component and continue building out 
+          your actual Settings page functionality. Everything is working as expected!
         </p>
       </div>
     </div>
