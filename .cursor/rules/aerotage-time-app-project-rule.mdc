@@ -3,501 +3,180 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Aerotage Time Reporting Application - Frontend Repository - Cursor Rules
+# Aerotage Time Reporting App - Frontend Development Rules
 
-## 🏗️ Repository Architecture Overview
+## 🏗️ Project Context
+Electron desktop app with React/TypeScript frontend connecting to AWS serverless backend (separate repository).
 
-This project uses a **two-repository architecture** to separate concerns:
+**Stack**: Electron + React 18 + TypeScript + Tailwind CSS + React Context API
 
-### 📱 **aerotage_time_reporting_app** (THIS REPOSITORY)
-**Purpose**: Frontend Electron desktop application
-**Contains**: 
-- Electron main process, renderer, and preload scripts
-- React/TypeScript frontend code
-- UI components, pages, and styling
-- State management (React Context)
-- Frontend configuration and build tools
-- Documentation specific to frontend development
+## 🚫 Critical Prohibitions
 
-### 🚀 **aerotage-time-reporting-api** (SEPARATE REPOSITORY)
-**Purpose**: Backend AWS serverless infrastructure
-**Contains**:
-- AWS CDK infrastructure code (TypeScript)
-- AWS Lambda function implementations
-- DynamoDB table definitions
-- API Gateway configurations
-- Cognito authentication setup
-- CloudWatch monitoring and logging
-- S3 storage buckets
-- Deployment scripts and infrastructure documentation
+### Dependency Management ⚠️ CRITICAL
+- **NEVER install alpha, beta, RC, or pre-release dependencies**
+- **ALWAYS run `npm run check-deps` before dependency changes**
+- **ALWAYS use stable versions with caret ranges (^1.2.3)**
+- **NEVER add AWS CDK or infrastructure code to this repository**
 
-### 🔄 **Repository Interaction Rules**
-1. **Frontend NEVER contains**: AWS CDK code, Lambda functions, infrastructure definitions
-2. **Backend NEVER contains**: Electron code, React components, frontend styling
-3. **Shared Configuration**: AWS configuration values are maintained in frontend `src/renderer/config/aws-config.ts`
-4. **Development**: Both repositories can be developed independently
-5. **Deployment**: Infrastructure must be deployed before frontend can connect to APIs
+### Code Standards
+- **NEVER use deprecated React patterns (class components)**
+- **NEVER ignore TypeScript errors or use 'any' type**
+- **NEVER store sensitive data in localStorage**
+- **NEVER create .js files - TypeScript only**
+  - ⚠️ **EXCEPTION**: Critical Electron infrastructure files are allowed to remain as JavaScript:
+    - `src/main/main.js` (Electron main process entry point)
+    - `src/preload/preload.js` (Electron preload security bridge)
+  - **Reason**: These files are core Electron infrastructure that require careful migration planning
+  - **Future**: Plan dedicated TypeScript conversion as separate enhancement project
 
-## Project Overview
-You are developing the **frontend** of the Aerotage Time Reporting Application, a professional desktop time tracking and billing application for Aerotage Design Group, Inc. This is an Electron-based desktop app with React/TypeScript frontend that connects to an AWS serverless backend (maintained in separate repository).
+## ✅ Required Patterns
 
-## Core Architecture Rules
-
-### Technology Stack
-- **Frontend**: Electron + React 18 + TypeScript
-- **State Management**: React Context API with useReducer
-- **Styling**: Tailwind CSS + Headless UI
-- **Forms**: React Hook Form + Zod validation
-- **Date/Time**: date-fns library
-- **Charts**: Chart.js with react-chartjs-2
-- **Backend**: AWS Serverless (Cognito, API Gateway, Lambda, DynamoDB)
-
-### Dependency Management Rules ⚠️ CRITICAL
-**STABILITY FIRST**: Only stable, production-ready dependencies are allowed in this project.
-
-#### Forbidden Dependency Versions
-- **Alpha releases** (e.g., `2.0.0-alpha.1`) ❌
-- **Beta releases** (e.g., `3.0.0-beta.2`) ❌  
-- **Release candidates** (e.g., `1.5.0-rc.1`) ❌
-- **Pre-release versions** (e.g., `4.0.0-pre.3`) ❌
-- **Canary builds** (e.g., `1.2.0-canary.45`) ❌
-- **Next tags** (e.g., `@next`) ❌
-- **Dev builds** (e.g., `2.1.0-dev.1`) ❌
-- **Snapshot versions** (e.g., `1.0.0-SNAPSHOT`) ❌
-
-#### Required Dependency Practices
-1. **Stability Check**: Run `npm run check-deps` before any dependency changes
-2. **Documentation**: Reference `DEPENDENCY_ANALYSIS.md` for guidelines
-3. **Version Pinning**: Use caret ranges (`^1.2.3`) for stable dependencies only
-4. **Security Audits**: Run `npm audit` and address vulnerabilities immediately
-5. **Update Strategy**: Only update to latest stable versions after testing
-6. **Branch Testing**: Test dependency updates in feature branches first
-
-#### Dependency Installation Process
-```bash
-# 1. Check current dependencies are stable
-npm run check-deps
-
-# 2. Install new dependency (stable version only)
-npm install package@^1.2.3  # Use latest stable version
-
-# 3. Re-check for any unstable dependencies
-npm run check-deps
-
-# 4. Run security audit
-npm audit
-
-# 5. Test application thoroughly
-npm run dev && npm test
-```
-
-#### Monitoring and Maintenance
-- **Before each commit**: Run `npm run check-deps`
-- **Weekly**: Run `npm audit` for security vulnerabilities
-- **Monthly**: Check for stable updates to outdated packages with `npm outdated`
-- **Before releases**: Full dependency stability and security review
-- **CI/CD Integration**: Automated stability checks in pipeline
-
-#### Exception Handling
-If unstable dependencies are unavoidable:
-1. Document the business justification in `DEPENDENCY_ANALYSIS.md`
-2. Create isolated testing environment
-3. Implement fallback strategies
-4. Plan migration path to stable version
-5. Get team approval before merging
-6. Add to monitoring for stable releases
-
-#### Current Known Issues
-- **xlsx package**: Known security vulnerabilities with no upstream fix
-  - **Risk**: Prototype Pollution & ReDoS attacks
-  - **Alternatives**: Consider `exceljs`, `papaparse`, or remove if non-critical
-  - **Action**: Monitor for security updates, document risk acceptance
-
-#### Tools and Scripts
-- **`npm run check-deps`**: Automated unstable dependency detection
-- **`scripts/check-stable-deps.js`**: Custom stability validation script
-- **`DEPENDENCY_ANALYSIS.md`**: Comprehensive dependency documentation
-- **`README_DEPENDENCY_ANALYSIS.md`**: Quick reference guide
-
-### File Structure Rules
-```
-src/
-├── main/                    # Electron main process
-├── renderer/               # React frontend
-│   ├── components/         # Reusable UI components
-│   ├── pages/             # Main application pages
-│   ├── context/           # React Context providers and hooks
-│   │   └── AppContext.tsx # Main application state
-│   ├── services/          # API client services (connects to backend)
-│   ├── config/            # AWS and API configuration
-│   ├── utils/             # Utility functions
-│   └── types/             # TypeScript definitions
-├── preload/               # Electron preload scripts
-└── shared/                # Shared utilities
-
-# IMPORTANT: NO infrastructure/ directory in this repo
-# Infrastructure is maintained in aerotage-time-reporting-api repo
-```
-
-## Development Guidelines
-
-### Code Quality Standards
-1. **TypeScript**: Use strict TypeScript with proper type definitions
-2. **ESLint**: Follow existing ESLint configuration
-3. **Naming**: Use camelCase for variables/functions, PascalCase for components
-4. **Components**: Create functional components with TypeScript interfaces
-5. **Hooks**: Use React hooks appropriately (useState, useEffect, useContext, custom hooks)
-
-### Component Development Rules
-1. **Structure**: Each component should have its own folder with index.ts export
-2. **Props**: Define TypeScript interfaces for all component props
-3. **Styling**: Use Tailwind CSS classes, avoid inline styles
-4. **Accessibility**: Include proper ARIA labels and semantic HTML
-5. **Reusability**: Create reusable components in `components/common/`
-6. **Context Usage**: Use `useAppContext()` hook for accessing global state
-
-### State Management Rules
-1. **React Context**: Use AppContext with useReducer for global state management
-2. **Local State**: Use useState for component-specific state only
-3. **Context Provider**: Ensure all components needing global state are wrapped with AppProvider
-4. **Actions**: Use typed action objects with dispatch for state updates
-5. **Error Handling**: Always check if context is available before using
-
-### Context Implementation Rules
-1. **Provider Setup**: Wrap app with `<AppProvider>` inside `<ErrorBoundary>`
-2. **Hook Usage**: Always use `useAppContext()` hook, never useContext directly
-3. **Action Types**: Define all actions in TypeScript union types
-4. **Reducer Logic**: Keep reducer functions pure and predictable
-5. **State Structure**: Organize state logically (timeEntries, projects, timer, user)
-
-### API Integration Rules
-1. **AWS Amplify**: Use for authentication and API calls to backend
-2. **Configuration**: Backend endpoints configured in `src/renderer/config/aws-config.ts`
-3. **API Client**: Use centralized API client in `src/renderer/services/api-client.ts`
-4. **Error Handling**: Implement proper error boundaries and try-catch blocks
-5. **Loading States**: Show loading indicators for async operations
-6. **Offline Support**: Handle network connectivity issues gracefully
-7. **Context Integration**: Update context state after successful API calls
-8. **Backend Dependency**: Frontend requires backend infrastructure to be deployed first
-
-### API Documentation & Reference 📚
-**Official API Documentation**: [https://djfreip4iwrq0.cloudfront.net/](mdc:https:/djfreip4iwrq0.cloudfront.net)
-
-#### API Documentation Usage Rules
-1. **Primary Reference**: Always consult the official API docs before implementing new API integrations
-2. **Endpoint Discovery**: Use the documentation to identify available endpoints and their specifications
-3. **Request/Response Formats**: Follow the exact request/response schemas documented in the API docs
-4. **Authentication Requirements**: Verify JWT token requirements and header formats from the documentation
-5. **Error Handling**: Implement error handling based on documented error response formats
-6. **Development Environment**: Current API base URL is `https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev/`
-7. **Production Environment**: Production API base URL will be `https://api.aerotage.com/`
-
-#### API Integration Workflow
-1. **Documentation First**: Review API documentation before writing any API integration code
-2. **Type Definitions**: Create TypeScript interfaces that match the documented API schemas
-3. **Service Layer**: Implement API calls in `src/renderer/services/` following documented patterns
-4. **Error Mapping**: Map API error responses to user-friendly messages
-5. **Testing**: Test against documented endpoints and expected responses
-6. **Context Updates**: Update React Context state based on successful API responses
-
-#### API Documentation Integration with Development
-- **Cursor Docs**: API documentation is indexed in Cursor for AI-assisted development
-- **Reference During Coding**: Use the documentation to ensure accurate API implementation
-- **Schema Validation**: Validate frontend data structures against API documentation schemas
-- **Endpoint Coverage**: Ensure all documented endpoints have corresponding frontend implementations
-- **Version Compatibility**: Monitor API documentation for version updates and breaking changes
-
-## Feature-Specific Rules
-
-### Authentication
-- Use AWS Cognito for all authentication flows
-- Implement proper token refresh mechanisms
-- Store auth state in Context with persistence
-- Handle MFA flows when required
-- Redirect unauthenticated users to login
-
-### Time Tracking ✅ IMPLEMENTED
-- Timer must persist across app restarts
-- Validate time entries before submission
-- Support both timer and manual entry modes
-- Implement auto-save for draft entries
-- Show clear visual feedback for timer state
-- Use Context actions: START_TIMER, STOP_TIMER, UPDATE_TIMER_TIME
-- Automatically create time entries when timer stops
-
-### Project Management
-- Enforce client-project relationships
-- Validate project budgets and rates
-- Implement proper permission checks
-- Support project status workflows
-- Store project data in Context state
-- Use Context for project selection and filtering
-
-### Reporting
-- Use Chart.js for all visualizations
-- Implement proper date range filtering
-- Support multiple export formats (PDF, CSV, Excel)
-- Optimize queries for large datasets
-- Calculate reports from Context state data
-
-### Invoicing
-- Generate invoices from approved time entries only
-- Support customizable invoice templates
-- Implement proper invoice numbering
-- Handle invoice status workflows
-- Integrate with email sending (AWS SES)
-
-## UI/UX Guidelines
-
-### Design System
-- Use Headless UI components as base
-- Implement consistent spacing (Tailwind spacing scale)
-- Use Aerotage brand colors and typography
-- Ensure responsive design for different screen sizes
-- Follow macOS and Windows design guidelines
-
-### User Experience
-- Provide clear feedback for all user actions
-- Implement keyboard shortcuts for common actions
-- Show progress indicators for long operations
-- Use toast notifications for success/error messages
-- Maintain consistent navigation patterns
-
-### Accessibility
-- Ensure keyboard navigation works throughout
-- Use proper heading hierarchy (h1, h2, h3)
-- Provide alt text for images and icons
-- Implement proper focus management
-- Support screen readers with ARIA labels
-
-## Security Rules
-
-### Data Protection
-- Never store sensitive data in localStorage
-- Use secure storage for authentication tokens
-- Implement proper input validation and sanitization
-- Encrypt sensitive data before storage
-- Follow OWASP security guidelines
-
-### API Security
-- Always validate API responses
-- Implement proper error handling for API failures
-- Use HTTPS for all API communications
-- Implement request timeouts and retries
-- Log security events appropriately
-
-## Performance Rules
-
-### Optimization
-- Implement lazy loading for routes and components
-- Use React.memo for expensive components that don't need frequent re-renders
-- Optimize bundle size with code splitting
-- Implement proper caching strategies
-- Monitor and optimize render performance
-
-### Context Performance
-- Use React.memo for components that don't need frequent Context updates
-- Split Context if state becomes too large
-- Optimize reducer logic for complex state updates
-- Only destructure needed state properties in components
-- Avoid unnecessary re-renders with selective state access
-
-### Memory Management
-- Clean up event listeners and timers
-- Properly dispose of subscriptions
-- Avoid memory leaks in useEffect hooks
-- Optimize large list rendering with virtualization
-- Monitor memory usage in development
-
-## Testing Requirements
-
-### Unit Testing
-- Write tests for all utility functions
-- Test component rendering and interactions with Context
-- Mock Context provider in tests
-- Test reducer functions thoroughly
-- Achieve minimum 80% code coverage
-- Use Jest and React Testing Library
-
-### Context Testing
-- Test Context provider initialization
-- Test all reducer actions and state updates
-- Test error handling for missing provider
-- Test component integration with Context
-- Use custom render utilities that wrap with provider
-
-### Integration Testing
-- Test complete user workflows with Context
-- Verify Context state persistence
-- Test timer functionality end-to-end
-- Validate data flow through Context
-- Use Playwright for E2E testing
-
-## Development Workflow
-
-### Git Practices
-- Use conventional commit messages
-- Create feature branches for new development
-- Implement proper code review process
-- Keep commits atomic and focused
-- Write descriptive commit messages
-
-### Code Organization
-- Group related functionality together
-- Keep components small and focused
-- Extract reusable logic into custom hooks
-- Organize imports consistently
-- Remove unused code and imports
-
-## Error Handling
-
-### Context Error Handling
-- Always wrap Context usage in try-catch blocks
-- Implement proper error boundaries around Context provider
-- Handle cases where Context is not available
-- Provide fallback UI for Context errors
-- Log Context-related errors for debugging
-
-### User-Facing Errors
-- Show user-friendly error messages
-- Provide actionable error recovery options
-- Log errors for debugging purposes
-- Implement global error boundaries
-- Handle network connectivity issues
-
-### Development Errors
-- Use proper TypeScript error types
-- Implement comprehensive error logging
-- Provide detailed error context
-- Use error monitoring tools
-- Handle edge cases gracefully
-
-## Specific Implementation Notes
-
-### Timer Functionality ✅ IMPLEMENTED
-- Use high-precision timestamps
-- Implement pause/resume capabilities
-- Handle system sleep/wake events
-- Persist timer state in Context
-- Validate time entry data
-- Real-time timer updates with useEffect intervals
-
-### Context State Structure ✅ IMPLEMENTED
+### React Context State Management
 ```typescript
-interface AppState {
-  timeEntries: TimeEntry[];
-  projects: Project[];
-  timer: TimerState;
-  user: User | null;
+// ALWAYS use useAppContext() hook
+const { state, dispatch } = useAppContext();
+
+// ALWAYS dispatch typed actions
+dispatch({ type: 'ADD_TIME_ENTRY', payload: timeEntry });
+
+// NEVER mutate state directly
+```
+
+### Component Structure
+```typescript
+// ALWAYS define props interface
+interface ComponentProps {
+  title: string;
+  onSave: (data: FormData) => void;
 }
 
-type AppAction = 
-  | { type: 'ADD_TIME_ENTRY'; payload: Omit<TimeEntry, 'id' | 'createdAt'> }
-  | { type: 'UPDATE_TIME_ENTRY'; payload: { id: string; updates: Partial<TimeEntry> } }
-  | { type: 'DELETE_TIME_ENTRY'; payload: string }
-  | { type: 'START_TIMER'; payload: { projectId: string; description: string } }
-  | { type: 'STOP_TIMER' }
-  | { type: 'UPDATE_TIMER_TIME'; payload: number }
-  | { type: 'SET_USER'; payload: AppState['user'] };
+// ALWAYS use functional components
+export const Component: React.FC<ComponentProps> = ({ title, onSave }) => {
+  // Component logic
+};
 ```
 
-### Data Synchronization
-- Implement optimistic updates in Context
-- Handle offline/online state changes
-- Sync data when connection restored
-- Resolve conflicts appropriately
-- Show sync status to users
+### API Integration
+```typescript
+// ALWAYS use centralized API client
+import { apiClient } from '@/services/api-client';
 
-### Invoice Generation
-- Use jsPDF for PDF generation
-- Implement proper invoice templates
-- Calculate totals and taxes correctly
-- Handle multiple currencies if needed
-- Generate unique invoice numbers
+// ALWAYS handle errors properly
+try {
+  const result = await apiClient.createTimeEntry(data);
+  dispatch({ type: 'ADD_TIME_ENTRY', payload: result });
+} catch (error) {
+  console.error('API Error:', error);
+  // Handle error appropriately
+}
+```
 
-## Deployment Considerations
+## 📁 File Structure Rules
+```
+src/renderer/
+├── components/          # Reusable UI components
+├── pages/              # Main application pages  
+├── context/            # React Context (AppContext.tsx)
+├── services/           # API client services
+├── config/             # AWS and API configuration
+├── utils/              # Utility functions
+└── types/              # TypeScript definitions
+```
 
-### Frontend Deployment
-- Build Electron application for target platforms
-- Configure proper app signing and notarization
-- Implement auto-update functionality
-- Package with correct backend API endpoints
-- Test against deployed backend infrastructure
+## 🎯 Development Guidelines
 
-### ⚠️ Backend Deployment (External Dependency)
-**NOTE**: Backend infrastructure is maintained in `aerotage-time-reporting-api` repository
-- Backend must be deployed before frontend development/testing
-- AWS resources (Cognito, API Gateway, Lambda, DynamoDB) managed separately
-- Backend deployment handled via AWS CDK in separate repository
-- Frontend connects to deployed backend via configured endpoints
-
-## Prohibited Practices
-
-### Never Do
-- Store passwords or secrets in code
-- Use deprecated React patterns (class components)
-- Implement custom authentication (use Cognito)
-- Ignore TypeScript errors or use 'any' type
-- Skip error handling for async operations
-- Use inline styles instead of Tailwind
-- Create tightly coupled components
-- Ignore accessibility requirements
-- Skip input validation
-- Use console.log in production code
-- Use Context outside of AppProvider
-- Mutate Context state directly
-- Use Redux or other state management libraries
-- **Install alpha, beta, or RC dependencies** ❌
-- **Skip `npm run check-deps` before dependency changes** ❌
-- **Ignore security vulnerabilities from `npm audit`** ❌
-- **Use exact versions without caret (^) for stable deps** ❌
-- **Install dependencies without testing in feature branch** ❌
-- **Add AWS CDK or infrastructure code to this repository** ❌
-- **Modify backend infrastructure from this repository** ❌
-
-### Always Do
-- Follow the established file structure
-- Use TypeScript interfaces for all data
+### Code Quality
+- Use strict TypeScript with proper type definitions
+- Follow functional programming patterns
+- Use Tailwind CSS classes, avoid inline styles
 - Implement proper error boundaries
-- Test new functionality thoroughly
-- Document complex business logic
-- Use semantic HTML elements
-- Implement loading states
-- Validate user inputs
-- Handle edge cases
-- Follow the development phases in order
-- Wrap components with AppProvider when needed
-- Use useAppContext() hook for state access
-- Dispatch actions for state updates
-- **Run `npm run check-deps` before any dependency changes** ✅
-- **Check `DEPENDENCY_ANALYSIS.md` for dependency guidance** ✅
-- **Use stable versions only (^1.2.3 format)** ✅
-- **Run `npm audit` weekly for security issues** ✅
-- **Test dependency updates in feature branches** ✅
-- **Document any unavoidable unstable dependencies** ✅
-- **Coordinate with backend repository for infrastructure changes** ✅
-- **Update AWS configuration when backend endpoints change** ✅
-- **Consult API documentation before implementing new integrations** ✅
-- **Follow documented API schemas and response formats exactly** ✅
+- Include accessibility (ARIA labels, semantic HTML)
 
-## Phase-Specific Focus
+### State Management
+- Use React Context with useReducer for global state
+- Keep local state minimal (useState for component-specific only)
+- Always wrap components needing global state with AppProvider
+- Use typed actions for all state updates
 
-### Current Phase Guidelines
-When working on specific development phases, prioritize:
+### API & Backend Integration
+- Backend API documentation: https://djfreip4iwrq0.cloudfront.net/
+- Current API base URL: `https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev/`
+- Use AWS Amplify for authentication
+- Always validate API responses
+- Implement proper loading states
 
-**Phase 1 (Foundation)** ✅ COMPLETED: Focus on React/TypeScript setup, basic routing, Context setup
-**Phase 2 (Time Tracking)** ✅ COMPLETED: Implement timer, manual entry, project selection with Context
-**Phase 3 (Project Management)** 🚧 IN PROGRESS: Build client/project CRUD, team management
-**Phase 4 (Approval Workflow)**: Create submission and approval interfaces
-**Phase 5 (Reporting)**: Implement charts, exports, analytics
-**Phase 6 (Invoicing)**: Build invoice generation and management
-**Phase 7 (Polish)**: Focus on UX improvements and testing
+### Performance
+- Use React.memo for expensive components
+- Implement lazy loading for routes
+- Optimize Context usage to prevent unnecessary re-renders
+- Clean up event listeners and timers
 
-### Context Usage Patterns by Phase
-- **Phase 3+**: Extend Context state for clients, teams, and advanced project management
-- **Phase 4+**: Add approval workflow actions and state
-- **Phase 5+**: Add reporting state and computed values
-- **Phase 6+**: Add invoice state and generation logic
+## 🧪 Testing Requirements
+- Write tests for all utility functions
+- Test component rendering and Context interactions
+- Mock Context provider in tests
+- Use Jest and React Testing Library
+- Achieve minimum 80% code coverage
 
-Remember: This is a professional business application that needs to be reliable, secure, and user-friendly. Every feature should be implemented with production quality in mind. The React Context implementation provides a solid foundation for state management while remaining simple and maintainable. 
+## 📋 Current Phase: Project Management (Phase 3)
+Focus on client/project CRUD operations and team management features.
+
+## 🔗 Repository Architecture
+- **Frontend** (this repo): Electron app with React/TypeScript
+- **Backend** (separate repo): AWS serverless infrastructure
+- **Coordination**: Update AWS config when backend endpoints change
+
+## 🚫 Acceptable Exceptions
+
+### Electron Infrastructure Files
+```javascript
+// ✅ ALLOWED: Critical Electron files (main.js, preload.js)
+// These are core infrastructure requiring careful migration planning
+const { app, BrowserWindow } = require('electron');  // main.js
+const { contextBridge, ipcRenderer } = require('electron');  // preload.js
+```
+
+### Error Boundary Components
+```typescript
+// ⚠️ TEMPORARY: Error boundaries require class components until React 18+ alternatives
+class ErrorBoundary extends Component<Props, State> {
+  // Error boundary logic - plan migration to react-error-boundary library
+}
+```
+
+## Examples
+
+### ✅ Correct Context Usage
+```typescript
+const { state, dispatch } = useAppContext();
+const { timeEntries, projects, timer } = state;
+
+const handleStartTimer = (projectId: string, description: string) => {
+  dispatch({ 
+    type: 'START_TIMER', 
+    payload: { projectId, description } 
+  });
+};
+```
+
+### ❌ Incorrect Patterns
+```typescript
+// DON'T: Direct state mutation
+state.timeEntries.push(newEntry);
+
+// DON'T: Using any type
+const data: any = response.data;
+
+// DON'T: Inline styles
+<div style={{ color: 'red' }}>Error</div>
+
+// DON'T: Class components (except Error Boundaries)
+class MyComponent extends React.Component {}
+
+// DON'T: JavaScript files in application code
+// ❌ src/renderer/components/MyComponent.js
+// ✅ src/renderer/components/MyComponent.tsx
+```
+
+Remember: This is a professional business application requiring production-quality code with reliability, security, and user-friendliness as top priorities.
 
