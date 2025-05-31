@@ -152,8 +152,8 @@ const NotificationSettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Notification Settings</h2>
-        <p className="text-sm text-[var(--color-text-secondary)]">Configure how and when you receive notifications</p>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Notification Settings</h2>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Configure how and when you receive notifications</p>
       </div>
 
       {/* Messages */}
@@ -171,7 +171,7 @@ const NotificationSettings: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Email Notifications */}
         <div className="space-y-4">
-          <h3 className="text-md font-medium text-[var(--color-text-primary)] border-b border-[var(--color-border)] pb-2">
+          <h3 className="text-md font-medium pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)' }}>
             Email Notifications
           </h3>
           
@@ -184,14 +184,14 @@ const NotificationSettings: React.FC = () => {
               onChange={handleInputChange}
               className="h-4 w-4 text-[var(--color-primary-600)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
             />
-            <label htmlFor="emailEnabled" className="ml-2 text-sm text-[var(--color-text-secondary)]">
+            <label htmlFor="emailEnabled" className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
               Enable email notifications
             </label>
           </div>
 
           {formData.emailEnabled && (
             <div>
-              <label htmlFor="emailFrequency" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="emailFrequency" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Email Frequency
               </label>
               <select
@@ -199,7 +199,12 @@ const NotificationSettings: React.FC = () => {
                 name="emailFrequency"
                 value={formData.emailFrequency}
                 onChange={handleInputChange}
-                className="w-full md:w-64 px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                className="w-full md:w-64 px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
                 <option value="immediate">Immediate</option>
                 <option value="daily">Daily digest</option>

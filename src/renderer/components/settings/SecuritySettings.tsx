@@ -418,8 +418,8 @@ const SecuritySettings: React.FC = () => {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Security Settings</h2>
-        <p className="text-sm text-[var(--color-text-secondary)]">Manage your account security and authentication</p>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Security Settings</h2>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage your account security and authentication</p>
       </div>
 
       {/* Messages */}
@@ -434,8 +434,8 @@ const SecuritySettings: React.FC = () => {
       )}
 
       {/* Password Change Section */}
-      <div className="bg-[var(--color-surface-secondary)] rounded-lg p-6">
-        <h3 className="text-md font-medium text-[var(--color-text-primary)] mb-4">Change Password</h3>
+      <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+        <h3 className="text-md font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Change Password</h3>
         
         {securitySettings && (
           <div className="mb-4 p-3 bg-[var(--color-primary-50)] border border-[var(--color-primary-200)] rounded-lg">
@@ -453,7 +453,7 @@ const SecuritySettings: React.FC = () => {
         
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+            <label htmlFor="currentPassword" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
               Current Password
             </label>
             <input
@@ -463,13 +463,18 @@ const SecuritySettings: React.FC = () => {
               value={passwordData.currentPassword}
               onChange={handlePasswordInputChange}
               required
-              className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+              className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              style={{ 
+                backgroundColor: 'var(--background-color)', 
+                color: 'var(--text-primary)', 
+                border: '1px solid var(--border-color)' 
+              }}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="newPassword" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 New Password
               </label>
               <input
@@ -480,12 +485,17 @@ const SecuritySettings: React.FC = () => {
                 onChange={handlePasswordInputChange}
                 required
                 minLength={8}
-                className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                 Confirm New Password
               </label>
               <input
@@ -496,12 +506,17 @@ const SecuritySettings: React.FC = () => {
                 onChange={handlePasswordInputChange}
                 required
                 minLength={8}
-                className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                style={{ 
+                  backgroundColor: 'var(--background-color)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               />
             </div>
           </div>
 
-          <div className="text-xs text-[var(--color-text-tertiary)]">
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
             Password must be at least 8 characters long and contain a mix of letters, numbers, and symbols.
           </div>
 
@@ -509,7 +524,7 @@ const SecuritySettings: React.FC = () => {
             <button
               type="submit"
               disabled={isChangingPassword}
-              className="px-4 py-2 bg-[var(--color-primary)] text-[var(--color-text-on-primary)] rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors duration-200 disabled:opacity-50"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
             >
               {isChangingPassword ? 'Changing...' : 'Change Password'}
             </button>
@@ -518,8 +533,8 @@ const SecuritySettings: React.FC = () => {
       </div>
 
       {/* Security Preferences */}
-      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
-        <h3 className="text-md font-medium text-[var(--color-text-primary)] mb-4">Security Preferences</h3>
+      <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+        <h3 className="text-md font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Security Preferences</h3>
         
         {isLoadingSettings ? (
           <div className="text-center py-8">
@@ -529,7 +544,7 @@ const SecuritySettings: React.FC = () => {
           <form onSubmit={handleSecuritySubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="sessionTimeout" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                <label htmlFor="sessionTimeout" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                   Session Timeout (minutes)
                 </label>
                 <select
@@ -537,7 +552,12 @@ const SecuritySettings: React.FC = () => {
                   name="sessionTimeout"
                   value={securitySettings.sessionTimeout}
                   onChange={handleSecurityInputChange}
-                  className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  style={{ 
+                    backgroundColor: 'var(--background-color)', 
+                    color: 'var(--text-primary)', 
+                    border: '1px solid var(--border-color)' 
+                  }}
                 >
                   <option value={15}>15 minutes</option>
                   <option value={30}>30 minutes</option>
@@ -552,7 +572,7 @@ const SecuritySettings: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="requirePasswordChangeEvery" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                <label htmlFor="requirePasswordChangeEvery" className="block text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                   Password Change Frequency
                 </label>
                 <select
@@ -560,7 +580,12 @@ const SecuritySettings: React.FC = () => {
                   name="requirePasswordChangeEvery"
                   value={securitySettings.securitySettings.requirePasswordChangeEvery}
                   onChange={handleSecurityInputChange}
-                  className="w-full px-3 py-2 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] rounded-lg text-sm focus:border-[var(--color-primary-500)] focus:ring-1 focus:ring-[var(--color-primary-500)]"
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  style={{ 
+                    backgroundColor: 'var(--background-color)', 
+                    color: 'var(--text-primary)', 
+                    border: '1px solid var(--border-color)' 
+                  }}
                 >
                   <option value={0}>Never</option>
                   <option value={30}>Every 30 days</option>
@@ -582,7 +607,7 @@ const SecuritySettings: React.FC = () => {
                   onChange={handleSecurityInputChange}
                   className="h-4 w-4 text-[var(--color-primary)] border-[var(--color-border)] rounded focus:ring-[var(--color-primary-500)]"
                 />
-                <label htmlFor="allowMultipleSessions" className="ml-2 text-sm text-[var(--color-text-secondary)]">
+                <label htmlFor="allowMultipleSessions" className="ml-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   Allow multiple simultaneous sessions
                 </label>
               </div>
@@ -600,7 +625,7 @@ const SecuritySettings: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSavingSecurity}
-                className="px-4 py-2 bg-[var(--color-primary)] text-[var(--color-text-on-primary)] rounded-lg hover:bg-[var(--color-primary-hover)] transition-colors duration-200 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
               >
                 {isSavingSecurity ? 'Saving...' : 'Save Security Settings'}
               </button>

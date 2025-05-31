@@ -44,6 +44,7 @@ Debugging and troubleshooting documentation:
 - Session management issues and fixes
 - CORS and API connectivity issues
 - Bootstrap and testing troubleshooting
+- Dark theme settings components fix
 
 ### [`archive/`](./archive/)
 Completed implementations and resolved issues:

@@ -220,82 +220,82 @@ const DeveloperSettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">Developer Settings</h3>
-        <p className="text-[var(--color-text-secondary)]">
+        <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Developer Settings</h3>
+        <p style={{ color: 'var(--text-secondary)' }}>
           Development tools, debugging information, and advanced settings.
         </p>
       </div>
 
       {/* System Information */}
-      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
+      <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         <div className="flex items-center space-x-2 mb-4">
-          <InformationCircleIcon className="h-5 w-5 text-[var(--color-primary-500)]" />
-          <h4 className="text-md font-medium text-[var(--color-text-primary)]">System Information</h4>
+          <InformationCircleIcon className="h-5 w-5 text-blue-500" />
+          <h4 className="text-md font-medium" style={{ color: 'var(--text-primary)' }}>System Information</h4>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">App Version:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.appVersion}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>App Version:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.appVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Electron:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.electronVersion}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Electron:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.electronVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Node.js:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.nodeVersion}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Node.js:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.nodeVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Chrome:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.chromeVersion}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Chrome:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.chromeVersion}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Platform:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.platform}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Platform:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.platform}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Language:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.language}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Language:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.language}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Screen:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.screenResolution} ({developerInfo.colorDepth}-bit)</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Screen:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.screenResolution} ({developerInfo.colorDepth}-bit)</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Timezone:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)]">{developerInfo.timezone}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Timezone:</span>
+            <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>{developerInfo.timezone}</span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Online:</span>
-            <span className={`ml-2 ${developerInfo.onLine ? 'text-[var(--color-success-600)]' : 'text-[var(--color-error-600)]'}`}>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Online:</span>
+            <span className={`ml-2 ${developerInfo.onLine ? 'text-green-600' : 'text-red-600'}`}>
               {developerInfo.onLine ? '✅ Connected' : '❌ Offline'}
             </span>
           </div>
           <div>
-            <span className="font-medium text-[var(--color-text-secondary)]">Cookies:</span>
-            <span className={`ml-2 ${developerInfo.cookieEnabled ? 'text-[var(--color-success-600)]' : 'text-[var(--color-error-600)]'}`}>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Cookies:</span>
+            <span className={`ml-2 ${developerInfo.cookieEnabled ? 'text-green-600' : 'text-red-600'}`}>
               {developerInfo.cookieEnabled ? '✅ Enabled' : '❌ Disabled'}
             </span>
           </div>
           <div className="md:col-span-2">
-            <span className="font-medium text-[var(--color-text-secondary)]">User Agent:</span>
-            <span className="ml-2 text-[var(--color-text-tertiary)] break-all">{developerInfo.userAgent}</span>
+            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>User Agent:</span>
+            <span className="ml-2 break-all" style={{ color: 'var(--text-secondary)' }}>{developerInfo.userAgent}</span>
           </div>
         </div>
       </div>
 
       {/* API Testing */}
-      <div className="bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
+      <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <CodeBracketIcon className="h-5 w-5 text-[var(--color-success-500)]" />
-            <h4 className="text-md font-medium text-[var(--color-text-primary)]">API Testing</h4>
+            <CodeBracketIcon className="h-5 w-5 text-green-500" />
+            <h4 className="text-md font-medium" style={{ color: 'var(--text-primary)' }}>API Testing</h4>
           </div>
           <button
             onClick={testApiConnection}
             disabled={isTestingApi}
-            className="inline-flex items-center px-3 py-2 border border-[var(--color-border)] shadow-sm text-sm leading-4 font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)] disabled:opacity-50"
+            className="inline-flex items-center px-3 py-2 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
             <ArrowPathIcon className={`h-4 w-4 mr-2 ${isTestingApi ? 'animate-spin' : ''}`} />
             {isTestingApi ? 'Testing...' : 'Test API'}
@@ -303,13 +303,13 @@ const DeveloperSettings: React.FC = () => {
         </div>
 
         {apiTestResult && (
-          <div className="bg-[var(--color-surface-secondary)] rounded-md p-4">
-            <pre className="text-sm text-[var(--color-text-primary)] whitespace-pre-wrap font-mono">
+          <div className="rounded-md p-4" style={{ backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)' }}>
+            <pre className="text-sm whitespace-pre-wrap font-mono" style={{ color: 'var(--text-primary)' }}>
               {apiTestResult}
             </pre>
             <button
               onClick={() => copyToClipboard(apiTestResult)}
-              className="mt-2 inline-flex items-center px-2 py-1 border border-[var(--color-border)] shadow-sm text-xs font-medium rounded text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)]"
+              className="mt-2 inline-flex items-center px-2 py-1 shadow-sm text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700"
             >
               <ClipboardDocumentIcon className="h-3 w-3 mr-1" />
               Copy

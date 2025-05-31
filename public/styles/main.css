@@ -43,6 +43,29 @@
   --color-success-50: #f0fdf4;
   --color-success-200: #bbf7d0;
   --color-success-800: #166534;
+
+  /* Aliases for settings components compatibility */
+  --color-background: var(--background-color);
+  --color-surface: var(--surface-color);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border: var(--border-color);
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  
+  /* Additional color variables for buttons and interactions */
+  --color-primary-hover: #0056b3;
+  --color-text-on-primary: #ffffff;
+  --color-success: #28a745;
+  --color-success-hover: #218838;
+  --color-text-on-success: #ffffff;
+  --color-error: #dc3545;
+  --color-error-hover: #c82333;
+  --color-text-on-error: #ffffff;
+  --color-success-100: #d4edda;
+  --color-success-600: #28a745;
 }
 
 /* Dark mode variables - explicit class-based */
@@ -85,6 +108,22 @@
   --color-success-50: #166534;
   --color-success-200: #16a34a;
   --color-success-800: #4ade80;
+  --color-success-100: #22c55e;
+  --color-success-600: #16a34a;
+
+  /* Dark mode aliases - these automatically inherit the updated values */
+  --color-background: var(--background-color);
+  --color-surface: var(--surface-color);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border: var(--border-color);
+  
+  /* Dark mode button colors */
+  --color-primary-hover: #4a90e2;
+  --color-success-hover: #22c55e;
+  --color-error-hover: #ef4444;
 }
 
 /* Dark mode variables - system preference fallback */
