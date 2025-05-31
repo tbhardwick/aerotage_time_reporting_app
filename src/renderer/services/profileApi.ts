@@ -12,8 +12,12 @@ import {
 } from '../types/user-profile-api';
 import { authErrorHandler } from './authErrorHandler';
 import { decodeJWTPayload } from '../utils/jwt';
+import { awsConfig } from '../config/aws-config';
 
-const API_BASE_URL = 'https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev';
+const API_BASE_URL = awsConfig.apiGatewayUrl;
+
+// TEMPORARY DEBUG FLAG - Set to true to disable automatic logout on API errors
+const DISABLE_AUTO_LOGOUT_FOR_DEBUG = true;
 
 class ProfileApiService {
   private async getAuthHeaders(): Promise<HeadersInit> {
@@ -56,7 +60,7 @@ class ProfileApiService {
       
       // Check for session validation errors
       if (this.isSessionValidationError(error)) {
-        console.log('🔍 ProfileAPI: Auth headers failed due to session validation, triggering logout');
+        console.log('🔍 ProfileAPI: Auth headers failed due to session validation');
         
         const sessionError = { 
           code: 'SESSION_VALIDATION_FAILED', 
@@ -65,8 +69,13 @@ class ProfileApiService {
           message: 'Your session is no longer valid. Please sign in again.' 
         };
         
-        // Handle session validation error automatically (non-blocking)
-        authErrorHandler.handleAuthError(sessionError).catch(console.error);
+        // Handle session validation error automatically (unless debugging)
+        if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+          console.log('🚪 Auto-logout triggered by session validation error');
+          authErrorHandler.handleAuthError(sessionError).catch(console.error);
+        } else {
+          console.log('🚫 Auto-logout DISABLED for debugging - session validation error logged but not triggering logout');
+        }
       }
       
       throw new Error('Authentication required. Please sign in again.');
@@ -86,8 +95,13 @@ class ProfileApiService {
         (sessionError as any).statusCode = 401;
         (sessionError as any).shouldLogout = true;
         
-        // Handle authentication error automatically
-        await authErrorHandler.handleAuthError(sessionError);
+        // Handle authentication error automatically (unless debugging)
+        if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+          console.log('🚪 Auto-logout triggered by 401 error');
+          await authErrorHandler.handleAuthError(sessionError);
+        } else {
+          console.log('🚫 Auto-logout DISABLED for debugging - 401 error logged but not triggering logout');
+        }
         throw sessionError;
       } else if (response.status === 403) {
         // Check if this is a session validation error
@@ -102,8 +116,13 @@ class ProfileApiService {
           (sessionError as any).statusCode = 403;
           (sessionError as any).shouldLogout = true;
           
-          // Handle session termination error automatically
-          await authErrorHandler.handleAuthError(sessionError);
+          // Handle session termination error automatically (unless debugging)
+          if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+            console.log('🚪 Auto-logout triggered by 403 session error');
+            await authErrorHandler.handleAuthError(sessionError);
+          } else {
+            console.log('🚫 Auto-logout DISABLED for debugging - 403 session error logged but not triggering logout');
+          }
           throw sessionError;
         }
         
@@ -193,8 +212,13 @@ class ProfileApiService {
           message: 'Your session is no longer valid. Please sign in again.' 
         };
         
-        // Handle session validation error automatically
-        await authErrorHandler.handleAuthError(sessionError);
+        // Handle session validation error automatically (unless debugging)
+        if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+          await authErrorHandler.handleAuthError(sessionError);
+          console.log('🚪 Auto-logout triggered by session validation error');
+        } else {
+          console.log('🚫 Auto-logout DISABLED for debugging - session validation error logged but not triggering logout');
+        }
         throw new Error('Your session is no longer valid. Please sign in again.');
       }
       

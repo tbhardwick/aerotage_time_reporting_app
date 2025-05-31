@@ -4,6 +4,9 @@ import { authErrorHandler } from './authErrorHandler';
 import { decodeJWTPayload } from '../utils/jwt';
 import { healthCheckService, type HealthCheckResponse, type APIConnectionStatus } from './health-check';
 
+// TEMPORARY DEBUG FLAG - Set to true to disable automatic logout on API errors
+const DISABLE_AUTO_LOGOUT_FOR_DEBUG = true;
+
 export interface TimeEntry {
   id: string;
   userId?: string; // Added for API compatibility
@@ -508,15 +511,18 @@ class AerotageApiClient {
           if (statusCodeNum === 401) {
             errorMessage = 'Authentication token is invalid or expired. Please sign in again.';
             
-            // Handle authentication error automatically
-            const authError = { 
-              code: 'AUTHENTICATION_FAILED', 
-              statusCode: 401, 
-              shouldLogout: true, 
-              message: errorMessage 
-            };
-            authErrorHandler.handleAuthError(authError).catch(console.error);
-            
+            // Handle authentication error automatically (unless debugging)
+            if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+              const authError = { 
+                code: 'AUTHENTICATION_FAILED', 
+                statusCode: 401, 
+                shouldLogout: true, 
+                message: errorMessage 
+              };
+              authErrorHandler.handleAuthError(authError).catch(console.error);
+            } else {
+              console.log('🚫 Auto-logout DISABLED for debugging - 401 error logged but not triggering logout');
+            }
           } else if (statusCodeNum === 403) {
             // Check if this is a session validation error
             if (errorBody && (
@@ -527,15 +533,18 @@ class AerotageApiClient {
             )) {
               errorMessage = 'Your session has been terminated. Please sign in again.';
               
-              // Handle session termination error automatically
-              const sessionError = { 
-                code: 'SESSION_TERMINATED', 
-                statusCode: 403, 
-                shouldLogout: true, 
-                message: errorMessage 
-              };
-              authErrorHandler.handleAuthError(sessionError).catch(console.error);
-              
+              // Handle session termination error automatically (unless debugging)
+              if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+                const sessionError = { 
+                  code: 'SESSION_TERMINATED', 
+                  statusCode: 403, 
+                  shouldLogout: true, 
+                  message: errorMessage 
+                };
+                authErrorHandler.handleAuthError(sessionError).catch(console.error);
+              } else {
+                console.log('🚫 Auto-logout DISABLED for debugging - 403 session error logged but not triggering logout');
+              }
             } else {
               errorMessage = 'Access denied. You do not have permission to perform this action.';
             }
@@ -583,8 +592,13 @@ class AerotageApiClient {
           message: 'Your session is no longer valid. Please sign in again.' 
         };
         
-        // Handle session validation error automatically
-        authErrorHandler.handleAuthError(sessionError).catch(console.error);
+        // Handle session validation error automatically (unless debugging)
+        if (!DISABLE_AUTO_LOGOUT_FOR_DEBUG) {
+          authErrorHandler.handleAuthError(sessionError).catch(console.error);
+          console.log('🚪 Auto-logout triggered by session validation error');
+        } else {
+          console.log('🚫 Auto-logout DISABLED for debugging - session validation error logged but not triggering logout');
+        }
         
         // Update error message for user
         errorMessage = 'Your session is no longer valid. Please sign in again.';

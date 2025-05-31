@@ -4,6 +4,7 @@ import { useApiOperations } from '../../hooks/useApiOperations';
 import { useDataLoader } from '../../hooks/useDataLoader';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { decodeJWTPayload } from '../../utils/jwt';
+import { awsConfig } from '../../config/aws-config';
 import { ShieldCheckIcon, UserPlusIcon, ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const AdminBootstrap: React.FC = () => {
@@ -142,7 +143,7 @@ const AdminBootstrap: React.FC = () => {
         
         if (userId) {
           // Make direct API call to see raw response
-          const apiUrl = `https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev/users/${userId}`;
+          const apiUrl = `${awsConfig.apiGatewayUrl}/users/${userId}`;
           addResult(`🌐 Testing direct API call to: ${apiUrl}`);
           
           const response = await fetch(apiUrl, {
@@ -217,7 +218,7 @@ const AdminBootstrap: React.FC = () => {
                 <li>Network connectivity issues</li>
               </ul>
               <div className="mt-3 p-2 bg-red-100 rounded text-xs text-red-800">
-                <strong>API Endpoint:</strong> GET https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev/users
+                <strong>API Endpoint:</strong> GET {awsConfig.apiGatewayUrl}/users
               </div>
             </div>
           </div>
@@ -315,7 +316,7 @@ const AdminBootstrap: React.FC = () => {
             <li>Verify JWT token contains correct user ID and permissions</li>
           </ol>
           <div className="mt-3 p-2 bg-blue-100 rounded text-blue-800 text-xs">
-            <strong>API Base URL:</strong> https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev<br/>
+            <strong>API Base URL:</strong> {awsConfig.apiGatewayUrl}<br/>
             <strong>Auth Method:</strong> Bearer AccessToken (not IdToken)<br/>
             <strong>Response Format:</strong> {`{ success: true, data: { users: [...] } }`}
           </div>

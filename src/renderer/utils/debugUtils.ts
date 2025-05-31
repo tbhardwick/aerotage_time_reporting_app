@@ -162,14 +162,42 @@ export const testSessionProtection = async () => {
   }
 };
 
+/**
+ * Reset navigation state and redirect to dashboard
+ */
+export const resetNavigation = () => {
+  console.log('🧭 Resetting navigation state...');
+  
+  // Clear any stored navigation state
+  sessionStorage.removeItem('navigationState');
+  sessionStorage.removeItem('lastVisitedRoute');
+  
+  // Force navigation to dashboard
+  window.location.hash = '#/';
+  window.location.reload();
+  
+  console.log('✅ Navigation reset complete');
+};
+
+/**
+ * Force redirect to dashboard
+ */
+export const goToDashboard = () => {
+  console.log('🏠 Forcing redirect to dashboard...');
+  window.location.hash = '#/';
+  console.log('✅ Redirected to dashboard');
+};
+
 // Make functions available globally for console access
 if (typeof window !== 'undefined') {
   (window as any).debugUtils = {
     forceLogout,
     clearAllData,
     checkAuthState,
-    testSessionProtection
+    testSessionProtection,
+    resetNavigation,
+    goToDashboard
   };
   
-  console.log('🔧 Debug utilities available: window.debugUtils.forceLogout(), window.debugUtils.clearAllData(), window.debugUtils.checkAuthState(), window.debugUtils.testSessionProtection()');
+  console.log('🔧 Debug utilities available: window.debugUtils.forceLogout(), window.debugUtils.clearAllData(), window.debugUtils.checkAuthState(), window.debugUtils.testSessionProtection(), window.debugUtils.resetNavigation(), window.debugUtils.goToDashboard()');
 } 

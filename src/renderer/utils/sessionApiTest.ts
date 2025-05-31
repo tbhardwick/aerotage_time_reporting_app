@@ -5,8 +5,9 @@
 
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import { decodeJWTPayload } from './jwt';
+import { awsConfig } from '../config/aws-config';
 
-const API_BASE_URL = 'https://k60bobrd9h.execute-api.us-east-1.amazonaws.com/dev';
+const API_BASE_URL = awsConfig.apiGatewayUrl;
 
 /**
  * Test session API endpoints to verify real vs mock data

@@ -7,6 +7,7 @@ import { sessionBootstrap } from '../../services/sessionBootstrap';
 import { handlePasswordResetErrors, validatePasswordPolicy, formatPasswordErrors } from '../../utils/passwordResetErrors';
 import { useDataLoader } from '../../hooks/useDataLoader';
 import { decodeJWTPayload } from '../../utils/jwt';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface LoginFormProps {
   onLoginSuccess?: () => void;
@@ -15,6 +16,11 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const { dispatch } = useAppContext();
   const { loadAllData } = useDataLoader();
+  
+  // Navigation hooks for redirect after login
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -236,7 +242,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
       console.log('🎉 Login completed successfully!');
       
-      // Navigate to dashboard
+      // Always navigate to dashboard after successful login for better UX
+      // This prevents users from being taken back to routes that might have authorization issues
+      console.log('🏠 [LoginForm] Redirecting to dashboard after successful login');
+      console.log('🔍 [LoginForm] Previous location was:', location.pathname);
+      navigate('/', { replace: true });
+      
+      // Call the onLoginSuccess callback to trigger auth status check
       if (onLoginSuccess) {
         onLoginSuccess();
       }

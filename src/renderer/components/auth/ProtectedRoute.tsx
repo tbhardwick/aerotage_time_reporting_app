@@ -23,20 +23,33 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
+      console.log('🔍 [ProtectedRoute] Starting authentication check...');
+      
       const amplifyUser = await getCurrentUser();
-      console.log('🔍 Amplify user:', amplifyUser);
+      console.log('👤 [ProtectedRoute] Amplify user:', amplifyUser);
       
       // Get the JWT token to extract the correct user ID
+      console.log('🔐 [ProtectedRoute] Getting auth session...');
       const session = await fetchAuthSession({ forceRefresh: false });
+      console.log('📧 [ProtectedRoute] Session received:', {
+        hasTokens: !!session.tokens,
+        hasAccessToken: !!session.tokens?.accessToken,
+        hasIdToken: !!session.tokens?.idToken,
+        tokenExpiry: session.tokens?.idToken?.payload?.exp ? 
+          new Date(session.tokens.idToken.payload.exp * 1000).toISOString() : 'N/A'
+      });
+      
       const token = session.tokens?.idToken?.toString();
       
       if (!token) {
+        console.error('❌ [ProtectedRoute] No authentication token available');
         throw new Error('No authentication token available');
       }
       
       // Extract user ID from JWT token (this matches what backend expects)
       const tokenPayload = decodeJWTPayload(token);
       if (!tokenPayload || !tokenPayload.sub) {
+        console.error('❌ [ProtectedRoute] Invalid token payload:', tokenPayload);
         throw new Error('Invalid token payload');
       }
       
@@ -44,17 +57,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       const email = tokenPayload.email || amplifyUser.signInDetails?.loginId || 'user@example.com';
       const name = tokenPayload.name || amplifyUser.signInDetails?.loginId?.split('@')[0] || 'Test User';
       
-      console.log('🔍 User ID from token:', userId);
-      console.log('🔍 Email from token:', email);
+      console.log('✅ [ProtectedRoute] Token validation successful:', {
+        userId,
+        email,
+        tokenLength: token.length,
+        expiresAt: tokenPayload.exp ? new Date(tokenPayload.exp * 1000).toISOString() : 'Unknown'
+      });
       
       // Try to load real user data from API
       try {
-        console.log('🔄 Loading real user data from API...');
+        console.log('🔄 [ProtectedRoute] Loading real user data from API...');
         const realUserData = await loadCurrentUser();
-        console.log('✅ Real user data loaded:', realUserData);
+        console.log('✅ [ProtectedRoute] Real user data loaded successfully:', realUserData);
         setIsAuthenticated(true);
       } catch (apiError: any) {
-        console.warn('⚠️ Failed to load user data from API, using fallback:', apiError.message);
+        console.warn('⚠️ [ProtectedRoute] Failed to load user data from API:', apiError.message);
         
         // Create fallback user object for context if API fails
         const fallbackUser = {
@@ -85,7 +102,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           createdBy: 'system',
         };
         
-        console.log('⚠️ Setting fallback user in context:', fallbackUser);
+        console.log('⚠️ [ProtectedRoute] Setting fallback user in context:', fallbackUser);
         
         // Set fallback user in context
         dispatch({ type: 'SET_USER', payload: fallbackUser });
@@ -96,7 +113,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       clearBootstrapErrorIfLoggedIn();
       
     } catch (error) {
-      console.error('❌ Authentication failed:', error);
+      console.error('❌ [ProtectedRoute] Authentication failed:', error);
+      console.error('❌ [ProtectedRoute] Error details:', {
+        name: (error as any)?.name,
+        message: (error as any)?.message,
+        stack: (error as any)?.stack,
+        type: typeof error
+      });
       setIsAuthenticated(false);
       dispatch({ type: 'SET_USER', payload: null });
     } finally {
@@ -105,6 +128,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   };
 
   const handleLoginSuccess = () => {
+    console.log('🎉 [ProtectedRoute] Login success callback triggered');
+    
     // Re-check auth status to get user data and set in context
     checkAuthStatus();
   };
@@ -121,7 +146,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <LoginForm onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <div className="min-h-screen">
+        <LoginForm onLoginSuccess={handleLoginSuccess} />
+      </div>
+    );
   }
 
   return <>{children}</>;

@@ -6,6 +6,7 @@ import { AppProvider, useAppContext } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { DataInitializer } from './components/common/DataInitializer';
 import { HealthStatus } from './components/common/HealthStatus';
+import { Dashboard } from './pages/Dashboard';
 import TimeTrackingEnhanced from './pages/TimeTrackingEnhanced';
 import Projects from './pages/Projects';
 import { Approvals } from './pages/Approvals';
@@ -28,51 +29,6 @@ import './utils/themeTestUtils';
 
 // Configure AWS Amplify
 Amplify.configure(amplifyConfig);
-
-const Dashboard: React.FC = () => (
-  <div className="text-center">
-    <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
-      Welcome to Aerotage Time Reporting
-    </h1>
-    <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-      Track your time efficiently, manage projects, and generate professional reports with our comprehensive time tracking solution.
-    </p>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-      <Link 
-        to="/time-tracking" 
-        className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
-      >
-        <div className="text-2xl mb-2">⏱️</div>
-        <h3 className="font-semibold mb-2">Time Tracking</h3>
-        <p className="text-sm text-blue-100">Start tracking your time with our intuitive timer</p>
-      </Link>
-      <Link 
-        to="/projects" 
-        className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
-      >
-        <div className="text-2xl mb-2">📁</div>
-        <h3 className="font-semibold mb-2">Projects</h3>
-        <p className="text-sm text-green-100">Manage your clients and projects</p>
-      </Link>
-      <Link 
-        to="/reports" 
-        className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
-      >
-        <div className="text-2xl mb-2">📊</div>
-        <h3 className="font-semibold mb-2">Reports</h3>
-        <p className="text-sm text-purple-100">Generate insights and export data</p>
-      </Link>
-      <Link 
-        to="/users" 
-        className="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-lg transition-colors duration-200 text-center group"
-      >
-        <div className="text-2xl mb-2">👥</div>
-        <h3 className="font-semibold mb-2">User Management</h3>
-        <p className="text-sm text-indigo-100">Manage users, roles, and permissions</p>
-      </Link>
-    </div>
-  </div>
-);
 
 const NavLink: React.FC<{ to: string; children: React.ReactNode; icon?: string }> = ({ to, children, icon }) => {
   const location = useLocation();
@@ -262,8 +218,8 @@ const App: React.FC = () => {
           {({ state }) => (
             <ThemeProvider user={state.user}>
               <DataInitializer>
-                <ProtectedRoute>
-                  <Router>
+                <Router>
+                  <ProtectedRoute>
                     <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--background-color)', color: 'var(--text-primary)' }}>
                       <Navigation />
                       <main className="flex-1 pt-16" role="main">
@@ -278,12 +234,14 @@ const App: React.FC = () => {
                             <Route path="/users" element={<Users />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/email-verification" element={<EmailVerificationHandler />} />
+                            {/* Fallback route - redirect any unmatched routes to dashboard */}
+                            <Route path="*" element={<Dashboard />} />
                           </Routes>
                         </div>
                       </main>
                     </div>
-                  </Router>
-                </ProtectedRoute>
+                  </ProtectedRoute>
+                </Router>
               </DataInitializer>
             </ThemeProvider>
           )}

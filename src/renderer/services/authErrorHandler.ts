@@ -5,6 +5,9 @@
 
 import { signOut } from 'aws-amplify/auth';
 
+// GLOBAL DEBUG FLAG - Set to true to disable ALL automatic logout for debugging
+const GLOBAL_DISABLE_AUTO_LOGOUT = false;
+
 interface AuthError {
   code?: string;
   statusCode?: number;
@@ -33,6 +36,12 @@ class AuthErrorHandler {
       shouldLogout: error.shouldLogout,
       message: error.message
     });
+
+    // Check global debug flag first
+    if (GLOBAL_DISABLE_AUTO_LOGOUT) {
+      console.log('🚫 AuthErrorHandler: GLOBAL auto-logout disabled for debugging - error logged but no action taken');
+      return;
+    }
 
     // Check if this is a session validation error that requires logout
     if (this.shouldForceLogout(error)) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { apiClient } from '../../services/api-client';
 import { awsConfig } from '../../config/aws-config';
+import { ApiCallLogger } from '../debug/ApiCallLogger';
 import { 
   CodeBracketIcon, 
   CogIcon, 
@@ -43,6 +44,7 @@ const DeveloperSettings: React.FC = () => {
   const [apiTestResult, setApiTestResult] = useState<string>('');
   const [isTestingApi, setIsTestingApi] = useState(false);
   const [showDangerZone, setShowDangerZone] = useState(false);
+  const [showApiLogger, setShowApiLogger] = useState(false);
 
   useEffect(() => {
     loadDeveloperInfo();
@@ -374,17 +376,39 @@ const DeveloperSettings: React.FC = () => {
           <h4 className="text-md font-medium text-[var(--color-text-primary)]">Debug Tools</h4>
         </div>
 
-        <div className="space-y-3">
-          <button
-            onClick={exportDebugInfo}
-            className="inline-flex items-center px-4 py-2 border border-[var(--color-border)] shadow-sm text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)]"
-          >
-            <DocumentTextIcon className="h-4 w-4 mr-2" />
-            Export Debug Information
-          </button>
+        <div className="space-y-4">
+          <div>
+            <button
+              onClick={exportDebugInfo}
+              className="inline-flex items-center px-4 py-2 border border-[var(--color-border)] shadow-sm text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)]"
+            >
+              <DocumentTextIcon className="h-4 w-4 mr-2" />
+              Export Debug Information
+            </button>
 
-          <div className="text-sm text-[var(--color-text-tertiary)]">
-            Downloads a JSON file with system info, localStorage data, and API configuration for debugging.
+            <div className="text-sm text-[var(--color-text-tertiary)] mt-2">
+              Downloads a JSON file with system info, localStorage data, and API configuration for debugging.
+            </div>
+          </div>
+
+          <div>
+            <button
+              onClick={() => setShowApiLogger(!showApiLogger)}
+              className="inline-flex items-center px-4 py-2 border border-[var(--color-border)] shadow-sm text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary-500)]"
+            >
+              <CodeBracketIcon className="h-4 w-4 mr-2" />
+              {showApiLogger ? 'Hide API Call Logger' : 'Show API Call Logger'}
+            </button>
+
+            <div className="text-sm text-[var(--color-text-tertiary)] mt-2">
+              Monitor API calls in real-time to debug network issues and authentication problems.
+            </div>
+
+            {showApiLogger && (
+              <div className="mt-4">
+                <ApiCallLogger />
+              </div>
+            )}
           </div>
         </div>
       </div>
