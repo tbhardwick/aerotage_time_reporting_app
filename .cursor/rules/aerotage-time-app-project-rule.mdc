@@ -72,6 +72,8 @@ try {
 ```
 
 ## 📁 File Structure Rules
+
+### Application Code Structure
 ```
 src/renderer/
 ├── components/          # Reusable UI components
@@ -83,6 +85,29 @@ src/renderer/
 └── types/              # TypeScript definitions
 ```
 
+### Documentation Organization ⚠️ CRITICAL
+- **NEVER create .md files in root directory** (except README.md)
+- **ALWAYS place documentation in `/docs` folder**
+- **ALWAYS use organized subdirectories for logical grouping**
+
+```
+docs/
+├── README.md                    # Documentation index
+├── [FEATURE_NAME].md           # Core feature documentation
+├── api-integration/            # API specs and backend coordination
+├── implementation-guides/      # Step-by-step development guides
+├── troubleshooting/           # Debugging and issue resolution
+└── archive/                   # Completed work and resolved issues
+```
+
+#### Documentation Placement Rules
+- **Core Features**: Place in `/docs` root (e.g., `THEME_SYSTEM_DOCUMENTATION.md`)
+- **API Integration**: Place in `/docs/api-integration/`
+- **Implementation Guides**: Place in `/docs/implementation-guides/`
+- **Debugging/Issues**: Place in `/docs/troubleshooting/`
+- **Completed Work**: Move to `/docs/archive/` when resolved
+- **Project Plans**: Place in `/docs` root for visibility
+
 ## 🎯 Development Guidelines
 
 ### Code Quality
@@ -91,6 +116,13 @@ src/renderer/
 - Use Tailwind CSS classes, avoid inline styles
 - Implement proper error boundaries
 - Include accessibility (ARIA labels, semantic HTML)
+
+### Documentation Standards
+- Create comprehensive documentation for all new features
+- Update `/docs/README.md` index when adding new documentation
+- Use clear, descriptive filenames with consistent naming conventions
+- Include code examples and implementation details
+- Document API integrations and backend coordination requirements
 
 ### State Management
 - Use React Context with useReducer for global state
@@ -176,6 +208,32 @@ class MyComponent extends React.Component {}
 // DON'T: JavaScript files in application code
 // ❌ src/renderer/components/MyComponent.js
 // ✅ src/renderer/components/MyComponent.tsx
+
+// DON'T: Documentation in root directory
+// ❌ NEW_FEATURE_GUIDE.md (in root)
+// ✅ docs/implementation-guides/NEW_FEATURE_GUIDE.md
+
+// DON'T: Unorganized documentation
+// ❌ docs/random_notes.md
+// ✅ docs/troubleshooting/specific_issue_resolution.md
+```
+
+### ✅ Correct Documentation Organization
+```bash
+# New feature documentation
+docs/FEATURE_NAME_REQUIREMENTS.md
+
+# Implementation guide
+docs/implementation-guides/FEATURE_NAME_IMPLEMENTATION_GUIDE.md
+
+# API integration
+docs/api-integration/FEATURE_NAME_API_SPECIFICATION.md
+
+# Troubleshooting
+docs/troubleshooting/FEATURE_NAME_DEBUGGING.md
+
+# When feature is complete, move implementation details to archive
+docs/archive/FEATURE_NAME_IMPLEMENTATION_COMPLETED.md
 ```
 
 Remember: This is a professional business application requiring production-quality code with reliability, security, and user-friendliness as top priorities.
