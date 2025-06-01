@@ -135,16 +135,16 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             disabled={isLoading}
             className="px-4 py-2 text-sm font-medium border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors"
             style={{
-              color: 'var(--text-primary)',
-              backgroundColor: 'var(--surface-color)',
+              color: 'var(--button-secondary-text)',
+              backgroundColor: 'var(--button-secondary-bg)',
               borderColor: 'var(--border-color)',
               '--tw-ring-color': 'var(--color-primary-600)'
             } as React.CSSProperties}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+              e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+              e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
             }}
           >
             {cancelText}

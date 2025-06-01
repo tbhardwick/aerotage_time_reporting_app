@@ -545,14 +545,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 className="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                 style={{
                   border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--surface-color)'
+                  color: 'var(--button-secondary-text)',
+                  backgroundColor: 'var(--button-secondary-bg)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                  e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                  e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                 }}
               >
                 Back to Sign In
@@ -739,14 +739,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 className="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                 style={{
                   border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--surface-color)'
+                  color: 'var(--button-secondary-text)',
+                  backgroundColor: 'var(--button-secondary-bg)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                  e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                  e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                 }}
               >
                 Request New Code
@@ -765,14 +765,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 className="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                 style={{
                   border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--surface-color)'
+                  color: 'var(--button-secondary-text)',
+                  backgroundColor: 'var(--button-secondary-bg)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                  e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                  e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                 }}
               >
                 Back to Sign In

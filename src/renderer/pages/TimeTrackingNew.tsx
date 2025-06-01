@@ -59,29 +59,80 @@ const TimeTrackingNew: React.FC = () => {
   const handleStopTimer = async () => {
     if (state.timer.isRunning && state.timer.currentProjectId) {
       try {
-        // Create time entry via API
+        // Calculate start and end times
+        const endTime = new Date();
+        const startTime = new Date(state.timer.startTime!);
+        const durationMinutes = Math.floor(state.timer.elapsedTime / 60); // Convert seconds to minutes
+        
+        // Ensure minimum duration of 1 minute
+        const finalDuration = Math.max(durationMinutes, 1);
+        
+        // Create time entry via API with comprehensive data
         const timeEntryData = {
           projectId: state.timer.currentProjectId,
-          date: new Date().toISOString().split('T')[0],
-          duration: Math.floor(state.timer.elapsedTime / 60), // Convert to minutes
-          description: state.timer.currentDescription,
+          date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+          duration: finalDuration,
+          startTime: startTime.toISOString().split('T')[1].substring(0, 5), // HH:MM format
+          endTime: endTime.toISOString().split('T')[1].substring(0, 5), // HH:MM format
+          description: state.timer.currentDescription || 'Timer session',
           isBillable: true,
           status: 'draft' as const,
         };
 
-        await createTimeEntry(timeEntryData);
+        console.log('🚀 Creating time entry with data:', timeEntryData);
+        console.log('📊 Timer state:', {
+          isRunning: state.timer.isRunning,
+          startTime: state.timer.startTime,
+          elapsedTime: state.timer.elapsedTime,
+          currentProjectId: state.timer.currentProjectId,
+          currentDescription: state.timer.currentDescription
+        });
+        
+        // Create time entry via API
+        const result = await createTimeEntry(timeEntryData);
+        console.log('✅ Time entry created successfully:', result);
         
         // Stop the timer (this will reset timer state)
         dispatch({ type: 'STOP_TIMER' });
         setDescription('');
-      } catch (error) {
-        console.error('Failed to create time entry:', error);
-        alert('Failed to save time entry. Please try again.');
+        
+        // Show success message
+        console.log('🎉 Timer stopped and time entry saved successfully');
+        
+      } catch (error: any) {
+        console.error('❌ Failed to create time entry:', error);
+        console.error('📋 Error details:', {
+          message: error.message,
+          status: error.status,
+          response: error.response,
+          stack: error.stack
+        });
+        
+        // Provide more specific error messages
+        let errorMessage = 'Failed to save time entry. Please try again.';
+        
+        if (error.message?.includes('400')) {
+          errorMessage = 'Invalid time entry data. Please check your project selection and try again.';
+        } else if (error.message?.includes('401') || error.message?.includes('403')) {
+          errorMessage = 'Authentication error. Please log in again.';
+        } else if (error.message?.includes('404')) {
+          errorMessage = 'Project not found. Please select a different project.';
+        } else if (error.message?.includes('500')) {
+          errorMessage = 'Server error. Please try again in a moment.';
+        } else if (error.message?.includes('Network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        }
+        
+        alert(errorMessage);
+        
+        // Don't stop the timer if API call failed - let user try again
+        console.log('⚠️ Timer kept running due to API error');
       }
     } else {
-      // Just stop the timer if no project selected
+      // Just stop the timer if no project selected or timer not running
       dispatch({ type: 'STOP_TIMER' });
       setDescription('');
+      console.log('🛑 Timer stopped without creating time entry');
     }
   };
 
@@ -165,14 +216,19 @@ const TimeTrackingNew: React.FC = () => {
             {state.timer.isRunning ? (
               <button 
                 onClick={handleStopTimer}
+                className="px-6 py-3 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
-                  backgroundColor: 'var(--color-error-600)',
-                  color: 'var(--color-text-on-primary)',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '0.5rem',
-                  border: 'none',
-                  cursor: 'pointer',
+                  backgroundColor: '#dc2626',
+                  color: '#ffffff',
+                  border: '2px solid #b91c1c',
+                  '--tw-ring-color': '#dc2626',
                   marginRight: '0.5rem'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#b91c1c';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#dc2626';
                 }}
               >
                 Stop Timer
@@ -181,14 +237,27 @@ const TimeTrackingNew: React.FC = () => {
               <button 
                 onClick={handleStartTimer}
                 disabled={!selectedProjectId}
+                className="px-6 py-3 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  backgroundColor: selectedProjectId ? 'var(--color-success-600)' : 'var(--color-neutral-400)',
-                  color: 'var(--color-text-on-primary)',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '0.5rem',
-                  border: 'none',
-                  cursor: selectedProjectId ? 'pointer' : 'not-allowed',
+                  backgroundColor: selectedProjectId ? '#22c55e' : '#e2e8f0',
+                  color: selectedProjectId ? '#ffffff' : '#1e293b',
+                  border: selectedProjectId ? '2px solid #16a34a' : '2px solid var(--border-color)',
+                  '--tw-ring-color': 'var(--color-success-600)',
                   marginRight: '0.5rem'
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  if (selectedProjectId) {
+                    e.currentTarget.style.backgroundColor = '#16a34a';
+                  } else {
+                    e.currentTarget.style.backgroundColor = '#cbd5e1';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedProjectId) {
+                    e.currentTarget.style.backgroundColor = '#22c55e';
+                  } else {
+                    e.currentTarget.style.backgroundColor = '#e2e8f0';
+                  }
                 }}
               >
                 Start Timer
@@ -390,29 +459,36 @@ const TimeTrackingNew: React.FC = () => {
                           <>
                             <button 
                               onClick={() => handleSubmitEntry(entry.id)}
+                              className="px-3 py-1 text-sm rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 mr-2"
                               style={{
-                                backgroundColor: 'var(--color-primary-600)',
-                                color: 'var(--color-text-on-primary)',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '0.25rem',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: '0.875rem',
-                                marginRight: '0.5rem'
+                                backgroundColor: '#2563eb',
+                                color: '#ffffff',
+                                border: '1px solid #1d4ed8',
+                                '--tw-ring-color': '#2563eb'
+                              } as React.CSSProperties}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#1d4ed8';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#2563eb';
                               }}
                             >
                               Submit
                             </button>
                             <button 
                               onClick={() => handleDeleteEntry(entry.id)}
+                              className="px-3 py-1 text-sm rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
                               style={{
-                                backgroundColor: 'var(--color-error-600)',
-                                color: 'var(--color-text-on-primary)',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '0.25rem',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: '0.875rem'
+                                backgroundColor: '#dc2626',
+                                color: '#ffffff',
+                                border: '1px solid #b91c1c',
+                                '--tw-ring-color': '#dc2626'
+                              } as React.CSSProperties}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#b91c1c';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#dc2626';
                               }}
                             >
                               Delete

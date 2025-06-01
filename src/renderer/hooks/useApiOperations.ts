@@ -19,12 +19,47 @@ export const useApiOperations = () => {
     try {
       setLoading('createTimeEntry', true);
       setError('createTimeEntry', null);
-      const newEntry = await apiClient.createTimeEntry(entry);
-      // ✅ AFTER: Clean code - returns TimeEntry object directly
+      
+      console.log('🚀 API Call: Creating time entry with data:', entry);
+      const response = await apiClient.createTimeEntry(entry);
+      console.log('📥 API Response received:', response);
+      
+      // Handle different API response formats
+      let newEntry: TimeEntry;
+      if (response && typeof response === 'object') {
+        // Check if response is wrapped (has success/data structure)
+        if ((response as any).success && (response as any).data) {
+          newEntry = (response as any).data;
+          console.log('✅ Extracted time entry from wrapped response:', newEntry);
+        } else if ((response as any).id) {
+          // Direct time entry object
+          newEntry = response as TimeEntry;
+          console.log('✅ Using direct time entry response:', newEntry);
+        } else {
+          console.error('❌ Unexpected API response format:', response);
+          throw new Error('Invalid time entry data received from API');
+        }
+      } else {
+        console.error('❌ Invalid API response:', response);
+        throw new Error('No time entry data received from API');
+      }
+      
+      // Validate the time entry has required fields
+      if (!newEntry.id || !newEntry.projectId) {
+        console.error('❌ Invalid time entry data - missing required fields:', newEntry);
+        throw new Error('Invalid time entry data - missing required fields');
+      }
+      
       dispatch({ type: 'ADD_TIME_ENTRY', payload: newEntry });
+      console.log('✅ Time entry added to context:', newEntry.id);
       return newEntry;
     } catch (error: any) {
-      console.error('Failed to create time entry:', error);
+      console.error('❌ Failed to create time entry:', error);
+      console.error('📋 Error details:', {
+        message: error.message,
+        status: error.status,
+        response: error.response
+      });
       setError('createTimeEntry', error.message || 'Failed to create time entry');
       throw error;
     } finally {

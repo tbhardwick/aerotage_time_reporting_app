@@ -673,14 +673,14 @@ export const UserForm: React.FC<UserFormProps> = ({ userId, onClose, onSave }) =
               className="px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
               style={{
                 border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                backgroundColor: 'var(--surface-color)'
+                color: 'var(--button-secondary-text)',
+                backgroundColor: 'var(--button-secondary-bg)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-secondary-50)';
+                e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
               }}
             >
               Cancel

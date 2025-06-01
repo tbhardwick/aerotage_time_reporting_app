@@ -766,18 +766,18 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                     disabled={actionLoading}
                     className="px-4 py-2 text-sm font-medium border rounded-md disabled:opacity-50 transition-colors"
                     style={{
-                      color: 'var(--text-primary)',
-                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--button-secondary-text)',
+                      backgroundColor: 'var(--button-secondary-bg)',
                       borderColor: 'var(--border-color)'
                     }}
                     onMouseEnter={(e) => {
                       if (!actionLoading) {
-                        e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                        e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!actionLoading) {
-                        e.currentTarget.style.backgroundColor = 'var(--background-color)';
+                        e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                       }
                     }}
                   >
@@ -850,18 +850,18 @@ const AdminEmailChangeManagement: React.FC<AdminEmailChangeManagementProps> = ({
                     disabled={actionLoading}
                     className="px-4 py-2 text-sm font-medium border rounded-md disabled:opacity-50 transition-colors"
                     style={{
-                      color: 'var(--text-primary)',
-                      backgroundColor: 'var(--background-color)',
+                      color: 'var(--button-secondary-text)',
+                      backgroundColor: 'var(--button-secondary-bg)',
                       borderColor: 'var(--border-color)'
                     }}
                     onMouseEnter={(e) => {
                       if (!actionLoading) {
-                        e.currentTarget.style.backgroundColor = 'var(--surface-secondary)';
+                        e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!actionLoading) {
-                        e.currentTarget.style.backgroundColor = 'var(--background-color)';
+                        e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                       }
                     }}
                   >

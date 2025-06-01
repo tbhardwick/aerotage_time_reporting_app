@@ -531,15 +531,15 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, onClose, onSuccess
               className="px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
               style={{
                 border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--background-color)',
-                color: 'var(--text-primary)',
+                backgroundColor: 'var(--button-secondary-bg)',
+                color: 'var(--button-secondary-text)',
                 '--tw-ring-color': 'var(--color-primary-500)'
               } as React.CSSProperties}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--background-color)';
+                e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
               }}
             >
               Cancel

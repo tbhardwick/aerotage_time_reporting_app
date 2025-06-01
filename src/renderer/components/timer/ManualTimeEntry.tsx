@@ -281,16 +281,18 @@ const ManualTimeEntry: React.FC<ManualTimeEntryProps> = ({ onSubmit, onCancel })
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 rounded-lg transition-colors"
+              className="px-4 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
               style={{
-                color: 'var(--text-primary)',
-                backgroundColor: 'var(--color-secondary-100)'
-              }}
+                color: 'var(--button-secondary-text)',
+                backgroundColor: 'var(--button-secondary-bg)',
+                border: '1px solid var(--border-color)',
+                '--tw-ring-color': 'var(--color-primary-600)'
+              } as React.CSSProperties}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-secondary-200)';
+                e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-secondary-100)';
+                e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
               }}
             >
               Cancel

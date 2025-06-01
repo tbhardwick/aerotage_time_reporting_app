@@ -184,16 +184,16 @@ const EmailVerificationHandler: React.FC = () => {
                   onClick={() => navigate('/dashboard')}
                   className="w-full flex justify-center py-2 px-4 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                   style={{
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--button-secondary-text)',
+                    backgroundColor: 'var(--button-secondary-bg)',
                     borderColor: 'var(--border-color)',
                     '--tw-ring-color': 'var(--color-primary-500)'
                   } as React.CSSProperties}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                    e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                    e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                   }}
                 >
                   Go to Dashboard
@@ -238,16 +238,16 @@ const EmailVerificationHandler: React.FC = () => {
                   onClick={() => window.location.reload()}
                   className="w-full flex justify-center py-2 px-4 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                   style={{
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--surface-color)',
+                    color: 'var(--button-secondary-text)',
+                    backgroundColor: 'var(--button-secondary-bg)',
                     borderColor: 'var(--border-color)',
                     '--tw-ring-color': 'var(--color-primary-500)'
                   } as React.CSSProperties}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--border-color)';
+                    e.currentTarget.style.backgroundColor = 'var(--button-secondary-hover)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+                    e.currentTarget.style.backgroundColor = 'var(--button-secondary-bg)';
                   }}
                 >
                   Try Again
